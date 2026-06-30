@@ -2,8 +2,8 @@ import Link from "next/link";
 import DraftBoard from "./draft-board";
 
 export const metadata = {
-  title: "Strand Draft Lab | The Strand Invitational",
-  description: "Mock team draft with live TheGrint handicaps for Gamble Sands 2026",
+  title: "Strand Draft Lab | Captain Mock Draft",
+  description: "Interactive player map and multi-scenario captain mock draft vs Justin Uribe for Gamble Sands 2026",
 };
 
 export default function DraftPage() {
