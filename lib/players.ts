@@ -11,7 +11,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     email: "magerag1@gmail.com",
     blurb: "First-timer with low-handicap firepower and a calm, efficient game.",
     grintId: null,
-    grintSearchTerms: ["magerag1@gmail.com", "magerag1", "Andrew Mager", "BLADE"],
+    grintSearchTerms: ["magerag1@gmail.com", "magerag1", "Andrew Mager"],
     location: "California",
     tags: ["rookie", "low-handicap", "calm"],
     estimatedIndex: 9,
