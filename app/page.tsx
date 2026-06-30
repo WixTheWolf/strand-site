@@ -490,8 +490,8 @@ export default function StrandInvitationalSite() {
           <div className="text-xs uppercase tracking-[0.3em] text-white/60">Draft Lab</div>
           <h2 className="mt-2 font-serif text-4xl">Build your winning team before Thursday night</h2>
           <p className="mt-4 max-w-3xl text-white/80">
-            Live TheGrint handicaps, heat indicators, and snake-draft recommendations for all 20 players.
-            Eric &quot;Blaze&quot; Therrien is out — Brian Kerns is in.
+            Interactive player map, captain mock draft vs Justin Uribe, and saved what-if scenarios with live
+            TheGrint handicaps for all 20 players.
           </p>
           <a
             href="/draft"
