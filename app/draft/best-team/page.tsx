@@ -1,12 +1,12 @@
 import Link from "next/link";
-import DraftBoard from "./draft-board";
+import BestTeamView from "../best-team-view";
 
 export const metadata = {
-  title: "Strand Draft Lab | Captain Mock Draft",
-  description: "Interactive player map and multi-scenario captain mock draft vs Justin Uribe for Gamble Sands 2026",
+  title: "Best Team | Strand Draft Lab",
+  description: "Optimal WIX snake-draft roster and full player data sheet for Gamble Sands 2026",
 };
 
-export default function DraftPage() {
+export default function BestTeamPage() {
   return (
     <div className="min-h-screen bg-[#f7f3ea] text-[#14352a]">
       <header className="sticky top-0 z-40 border-b border-[#14352a]/10 bg-[#f7f3ea]/90 backdrop-blur">
@@ -15,15 +15,15 @@ export default function DraftPage() {
             <img src="/logo.png" alt="The Strand Invitational logo" className="h-12 w-auto object-contain" />
             <div>
               <div className="text-xs uppercase tracking-[0.35em] text-[#14352a]/70">Gamble Sands 2026</div>
-              <div className="font-serif text-2xl">Strand Draft Lab</div>
+              <div className="font-serif text-2xl">Best Team</div>
             </div>
           </div>
           <div className="flex gap-2">
             <Link
-              href="/draft/best-team"
+              href="/draft"
               className="rounded-2xl border border-[#14352a]/15 bg-white px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em]"
             >
-              Best team
+              Mock draft
             </Link>
             <Link
               href="/"
@@ -34,7 +34,7 @@ export default function DraftPage() {
           </div>
         </div>
       </header>
-      <DraftBoard />
+      <BestTeamView />
     </div>
   );
 }

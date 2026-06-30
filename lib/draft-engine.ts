@@ -162,6 +162,44 @@ export function getOptimalDraftOrder(stats: PlayerDraftStats[]): DraftRecommenda
   }));
 }
 
+export function getTeamSnakePickSlots(teamName: "A" | "B"): number[] {
+  const slots: number[] = [];
+  for (let round = 0; round < TEAM_SIZE; round += 1) {
+    const aFirst = round % 2 === 0;
+    const overallPick = aFirst
+      ? teamName === "A"
+        ? round * 2 + 1
+        : round * 2 + 2
+      : teamName === "A"
+        ? round * 2 + 2
+        : round * 2 + 1;
+    slots.push(overallPick);
+  }
+  return slots;
+}
+
+export interface OptimalTeamPick {
+  snakePick: number;
+  player: PlayerDraftStats;
+  rationale: string;
+}
+
+export function getOptimalTeamWithPicks(
+  stats: PlayerDraftStats[],
+  recommendations: DraftRecommendation[],
+  teamName: "A" | "B" = "A",
+): OptimalTeamPick[] {
+  const team = getOptimalTeam(stats, teamName);
+  const rationaleMap = new Map(recommendations.map((rec) => [rec.playerId, rec.rationale]));
+  const pickSlots = getTeamSnakePickSlots(teamName);
+
+  return team.map((player, index) => ({
+    snakePick: pickSlots[index] ?? index + 1,
+    player,
+    rationale: rationaleMap.get(player.id) ?? buildRationale(player),
+  }));
+}
+
 export function getOptimalTeam(stats: PlayerDraftStats[], teamName: "A" | "B" = "A"): PlayerDraftStats[] {
   const ranked = rankPlayers(stats);
   const picks: PlayerDraftStats[] = [];
