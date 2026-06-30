@@ -4,7 +4,7 @@ export interface MapPoint {
   city: string;
   lat: number;
   lng: number;
-  kind: "player" | "tournament";
+  kind: "player" | "tournament" | "origin";
 }
 
 export const GAMBLE_SANDS: MapPoint = {
@@ -16,17 +16,17 @@ export const GAMBLE_SANDS: MapPoint = {
   kind: "tournament",
 };
 
-/** Approximate home-base coordinates for map plotting */
+/** Home-base coordinates — uses actual residence, not stale TheGrint location */
 export const PLAYER_LOCATIONS: Record<string, Omit<MapPoint, "id" | "kind">> = {
-  "andrew-mager": { label: "Andrew Mager", city: "TBD", lat: 34.05, lng: -118.25 },
+  "andrew-mager": { label: "Andrew Mager", city: "California", lat: 34.05, lng: -118.25 },
   "brett-comfort": { label: "Brett Comfort", city: "La Mirada, CA", lat: 33.917, lng: -118.012 },
-  "brian-kerns": { label: "Brian Kerns", city: "TBD", lat: 34.05, lng: -118.28 },
+  "brian-kerns": { label: "Brian Kerns", city: "Colorado", lat: 39.739, lng: -104.99 },
   "fred-geisinger": { label: "Fred Geisinger", city: "Encinitas, CA", lat: 33.037, lng: -117.292 },
   "jack-groot": { label: "Jack Groot", city: "Palatine, IL", lat: 42.11, lng: -88.034 },
   "jason-olson": { label: "Jason Olson", city: "Van Nuys, CA", lat: 34.189, lng: -118.448 },
   "jordan-brodbeck": { label: "Jordan Brodbeck", city: "Manhattan Beach, CA", lat: 33.885, lng: -118.411 },
   "justin-uribe": { label: "Justin Uribe", city: "Los Angeles, CA", lat: 34.052, lng: -118.244 },
-  "kevin-gordon": { label: "Kevin Gordon", city: "Bay Area, CA", lat: 37.774, lng: -122.419 },
+  "kevin-gordon": { label: "Kevin Gordon", city: "San Francisco Bay Area, CA", lat: 37.804, lng: -122.271 },
   "matt-onorato": { label: "Matt Onorato", city: "Charlotte, NC", lat: 35.227, lng: -80.843 },
   "matt-schroeder": { label: "Matt Schroeder", city: "Redondo Beach, CA", lat: 33.849, lng: -118.388 },
   "matt-wixted": { label: "Matt Wixted", city: "Anaheim, CA", lat: 33.836, lng: -117.889 },
@@ -38,6 +38,11 @@ export const PLAYER_LOCATIONS: Record<string, Omit<MapPoint, "id" | "kind">> = {
   "sam-blonski": { label: "Sam Blonski", city: "Plymouth, MI", lat: 42.371, lng: -83.47 },
   "shaun-eipper": { label: "Shaun Eipper", city: "Redondo Beach, CA", lat: 33.848, lng: -118.39 },
   "tim-hummel": { label: "Tim Hummel", city: "Hawthorne, CA", lat: 33.916, lng: -118.352 },
+};
+
+/** Hometown / roots markers when different from current home */
+export const PLAYER_ORIGINS: Record<string, Omit<MapPoint, "id" | "kind">> = {
+  "brian-kerns": { label: "Brian Kerns", city: "Illinois (roots)", lat: 41.878, lng: -87.63 },
 };
 
 export function projectToSvg(

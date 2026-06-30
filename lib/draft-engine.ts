@@ -110,6 +110,7 @@ function buildRationale(player: PlayerDraftStats): string {
 export function buildPlayerStats(
   player: StrandPlayer,
   handicap: GrintHandicap | null,
+  grintMeta?: { location?: string; username?: string; dataSource?: PlayerDraftStats["dataSource"] },
 ): PlayerDraftStats {
   const indexNum = handicap
     ? parseHandicapNumber(handicap.index) ?? parseHandicapNumber(handicap.lowest)
@@ -130,7 +131,9 @@ export function buildPlayerStats(
     draftScore,
     draftRank: 0,
     formDelta,
-    dataSource: handicap ? "live" : player.estimatedIndex ? "estimated" : "missing",
+    dataSource: grintMeta?.dataSource ?? (handicap ? "live" : player.estimatedIndex ? "estimated" : "missing"),
+    grintLocation: grintMeta?.location,
+    grintUsernameResolved: grintMeta?.username,
   };
 }
 

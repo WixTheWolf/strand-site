@@ -308,7 +308,11 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                       <div className="font-medium">
                         #{player.draftRank} {player.nickname} — {player.name}
                       </div>
-                      <div className="text-xs text-[#14352a]/60">{player.heatLabel}</div>
+                      <div className="text-xs text-[#14352a]/60">
+                        {player.location ?? "—"}
+                        {player.origin ? ` • from ${player.origin}` : ""}
+                        {" • "}{player.heatLabel}
+                      </div>
                     </div>
                     <div className="font-serif text-xl">{formatIndex(player)}</div>
                   </button>

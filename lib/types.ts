@@ -9,7 +9,12 @@ export interface StrandPlayer {
   email?: string;
   grintId: string | null;
   grintUsername?: string;
+  /** Where the player actually lives (may differ from stale TheGrint location) */
   location?: string;
+  /** Hometown / roots when different from current residence */
+  origin?: string;
+  /** Extra terms for TheGrint/GHIN lookup: email, username, name */
+  grintSearchTerms?: string[];
   tags: string[];
   estimatedIndex?: number;
   out?: boolean;
@@ -36,6 +41,8 @@ export interface PlayerDraftStats extends StrandPlayer {
   draftRank: number;
   formDelta: number | null;
   dataSource: "live" | "estimated" | "missing";
+  grintLocation?: string;
+  grintUsernameResolved?: string;
 }
 
 export interface DraftRecommendation {

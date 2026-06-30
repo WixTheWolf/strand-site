@@ -5,6 +5,7 @@ import {
   GAMBLE_SANDS,
   MAP_BOUNDS,
   PLAYER_LOCATIONS,
+  PLAYER_ORIGINS,
   projectToSvg,
 } from "@/lib/player-locations";
 import type { PlayerDraftStats } from "@/lib/types";
@@ -127,6 +128,18 @@ export default function PlayerMap({
             </text>
           </g>
 
+          {Object.entries(PLAYER_ORIGINS).map(([id, origin]) => {
+            const { x, y } = projectToSvg(origin.lat, origin.lng, bounds, WIDTH, HEIGHT);
+            return (
+              <g key={`origin-${id}`} transform={`translate(${x}, ${y})`}>
+                <circle r={6} fill="none" stroke="#14352a" strokeWidth="2" strokeDasharray="3 2" opacity="0.5" />
+                <text y="20" textAnchor="middle" className="fill-[#14352a] text-[9px] opacity-60">
+                  {origin.city}
+                </text>
+              </g>
+            );
+          })}
+
           {points.map(({ player, loc, x, y, side }) => {
             const isActive = activeId === player.id;
             const isDrafted = Boolean(side);
@@ -159,10 +172,13 @@ export default function PlayerMap({
                       {player.nickname} • {formatIndex(player)}
                     </text>
                     <text x="10" y="34" className="fill-white/75 text-[10px]">
-                      {loc.city}
+                      {player.location ?? loc.city}
                     </text>
                     <text x="10" y="48" className="fill-white/60 text-[9px]">
                       #{player.draftRank} • {player.heat}
+                      {player.grintLocation && player.grintLocation !== player.location
+                        ? ` • GHIN: ${player.grintLocation}`
+                        : ""}
                     </text>
                   </g>
                 )}
