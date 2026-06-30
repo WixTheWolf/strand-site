@@ -7,16 +7,17 @@ export default function StrandInvitationalSite() {
   const heroSrc = "/hero.jpg";
 
   const nav = [
-    { label: "Home", id: "home" },
-    { label: "Leaderboard", id: "leaderboard" },
-    { label: "Schedule", id: "schedule" },
-    { label: "Players", id: "players" },
-    { label: "Travel", id: "travel" },
-    { label: "Stay & Pay", id: "stay-pay" },
-    { label: "Competitions", id: "competitions" },
-    { label: "Teams", id: "teams" },
-    { label: "Gallery", id: "gallery" },
-    { label: "History", id: "history" },
+    { label: "Home", href: "#home" },
+    { label: "Leaderboard", href: "#leaderboard" },
+    { label: "Schedule", href: "#schedule" },
+    { label: "Players", href: "#players" },
+    { label: "Travel", href: "#travel" },
+    { label: "Stay & Pay", href: "#stay-pay" },
+    { label: "Competitions", href: "#competitions" },
+    { label: "Teams", href: "#teams" },
+    { label: "Draft Lab", href: "/draft" },
+    { label: "Gallery", href: "#gallery" },
+    { label: "History", href: "#history" },
   ];
 
   const leaderboardLinks = [
@@ -46,7 +47,7 @@ export default function StrandInvitationalSite() {
   const playerProfiles = [
     { name: "Andrew Mager", nickname: "BLADE", initials: "AM", blurb: "First-timer with low-handicap firepower and a calm, efficient game." },
     { name: "Brett Comfort", nickname: "BRETT", initials: "BC", blurb: "New dad, Clemson loyalist, and permanently down-for-whatever." },
-    { name: "Eric Therrien", nickname: "ET", initials: "ET", blurb: "Smooth presence, strong hang, and a dangerous ability to look casual while still becoming a problem." },
+    { name: "Brian Kerns", nickname: "KERNS", initials: "BK", blurb: "New to the 2026 field — stepping in for Eric Therrien with everything to prove at Gamble Sands." },
     { name: "Fred Geisinger", nickname: "FRED", initials: "FG", blurb: "Chief planner, spreadsheet artist, and annual guardian of tee times, dinners, and logistics." },
     { name: "Jack Groot", nickname: "JACK", initials: "JG", blurb: "First trip, zero rookie energy. Midwest golfer with instant chemistry." },
     { name: "Jason Olson", nickname: "JASON", initials: "JO", blurb: "Steady, reliable, easygoing, and exactly the kind of rock-solid presence every golf trip needs." },
@@ -194,7 +195,7 @@ export default function StrandInvitationalSite() {
           </div>
           <nav className="hidden flex-wrap gap-6 md:flex">
             {nav.map((item) => (
-              <a key={item.id} href={`#${item.id}`} className="text-sm uppercase tracking-[0.22em] hover:opacity-70">
+              <a key={item.label} href={item.href} className="text-sm uppercase tracking-[0.22em] hover:opacity-70">
                 {item.label}
               </a>
             ))}
@@ -481,6 +482,23 @@ export default function StrandInvitationalSite() {
               <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{rules.map((item) => <li key={item}>• {item}</li>)}</ul>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section id="draft-lab" className="mx-auto max-w-7xl px-6 py-16">
+        <div className="rounded-[2rem] border border-[#14352a]/10 bg-[#14352a] p-8 text-white shadow-sm md:p-10">
+          <div className="text-xs uppercase tracking-[0.3em] text-white/60">Draft Lab</div>
+          <h2 className="mt-2 font-serif text-4xl">Build your winning team before Thursday night</h2>
+          <p className="mt-4 max-w-3xl text-white/80">
+            Live TheGrint handicaps, heat indicators, and snake-draft recommendations for all 20 players.
+            Eric &quot;Blaze&quot; Therrien is out — Brian Kerns is in.
+          </p>
+          <a
+            href="/draft"
+            className="mt-6 inline-flex rounded-2xl bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#14352a]"
+          >
+            Open Draft Lab →
+          </a>
         </div>
       </section>
 
