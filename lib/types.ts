@@ -6,6 +6,7 @@ export interface StrandPlayer {
   nickname: string;
   initials: string;
   blurb: string;
+  email?: string;
   grintId: string | null;
   grintUsername?: string;
   location?: string;

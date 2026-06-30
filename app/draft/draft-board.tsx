@@ -252,7 +252,11 @@ export default function DraftBoard() {
                       <div className="font-medium">
                         {player.name} <span className="text-[#14352a]/50">({player.nickname})</span>
                       </div>
-                      <div className="mt-1 text-sm text-[#14352a]/65">{player.heatLabel}</div>
+                      <div className="mt-1 text-sm text-[#14352a]/65">
+                        {player.heatLabel}
+                        {player.email ? ` • ${player.email}` : ""}
+                        {player.dataSource === "estimated" ? " • estimated" : ""}
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
