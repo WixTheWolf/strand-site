@@ -169,7 +169,7 @@ export function formatPickLabel(pickNumber: number, iPickFirst: boolean): string
 
 export const SCENARIO_TEMPLATES = [
   { name: "Justin takes Fred #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "fred-geisinger") },
-  { name: "Justin takes Kevin #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "kevin-gordon") },
+  { name: "Justin takes Mager #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "andrew-mager") },
   { name: "Justin takes D'Arcy #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "ryan-darcy") },
   { name: "I pick first — best case", preset: (s: MockDraftScenario) => ({ ...s, iPickFirst: true, picks: [] }) },
   { name: "Justin picks first — worst case", preset: (s: MockDraftScenario) => ({ ...s, iPickFirst: false, picks: [] }) },

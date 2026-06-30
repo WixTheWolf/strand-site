@@ -45,7 +45,7 @@ export default function StrandInvitationalSite() {
   ];
 
   const playerProfiles = [
-    { name: "Andrew Mager", nickname: "BLADE", initials: "AM", blurb: "First-timer with low-handicap firepower and a calm, efficient game." },
+    { name: "Andrew Mager", nickname: "MAGER", initials: "AM", blurb: "First-timer with low-handicap firepower and a calm, efficient game." },
     { name: "Brett Comfort", nickname: "BRETT", initials: "BC", blurb: "New dad, Clemson loyalist, and permanently down-for-whatever." },
     { name: "Brian Kerns", nickname: "KERNS", initials: "BK", blurb: "New to the 2026 field — stepping in for Eric Therrien with everything to prove at Gamble Sands." },
     { name: "Fred Geisinger", nickname: "FRED", initials: "FG", blurb: "Chief planner, spreadsheet artist, and annual guardian of tee times, dinners, and logistics." },

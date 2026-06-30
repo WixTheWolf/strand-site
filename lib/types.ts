@@ -16,6 +16,8 @@ export interface StrandPlayer {
   /** Extra terms for TheGrint/GHIN lookup: email, username, name */
   grintSearchTerms?: string[];
   tags: string[];
+  /** Captain-verified index when GHIN/TheGrint cannot be linked reliably */
+  manualIndex?: number;
   estimatedIndex?: number;
   out?: boolean;
 }
@@ -40,7 +42,7 @@ export interface PlayerDraftStats extends StrandPlayer {
   draftScore: number;
   draftRank: number;
   formDelta: number | null;
-  dataSource: "live" | "estimated" | "missing";
+  dataSource: "live" | "manual" | "estimated" | "missing";
   grintLocation?: string;
   grintUsernameResolved?: string;
 }

@@ -33,10 +33,11 @@ export async function GET() {
   }
 
   const linked = stats.filter((player) => player.dataSource === "live").length;
+  const manual = stats.filter((player) => player.dataSource === "manual").length;
 
   return NextResponse.json({
     updatedAt: new Date().toISOString(),
-    source: `TheGrint / GHIN — ${linked}/20 players linked`,
+    source: `TheGrint / GHIN — ${linked}/20 live${manual ? `, ${manual} captain-verified` : ""}`,
     players: ranked,
     recommendations,
     optimalTeams: { A: teamA, B: teamB },

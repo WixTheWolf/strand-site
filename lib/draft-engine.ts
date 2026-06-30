@@ -56,7 +56,8 @@ function strategicBonus(player: StrandPlayer): number {
   if (player.tags.includes("clutch")) bonus += 2;
   if (player.tags.includes("improving")) bonus += 1.5;
   if (player.tags.includes("shotmaker")) bonus += 1;
-  if (player.tags.includes("rookie") && player.estimatedIndex && player.estimatedIndex < 12) {
+  const projectedIndex = player.manualIndex ?? player.estimatedIndex;
+  if (player.tags.includes("rookie") && projectedIndex && projectedIndex < 12) {
     bonus += 2;
   }
   if (player.tags.includes("replacement")) bonus -= 1;
@@ -88,7 +89,8 @@ function buildRationale(player: PlayerDraftStats): string {
   const parts: string[] = [];
 
   if (player.indexNum !== null) {
-    parts.push(`${player.indexNum.toFixed(1)} index`);
+    const label = player.dataSource === "manual" ? "verified index" : "index";
+    parts.push(`${player.indexNum.toFixed(1)} ${label}`);
   } else if (player.estimatedIndex) {
     parts.push(`~${player.estimatedIndex} estimated index`);
   }
@@ -112,9 +114,11 @@ export function buildPlayerStats(
   handicap: GrintHandicap | null,
   grintMeta?: { location?: string; username?: string; dataSource?: PlayerDraftStats["dataSource"] },
 ): PlayerDraftStats {
-  const indexNum = handicap
-    ? parseHandicapNumber(handicap.index) ?? parseHandicapNumber(handicap.lowest)
-    : player.estimatedIndex ?? null;
+  const indexNum = player.manualIndex ?? (
+    handicap
+      ? parseHandicapNumber(handicap.index) ?? parseHandicapNumber(handicap.lowest)
+      : player.estimatedIndex ?? null
+  );
   const lowestNum = handicap ? parseHandicapNumber(handicap.lowest) : null;
   const attestNum = handicap ? parseFloat(handicap.attest || "0") : 0;
   const { heat, heatLabel, formDelta } = getHeat(indexNum, lowestNum, attestNum);
@@ -131,7 +135,14 @@ export function buildPlayerStats(
     draftScore,
     draftRank: 0,
     formDelta,
-    dataSource: grintMeta?.dataSource ?? (handicap ? "live" : player.estimatedIndex ? "estimated" : "missing"),
+    dataSource: grintMeta?.dataSource
+      ?? (player.manualIndex !== undefined
+        ? "manual"
+        : handicap
+          ? "live"
+          : player.estimatedIndex
+            ? "estimated"
+            : "missing"),
     grintLocation: grintMeta?.location,
     grintUsernameResolved: grintMeta?.username,
   };

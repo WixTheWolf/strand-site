@@ -5,7 +5,7 @@ export interface ResolvedGrintPlayer {
   handicap: GrintHandicap | null;
   match: GrintSearchResult | null;
   matchedTerm: string | null;
-  dataSource: "live" | "estimated" | "missing";
+  dataSource: "live" | "manual" | "estimated" | "missing";
 }
 
 function normalizeTerm(term: string): string {
@@ -38,6 +38,15 @@ function scoreMatch(player: StrandPlayer, hit: GrintSearchResult, term: string):
 }
 
 export async function resolvePlayerGrint(player: StrandPlayer): Promise<ResolvedGrintPlayer> {
+  if (player.manualIndex !== undefined) {
+    return {
+      handicap: null,
+      match: null,
+      matchedTerm: null,
+      dataSource: "manual",
+    };
+  }
+
   const terms = [
     ...(player.grintSearchTerms ?? []),
     player.email,
