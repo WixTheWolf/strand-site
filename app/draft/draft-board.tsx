@@ -6,7 +6,6 @@ import { summarizeTeam } from "@/lib/draft-engine";
 import { STRAND_RULES } from "@/lib/tournament";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 import CaptainMockDraft from "./captain-mock-draft";
-import PlayerMap from "./player-map";
 
 interface DraftPayload {
   updatedAt: string;
@@ -21,7 +20,7 @@ interface DraftPayload {
   };
 }
 
-type View = "captain" | "map" | "sandbox";
+type View = "captain" | "sandbox";
 
 const heatStyles = {
   heating: "bg-orange-100 text-orange-800 border-orange-200",
@@ -115,7 +114,6 @@ export default function DraftBoard() {
 
   const views: { key: View; label: string }[] = [
     { key: "captain", label: "Captain mock draft" },
-    { key: "map", label: "Player map" },
     { key: "sandbox", label: "Free sandbox" },
   ];
 
@@ -126,8 +124,8 @@ export default function DraftBoard() {
           <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/55">Strand Draft Lab</div>
           <h1 className="mt-2 font-serif text-5xl">Captain prep for Gamble Sands</h1>
           <p className="mt-3 max-w-3xl text-[#14352a]/75">
-            Mock snake drafts vs Justin Uribe (J-BONE). Save multiple scenarios, plot the field on the map,
-            and walk in Thursday night ready for any opening pick.
+            Mock snake drafts vs Justin Uribe (J-BONE) — prep for the captain draft ~one month before The
+            Strand. Thursday night is The Matchmaker for pairings, not roster picks.
           </p>
         </div>
         <button
@@ -155,8 +153,8 @@ export default function DraftBoard() {
       <div className="mb-8 rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
         <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Strand 2026 rules</div>
         <p className="mt-2 max-w-3xl text-sm text-[#14352a]/70">
-          Draft model uses these formats: four-ball best net, scramble/shamble at 35% low + 15% high team
-          handicap, singles with full course handicap difference, 3-point match play.
+          Draft model uses foursomes, shamble (35% low + 15% high), singles with full course handicap
+          difference, and scramble pairings — 3-point match play throughout.
         </p>
         <ul className="mt-4 grid gap-2 text-sm text-[#14352a]/75 md:grid-cols-2">
           {STRAND_RULES.map((rule) => (
@@ -181,34 +179,13 @@ export default function DraftBoard() {
           </div>
         </div>
         <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-[#14352a] p-5 text-white shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-white/60">Snake draft</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-white/60">Captain draft</div>
           <div className="mt-2 font-serif text-2xl">WIX vs J-BONE</div>
-          <div className="mt-1 text-sm text-white/70">{DRAFT_PICKS_PER_CAPTAIN} picks each + captains locked</div>
+          <div className="mt-1 text-sm text-white/70">~1 month before trip · {DRAFT_PICKS_PER_CAPTAIN} picks each</div>
         </div>
       </div>
 
       {view === "captain" && <CaptainMockDraft players={data.players} />}
-
-      {view === "map" && (
-        <div className="space-y-6">
-          <PlayerMap players={data.players} interactive />
-          <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-            <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Rankings</div>
-            <div className="mt-4 space-y-2">
-              {data.recommendations.slice(0, 10).map((rec) => {
-                const player = playerMap.get(rec.playerId);
-                if (!player) return null;
-                return (
-                  <div key={rec.pick} className="flex justify-between rounded-xl bg-[#f7f3ea] px-4 py-2 text-sm">
-                    <span>#{rec.pick} {player.name} ({player.nickname})</span>
-                    <span>{formatIndex(player)}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
 
       {view === "sandbox" && (
         <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">

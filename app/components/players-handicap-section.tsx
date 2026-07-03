@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { getPlayerPhoto } from "@/lib/player-assets";
 import { STRAND_PLAYERS } from "@/lib/players";
 import type { PlayerDraftStats } from "@/lib/types";
 
@@ -67,20 +69,34 @@ export default function PlayersHandicapSection() {
           return (
             <div
               key={profile.id}
-              className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              className="overflow-hidden rounded-[1.75rem] border border-[#14352a]/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">{profile.nickname}</div>
-                  <div className="mt-2 font-serif text-2xl leading-tight">{profile.name}</div>
+              <div className="relative aspect-[4/5] overflow-hidden bg-[#14352a]">
+                {getPlayerPhoto(profile.id) ? (
+                  <Image
+                    src={getPlayerPhoto(profile.id)!}
+                    alt={profile.name}
+                    fill
+                    className={`object-cover ${profile.id === "brian-kerns" ? "object-center scale-110" : "object-top"}`}
+                    sizes="(max-width: 640px) 100vw, 25vw"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center font-serif text-5xl text-white/80">
+                    {profile.initials}
+                  </div>
+                )}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#14352a]/90 to-transparent px-5 pb-4 pt-16">
+                  <div className="text-xs uppercase tracking-[0.22em] text-white/70">{profile.nickname}</div>
+                  <div className="font-serif text-2xl text-white">{profile.name}</div>
                 </div>
-                <div className="text-right">
-                  <div className="font-serif text-3xl text-[#14352a]">{index}</div>
-                  <div className="text-[10px] uppercase tracking-[0.16em] text-[#14352a]/45">Index</div>
+                <div className="absolute right-4 top-4 rounded-2xl bg-white/95 px-3 py-2 text-center shadow">
+                  <div className="font-serif text-2xl text-[#14352a]">{index}</div>
+                  <div className="text-[10px] uppercase tracking-[0.14em] text-[#14352a]/50">Index</div>
                 </div>
               </div>
 
-              <p className="mt-4 text-sm leading-6 text-[#14352a]/78">{profile.blurb}</p>
+              <div className="p-6">
+              <p className="text-sm leading-6 text-[#14352a]/78">{profile.blurb}</p>
 
               <div className="mt-4 space-y-2 border-t border-[#14352a]/8 pt-4 text-xs">
                 <div className="flex items-center justify-between gap-2">
@@ -123,6 +139,7 @@ export default function PlayersHandicapSection() {
                   </span>
                 </div>
               ) : null}
+              </div>
             </div>
           );
         })}

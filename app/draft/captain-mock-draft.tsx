@@ -25,7 +25,7 @@ import {
   type MockDraftScenario,
 } from "@/lib/mock-draft";
 import type { PlayerDraftStats } from "@/lib/types";
-import PlayerMap from "./player-map";
+import { PlayerSkillGraph } from "./player-skill-graph";
 
 function formatIndex(player: PlayerDraftStats) {
   if (player.indexNum !== null) return player.indexNum.toFixed(1);
@@ -138,6 +138,10 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
   const mySummary = summarizeTeam(myRoster);
   const justinSummary = summarizeTeam(justinRoster);
+  const draftedIds = useMemo(
+    () => (active ? getDraftedIds(active.picks) : new Set<string>()),
+    [active],
+  );
 
   return (
     <div className="space-y-6">
@@ -150,7 +154,8 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             <p className="mt-2 max-w-2xl text-sm text-[#14352a]/70">
               You&apos;re <strong>{MY_CAPTAIN.nickname}</strong> — already on your team. Draft{" "}
               <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a snake vs{" "}
-              <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned).
+              <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned). Live captain draft is ~one
+              month before The Strand; Thursday night is <strong>The Matchmaker</strong> for pairings.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -268,16 +273,6 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               </>
             )}
           </div>
-
-          <PlayerMap
-            players={players}
-            picks={active.picks}
-            onSelectPlayer={(id) => {
-              if (draftComplete) return;
-              if (currentOwner === "mine") makePick(id);
-              else makePick(id, "justin");
-            }}
-          />
 
           <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             {/* Available pool */}
@@ -419,6 +414,8 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               </div>
             </div>
           )}
+
+          <PlayerSkillGraph players={players} draftedIds={draftedIds} />
         </>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { LOGISTICS_NOTES } from "@/lib/tournament";
 import { STRAND_PLAYERS } from "@/lib/players";
 import { formatFlightLegs, getTravelByPlayerId } from "@/lib/travel";
 
@@ -51,15 +52,9 @@ export default function TravelSection() {
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {[
-            { title: "Fly into Spokane", body: "Thursday morning arrivals are the move. Coordinate especially with the LA / PDX group." },
-            { title: "Drive to the resort", body: "From GEG, rent cars and head to Gamble Sands at 200 Sand Trails Road, Brewster, WA 98812." },
-            { title: "Check-in / Check-out", body: "Check-in Thursday 3:00 PM. Check-out Sunday 10:00 AM." },
-            { title: "All onsite", body: "Golf, food, drinks, lodging, and leaderboard-watching are all right there." },
-          ].map((card) => (
-            <div key={card.title} className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur">
-              <div className="font-serif text-2xl text-white">{card.title}</div>
-              <p className="mt-4 text-sm text-white/75">{card.body}</p>
+          {LOGISTICS_NOTES.map((note) => (
+            <div key={note} className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur text-sm text-white/80">
+              {note}
             </div>
           ))}
         </div>

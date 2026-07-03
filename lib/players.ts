@@ -45,7 +45,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     name: "Brian Kerns",
     nickname: "KERNS",
     initials: "BK",
-    blurb: "New to the Strand field — replacing Eric Therrien. Lives in Colorado, originally from Illinois.",
+    blurb:
+      "Replaces Blade on the 2026 card — Colorado via Illinois, mid-handicap menace, and the only roster portrait drawn by a cartoonist who witnessed his pre-shot routine.",
     grintId: "1150612",
     grintUsername: "brian@kernslawoffices.com",
     grintSearchTerms: ["brian@kernslawoffices.com", "Brian Kerns", "Brian Kerns Colorado"],

@@ -1,13 +1,17 @@
 import PlayersHandicapSection from "./components/players-handicap-section";
 import TravelSection from "./components/travel-section";
-import { CAPTAINS, ROUND_FORMATS, STRAND_RULES, TEAM_DRAFT_RULES } from "@/lib/tournament";
+import CoursesSection from "./components/courses-section";
+import HistorySection from "./components/history-section";
+import { GALLERY_IMAGES } from "@/lib/courses";
+import { CAPTAINS, CAPTAIN_DRAFT_RULES, LOGISTICS_NOTES, MATCHMAKER_RULES, ON_COURSE_RULES, ROUND_FORMATS, STRAND_FORMAT, STRAND_RULES, WEEKEND_SCHEDULE } from "@/lib/tournament";
 
 export default function StrandInvitationalSite() {
   // Deployable asset paths:
   // place your files in a public/ folder as:
   // public/logo.png
   // public/hero.jpg
-  const logoSrc = "/logo.png";
+  const strandLogoSrc = "/brand/strand-invitational.png";
+  const eventLogoSrc = "/brand/gamble-sands-2026.png";
   const heroSrc = "/hero.jpg";
 
   const nav = [
@@ -20,6 +24,7 @@ export default function StrandInvitationalSite() {
     { label: "Competitions", href: "#competitions" },
     { label: "Teams", href: "#teams" },
     { label: "Draft Lab", href: "/draft" },
+    { label: "Courses", href: "#courses" },
     { label: "Gallery", href: "#gallery" },
     { label: "History", href: "#history" },
   ];
@@ -38,17 +43,12 @@ export default function StrandInvitationalSite() {
     { rank: 4, name: "Andrew Mager", thru: "36", score: "+2", status: "One run away" },
   ];
 
-  const schedule = [
-    { day: "Thursday • August 20", title: "QuickSands Warm-Up", time: "5:00 PM", note: "Kick off the trip with QuickSands, then roll straight into dinner and the opening ceremony." },
-    { day: "Thursday • August 20", title: "Dinner + Opening Ceremony", time: "7:00 PM / 8:00 PM", note: "Dinner at 7, then opening ceremony at 8 — captain snake draft and team reveal." },
-    ...ROUND_FORMATS.map((round) => ({
-      day: round.day,
-      title: `Round ${round.round} • ${round.format}`,
-      time: round.teeTime,
-      note: `${round.course}. ${round.note}`,
-    })),
-    { day: "Sunday • August 23", title: "Departure", time: "AM", note: "Checkout, load up, and head home before the stories get even less accurate." },
-  ];
+  const schedule = WEEKEND_SCHEDULE.map((item) => ({
+    day: item.day,
+    title: item.title,
+    time: item.time,
+    note: item.note,
+  }));
 
   const tripFacts = [
     ["Dates", "August 20–23, 2026"],
@@ -72,7 +72,8 @@ export default function StrandInvitationalSite() {
   ];
 
   const lodgingNotes = [
-    "Staying at the new hotel at the Scarecrow course.",
+    "New hotel at Scarecrow — short shuttle from original onsite lodging (that block was fully booked).",
+    "200 Sand Trails Road, Brewster, WA 98812.",
     "Rooms have double king beds.",
     "Two to a room is the default feel-good choice.",
     "Four to a room is the budget choice.",
@@ -101,7 +102,9 @@ export default function StrandInvitationalSite() {
     "Coordinate room splits early if you want the cheaper option.",
   ];
 
-  const formats = ROUND_FORMATS.map((round) => `Round ${round.round} • ${round.format} (${round.course})`);
+  const formats = STRAND_FORMAT;
+
+  const onCourseRules = ON_COURSE_RULES;
 
   const competitions = [
     "Closest to the Pin on every par 3.",
@@ -124,8 +127,8 @@ export default function StrandInvitationalSite() {
   const ceremonyTimeline = [
     ["7:00 PM", "Dinner"],
     ["8:00 PM", "Opening ceremony"],
-    ["8:15 PM", `${CAPTAINS.wix.nickname} vs ${CAPTAINS.justin.nickname} snake draft`],
-    ["8:30 PM", "Round 1 pairings reveal"],
+    ["8:15 PM", `The Matchmaker — ${CAPTAINS.wix.nickname} vs ${CAPTAINS.justin.nickname}`],
+    ["8:30 PM", "Round 1 pairings posted"],
     ["8:45 PM", "Leaderboard links live"],
   ];
 
@@ -134,23 +137,21 @@ export default function StrandInvitationalSite() {
     { title: CAPTAINS.justin.teamName, subtitle: `${CAPTAINS.justin.name} • Captain`, dark: false },
   ];
 
-  const pastTrips = [
-    "Monterey 2025",
-    "Ojai 2024",
-    "St. George 2023",
-    "Rams Hill 2022",
-    "La Quinta 2021",
-    "Palm Desert 2020",
-    "Indio 2019",
-    "Palm Springs 2018",
-  ];
+  const pairingRounds = ROUND_FORMATS.map((round) => ({
+    round: round.round,
+    format: round.format,
+    label: `Round ${round.round} • ${round.format}`,
+    day: round.day,
+    slots: round.format === "Singles" ? 10 : 5,
+  }));
 
   return (
     <div className="min-h-screen bg-[#f7f3ea] text-[#14352a]">
       <header className="sticky top-0 z-40 border-b border-[#14352a]/10 bg-[#f7f3ea]/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
-            <img src={logoSrc} alt="The Strand Invitational logo" className="h-14 w-auto object-contain" />
+            <img src={strandLogoSrc} alt="The Strand Invitational logo" className="h-14 w-auto object-contain" />
+            <img src={eventLogoSrc} alt="Gamble Sands 2026 logo" className="hidden h-12 w-auto object-contain lg:block" />
             <div>
               <div className="text-xs uppercase tracking-[0.35em] text-[#14352a]/70">Est. 2018</div>
               <div className="font-serif text-2xl md:text-3xl">THE STRAND INVITATIONAL</div>
@@ -220,7 +221,8 @@ export default function StrandInvitationalSite() {
                   ))}
                 </div>
                 <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/75">
-                  Thursday night: opening ceremony, team draw, pairings reveal, then the site flips from teaser mode to battle board.
+                  Captain snake draft ~one month out locks rosters. Thursday night: opening ceremony, then
+                  The Matchmaker pairings reveal — the site flips from teaser mode to battle board.
                 </div>
               </div>
             </div>
@@ -296,6 +298,8 @@ export default function StrandInvitationalSite() {
 
       <PlayersHandicapSection />
 
+      <CoursesSection />
+
       <TravelSection />
 
       <section id="stay-pay" className="mx-auto max-w-7xl px-6 py-16">
@@ -341,7 +345,9 @@ export default function StrandInvitationalSite() {
               <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/60">Teams & Pairings</div>
               <h2 className="mt-2 font-serif text-4xl">Thursday night reveal board</h2>
             </div>
-            <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">Pairings decided Thursday night</div>
+            <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">
+              Pairings decided Thursday night at The Matchmaker
+            </div>
           </div>
           <div className="grid gap-6 xl:grid-cols-[0.75fr_1.25fr]">
             <div className="space-y-6">
@@ -357,29 +363,59 @@ export default function StrandInvitationalSite() {
                 </div>
               </div>
               <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-                <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Snake draft rules</div>
+                <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Captain draft</div>
+                <p className="mt-2 text-xs text-[#14352a]/60">~One month before The Strand</p>
                 <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">
-                  {TEAM_DRAFT_RULES.map((rule) => (
+                  {CAPTAIN_DRAFT_RULES.map((rule) => (
+                    <li key={rule}>• {rule}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-[2rem] border border-orange-200 bg-orange-50 p-6 shadow-sm">
+                <div className="text-xs uppercase tracking-[0.22em] text-orange-800/70">The Matchmaker</div>
+                <p className="mt-2 text-xs text-orange-900/65">Thursday night • Gamble Sands</p>
+                <ul className="mt-4 space-y-3 text-sm text-orange-950/80">
+                  {MATCHMAKER_RULES.map((rule) => (
                     <li key={rule}>• {rule}</li>
                   ))}
                 </ul>
               </div>
             </div>
-            <div className="grid gap-6 lg:grid-cols-2">
-              {teamPlaceholders.map((team) => (
-                <div key={team.title} className={`rounded-[2rem] border p-6 shadow-sm ${team.dark ? "border-[#14352a] bg-[#14352a] text-white" : "border-[#14352a]/15 bg-white text-[#14352a]"}`}>
-                  <div className="text-xs uppercase tracking-[0.22em] opacity-60">Thursday night reveal</div>
-                  <div className="mt-2 font-serif text-3xl">{team.title}</div>
-                  <div className="mt-2 text-sm opacity-75">{team.subtitle}</div>
-                  <div className="mt-6 space-y-3">
-                    {Array.from({ length: 10 }).map((_, index) => (
-                      <div key={index} className={`rounded-2xl border px-4 py-3 text-sm ${team.dark ? "border-white/10 bg-white/10" : "border-[#14352a]/10 bg-[#f7f3ea]"}`}>
-                        Player slot {index + 1}
-                      </div>
-                    ))}
+            <div className="space-y-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                {teamPlaceholders.map((team) => (
+                  <div key={team.title} className={`rounded-[2rem] border p-6 shadow-sm ${team.dark ? "border-[#14352a] bg-[#14352a] text-white" : "border-[#14352a]/15 bg-white text-[#14352a]"}`}>
+                    <div className="text-xs uppercase tracking-[0.22em] opacity-60">Roster locked at captain draft</div>
+                    <div className="mt-2 font-serif text-3xl">{team.title}</div>
+                    <div className="mt-2 text-sm opacity-75">{team.subtitle}</div>
+                    <div className="mt-6 space-y-3">
+                      {Array.from({ length: 10 }).map((_, index) => (
+                        <div key={index} className={`rounded-2xl border px-4 py-3 text-sm ${team.dark ? "border-white/10 bg-white/10" : "border-[#14352a]/10 bg-[#f7f3ea]"}`}>
+                          Player slot {index + 1}
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                ))}
+              </div>
+              <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
+                <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Pairings board — revealed at The Matchmaker</div>
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  {pairingRounds.map((round) => (
+                    <div key={round.round} className="rounded-2xl border border-[#14352a]/10 bg-[#f7f3ea] p-4">
+                      <div className="font-serif text-xl">{round.label}</div>
+                      <div className="mt-1 text-xs text-[#14352a]/55">{round.day}</div>
+                      <div className="mt-4 space-y-2">
+                        {Array.from({ length: round.slots }).map((_, index) => (
+                          <div key={index} className="rounded-xl border border-dashed border-[#14352a]/20 bg-white px-3 py-2 text-sm text-[#14352a]/50">
+                            {round.format === "Singles" ? `Match ${index + 1}` : `Pairing ${index + 1}`} — TBD
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
@@ -391,12 +427,16 @@ export default function StrandInvitationalSite() {
         <div className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="space-y-6">
             <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">On-course competitions</div>
-              <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{competitions.map((item) => <li key={item}>• {item}</li>)}</ul>
+              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Format</div>
+              <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">
+                {formats.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
             </div>
             <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Match play formats</div>
-              <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{formats.map((item) => <li key={item}>• {item}</li>)}</ul>
+              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">On-course competitions</div>
+              <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{competitions.map((item) => <li key={item}>• {item}</li>)}</ul>
             </div>
           </div>
           <div className="space-y-6">
@@ -415,8 +455,16 @@ export default function StrandInvitationalSite() {
                 ))}
               </div>
             </div>
+            <div className="rounded-[2rem] border border-orange-200 bg-orange-50 p-6 shadow-sm">
+              <div className="text-xs uppercase tracking-[0.22em] text-orange-800/70">On-course rules</div>
+              <ul className="mt-4 space-y-3 text-sm text-orange-950/85">
+                {onCourseRules.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
+            </div>
             <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Rules</div>
+              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Handicap & match play</div>
               <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{rules.map((item) => <li key={item}>• {item}</li>)}</ul>
             </div>
           </div>
@@ -426,10 +474,11 @@ export default function StrandInvitationalSite() {
       <section id="draft-lab" className="mx-auto max-w-7xl px-6 py-16">
         <div className="rounded-[2rem] border border-[#14352a]/10 bg-[#14352a] p-8 text-white shadow-sm md:p-10">
           <div className="text-xs uppercase tracking-[0.3em] text-white/60">Draft Lab</div>
-          <h2 className="mt-2 font-serif text-4xl">Build your winning team before Thursday night</h2>
+          <h2 className="mt-2 font-serif text-4xl">Prep your roster before the captain draft</h2>
           <p className="mt-4 max-w-3xl text-white/80">
-            Interactive player map, captain mock draft vs Justin Uribe, and saved what-if scenarios with live
-            TheGrint handicaps for all 20 players.
+            Captain snake draft happens ~one month before The Strand. Thursday night is The Matchmaker —
+            pairings only. Use Draft Lab now for mock snakes, skill graphs, and saved what-if scenarios
+            with live TheGrint handicaps for all 20 players.
           </p>
           <a
             href="/draft"
@@ -448,67 +497,30 @@ export default function StrandInvitationalSite() {
           </div>
           <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">Course imagery loaded</div>
         </div>
-        <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="overflow-hidden rounded-[2rem] border border-[#14352a]/10 bg-white shadow-sm">
-            <img src={heroSrc} alt="Gamble Sands panoramic course view" className="h-full w-full object-cover" />
-          </div>
-          <div className="grid gap-5">
-            <div className="overflow-hidden rounded-[2rem] border border-[#14352a]/10 bg-white shadow-sm">
-              <img src={heroSrc} alt="Gamble Sands rolling fairways" className="h-64 w-full object-cover object-center" />
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {GALLERY_IMAGES.map((image) => (
+            <div key={image.src} className="overflow-hidden rounded-[2rem] border border-[#14352a]/10 bg-white shadow-sm">
+              <img src={image.src} alt={image.alt} className="h-64 w-full object-cover" />
+              <div className="px-5 py-3 text-sm font-medium">{image.caption}</div>
             </div>
-            <div className="overflow-hidden rounded-[2rem] border border-[#14352a]/10 bg-white shadow-sm">
-              <img src={heroSrc} alt="Gamble Sands desert and mountain backdrop" className="h-64 w-full object-cover object-bottom" />
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      <section id="history" className="border-y border-[#14352a]/10 bg-white/60">
-        <div className="mx-auto max-w-7xl px-6 py-16">
-          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/60">History</div>
-              <h2 className="mt-2 font-serif text-4xl">The Strand archive</h2>
-              <p className="mt-4 max-w-2xl text-[#14352a]/75">The live Strand site already carries the lineage. This build mirrors that annual structure and leaves room for a proper champions history once it is compiled.</p>
-            </div>
-            <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">Since 2018</div>
-          </div>
-          <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {pastTrips.map((trip) => (
-                <div key={trip} className="rounded-[1.5rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-                  <div className="font-medium">{trip}</div>
-                  <div className="mt-2 text-sm text-[#14352a]/70">Previous Strand destination archived on the current site.</div>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Winning team history</div>
-              <div className="mt-3 font-serif text-3xl text-[#14352a]">Champions board</div>
-              <p className="mt-4 text-sm leading-6 text-[#14352a]/75">I could not verify a complete year-by-year winning team list from the current site, so this section is intentionally staged and ready for the real records.</p>
-              <div className="mt-6 space-y-3">
-                {pastTrips.map((trip) => (
-                  <div key={trip} className="flex items-center justify-between rounded-2xl border border-[#14352a]/10 bg-[#f7f3ea] px-4 py-3 text-sm">
-                    <span>{trip}</span>
-                    <span className="text-[#14352a]/45">Winning team to add</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HistorySection />
 
       <footer className="border-t border-[#14352a]/10 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <img src={logoSrc} alt="The Strand Invitational logo" className="h-10 w-auto object-contain" />
+            <img src={strandLogoSrc} alt="The Strand Invitational logo" className="h-10 w-auto object-contain" />
             <div>
               <div className="font-serif text-xl">THE STRAND INVITATIONAL</div>
               <div className="mt-1 text-sm text-[#14352a]/65">Premium tournament site prototype with TheGrint scoring-link architecture.</div>
             </div>
           </div>
-          <div className="text-sm text-[#14352a]/55">V3 adds the real logo, richer player stories, a hero image, a gallery, and a live-ready pairing reveal board.</div>
+          <div className="text-sm text-[#14352a]/55">
+            Player photos, course imagery, and archive data sourced from strandinvitational.life. Logos by Wix.
+          </div>
         </div>
       </footer>
     </div>
