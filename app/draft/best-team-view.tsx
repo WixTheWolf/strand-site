@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { getOptimalTeamWithPicks, summarizeTeam } from "@/lib/draft-engine";
+import { getOptimalTeamWithPicks, simulateOptimalSnakeDraft, summarizeTeam } from "@/lib/draft-engine";
 import { MY_CAPTAIN, OPPONENT_CAPTAIN, DRAFT_PICKS_PER_CAPTAIN } from "@/lib/mock-draft";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 
@@ -168,14 +168,19 @@ export default function BestTeamView() {
     loadData();
   }, [loadData]);
 
-  const wixTeam = useMemo(
-    () => (data ? getOptimalTeamWithPicks(data.players, data.recommendations, "A") : []),
+  const simulation = useMemo(
+    () => (data ? simulateOptimalSnakeDraft(data.players, true) : null),
     [data],
   );
 
+  const wixTeam = useMemo(
+    () => (data && simulation ? getOptimalTeamWithPicks(data.players, data.recommendations, "A", simulation) : []),
+    [data, simulation],
+  );
+
   const justinTeam = useMemo(
-    () => (data ? getOptimalTeamWithPicks(data.players, data.recommendations, "B") : []),
-    [data],
+    () => (data && simulation ? getOptimalTeamWithPicks(data.players, data.recommendations, "B", simulation) : []),
+    [data, simulation],
   );
 
   const wixSummary = useMemo(() => summarizeTeam(wixTeam.map((p) => p.player)), [wixTeam]);

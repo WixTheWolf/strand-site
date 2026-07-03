@@ -75,9 +75,9 @@ function strategicBonus(player: StrandPlayer): number {
 
 /** Stroke allocation value in PGA singles / net match play */
 function strokeLeverage(index: number): number {
-  if (index <= 7) return 1.5;
-  if (index <= 12) return 4;
-  if (index <= 18) return 7;
+  if (index <= 7) return 3;
+  if (index <= 12) return 5;
+  if (index <= 18) return 8;
   if (index <= 24) return 10;
   return 6;
 }
@@ -105,16 +105,19 @@ export function computeMatchPlayValue(player: PlayerDraftStats): number {
   const reliability = Math.min(5, player.attestNum / 12);
   const strategy = strategicBonus(player);
 
-  const fourball = grossSkill * 1.1 + strategy;
+  const fourball = grossSkill * 1.2 + strategy + (index <= 9 ? (9 - index) * 0.8 : 0);
   const scramble = grossSkill * 0.85 + strategy * 1.15 + reliability;
-  const singles = grossSkill * 0.35 + netLeverage * 1.4 + formBonus + strategy;
-  const shamble = grossSkill * 0.5 + netLeverage * 0.7 + strategy + reliability * 0.5;
+  const singles = grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy;
+  const shamble = grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5;
+
+  const eliteAnchor = index <= 8 ? 6 + (8 - index) * 0.5 : 0;
 
   return (
     fourball * FORMAT_WEIGHTS.fourball +
     scramble * FORMAT_WEIGHTS.scramble +
     singles * FORMAT_WEIGHTS.singles +
-    shamble * FORMAT_WEIGHTS.shamble
+    shamble * FORMAT_WEIGHTS.shamble +
+    eliteAnchor
   );
 }
 
@@ -238,21 +241,29 @@ export function simulateOptimalSnakeDraft(
 
     if (owner === "wix") {
       let bestPlayer = available[0];
-      let bestScore = -Infinity;
+      // Pick 1: take the top available anchor before opponent can — then lookahead for balance
+      if (pick === 1 && wixPicksFirst) {
+        bestPlayer = [...available].sort(
+          (a, b) => computeMatchPlayValue(b) - computeMatchPlayValue(a),
+        )[0];
+      } else {
+        let bestScore = -Infinity;
 
-      for (const candidate of available) {
-        const simAvailable = available.filter((player) => player.id !== candidate.id);
-        const sim = simulateRemainingDraft(
-          pick + 1,
-          wixPicksFirst,
-          simAvailable,
-          [...wixRoster, candidate],
-          justinRoster,
-        );
-        const score = marginalTeamValue(sim.wix);
-        if (score > bestScore) {
-          bestScore = score;
-          bestPlayer = candidate;
+        for (const candidate of available) {
+          const simAvailable = available.filter((player) => player.id !== candidate.id);
+          const sim = simulateRemainingDraft(
+            pick + 1,
+            wixPicksFirst,
+            simAvailable,
+            [...wixRoster, candidate],
+            justinRoster,
+          );
+          const score =
+            marginalTeamValue(sim.wix) - marginalTeamValue(sim.justin) * 0.4;
+          if (score > bestScore) {
+            bestScore = score;
+            bestPlayer = candidate;
+          }
         }
       }
 
@@ -419,9 +430,10 @@ export function getOptimalTeamWithPicks(
   stats: PlayerDraftStats[],
   recommendations: DraftRecommendation[],
   teamName: "A" | "B" = "A",
+  simulation?: SimulatedDraftResult,
 ): OptimalTeamPick[] {
-  const simulation = simulateOptimalSnakeDraft(stats, teamName === "A");
-  const picks = teamName === "A" ? simulation.wixPicks : simulation.justinPicks;
+  const sim = simulation ?? simulateOptimalSnakeDraft(stats, teamName === "A");
+  const picks = teamName === "A" ? sim.wixPicks : sim.justinPicks;
   const captain = stats.find((player) =>
     player.id === (teamName === "A" ? CAPTAIN_IDS[0] : CAPTAIN_IDS[1]),
   )!;
@@ -443,9 +455,13 @@ export function getOptimalTeamWithPicks(
   return [captainPick, ...drafted];
 }
 
-export function getOptimalTeam(stats: PlayerDraftStats[], teamName: "A" | "B" = "A"): PlayerDraftStats[] {
-  const simulation = simulateOptimalSnakeDraft(stats, teamName === "A");
-  return teamName === "A" ? simulation.wixRoster : simulation.justinRoster;
+export function getOptimalTeam(
+  stats: PlayerDraftStats[],
+  teamName: "A" | "B" = "A",
+  simulation?: SimulatedDraftResult,
+): PlayerDraftStats[] {
+  const sim = simulation ?? simulateOptimalSnakeDraft(stats, teamName === "A");
+  return teamName === "A" ? sim.wixRoster : sim.justinRoster;
 }
 
 export function summarizeTeam(team: PlayerDraftStats[]) {

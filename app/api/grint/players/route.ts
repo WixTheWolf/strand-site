@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildPlayerStats, getOptimalDraftOrder, getOptimalTeam, rankPlayers } from "@/lib/draft-engine";
+import { buildPlayerStats, getOptimalDraftOrder, getOptimalTeam, rankPlayers, simulateOptimalSnakeDraft } from "@/lib/draft-engine";
 import { fetchGrintHandicap } from "@/lib/grint";
 import { resolvePlayerGrint } from "@/lib/grint-resolve";
 import { ERIC_THERRIEN, STRAND_PLAYERS } from "@/lib/players";
@@ -22,8 +22,9 @@ export async function GET() {
 
   const ranked = rankPlayers(stats);
   const recommendations = getOptimalDraftOrder(stats);
-  const teamA = getOptimalTeam(stats, "A");
-  const teamB = getOptimalTeam(stats, "B");
+  const simulation = simulateOptimalSnakeDraft(stats, true);
+  const teamA = getOptimalTeam(stats, "A", simulation);
+  const teamB = getOptimalTeam(stats, "B", simulation);
 
   let blazeHandicap = null;
   try {
