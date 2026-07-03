@@ -1,6 +1,6 @@
 export default function StrandV6FullSite() {
   const logoSrc = "/logo.png";
-  const heroSrc = "/hero.jpg";
+  const heroSrc = "/courses/gamble-sands.jpg";
 
   const nav = [
     { label: "Home", href: "#home" },

@@ -23,10 +23,10 @@ import {
   TOTAL_DRAFT_PICKS,
   DRAFT_PICKS_PER_CAPTAIN,
   upsertScenario,
-  type DraftPick,
   type MockDraftScenario,
 } from "@/lib/mock-draft";
 import type { PlayerDraftStats } from "@/lib/types";
+import DraftAnalytics from "./draft-analytics";
 import { PlayerSkillGraph } from "./player-skill-graph";
 
 function formatIndex(player: PlayerDraftStats) {
@@ -48,9 +48,12 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
   const playerMap = useMemo(() => new Map(players.map((p) => [p.id, p])), [players]);
 
   useEffect(() => {
+    // localStorage is only readable after mount, so hydrate scenarios in an effect
     const loaded = loadScenarios();
+    if (!loaded.length) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setScenarios(loaded);
-    if (loaded[0]) setActiveId(loaded[0].id);
+    setActiveId(loaded[0].id);
   }, []);
 
   const active = useMemo(
@@ -275,6 +278,17 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               </>
             )}
           </div>
+
+          <DraftAnalytics
+            players={players}
+            myRoster={myRoster}
+            justinRoster={justinRoster}
+            available={available}
+            currentOwner={currentOwner}
+            draftComplete={draftComplete}
+            picks={active.picks}
+            iPickFirst={active.iPickFirst}
+          />
 
           <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             {/* Available pool */}

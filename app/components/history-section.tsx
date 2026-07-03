@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { STRAND_PLAYERS } from "@/lib/players";
 import { buildPlayerRecords, CHAMPIONS_BOARD, STRAND_TOURNAMENTS } from "@/lib/history";
+import Reveal from "./reveal";
 
 export default function HistorySection() {
   const records = buildPlayerRecords(STRAND_PLAYERS);
@@ -9,7 +10,8 @@ export default function HistorySection() {
   return (
     <section id="history" className="divider bg-white">
       <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
-        <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        <Reveal className="mb-12">
+        <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div className="max-w-lg">
             <p className="label">Archive</p>
             <h2 className="section-title mt-3">The Strand since 2018</h2>
@@ -34,11 +36,13 @@ export default function HistorySection() {
             className="h-20 w-auto object-contain opacity-80"
           />
         </div>
+        </Reveal>
 
         <div className="grid gap-16 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-px bg-[#e2ddd3]">
-            {STRAND_TOURNAMENTS.map((event) => (
-              <article key={event.year} className="bg-white p-6 md:p-8">
+            {STRAND_TOURNAMENTS.map((event, i) => (
+              <Reveal key={event.year} delay={Math.min(i, 3) * 60}>
+              <article className="bg-white p-6 transition-colors duration-300 hover:bg-[#fdfcf9] md:p-8">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <p className="label">{event.destination}</p>
@@ -64,6 +68,7 @@ export default function HistorySection() {
                   View archive →
                 </Link>
               </article>
+              </Reveal>
             ))}
           </div>
 

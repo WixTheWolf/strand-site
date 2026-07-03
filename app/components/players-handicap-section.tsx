@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getPlayerPhoto } from "@/lib/player-assets";
 import { STRAND_PLAYERS } from "@/lib/players";
 import type { PlayerDraftStats } from "@/lib/types";
+import Reveal from "./reveal";
 
 function formatIndex(player: PlayerDraftStats) {
   if (player.indexNum !== null) return player.indexNum.toFixed(1);
@@ -40,30 +41,33 @@ export default function PlayersHandicapSection() {
   return (
     <section id="players" className="divider bg-white">
       <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
-        <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="label">Players</p>
-            <h2 className="section-title mt-3">The field</h2>
+        <Reveal className="mb-12">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="label">Players</p>
+              <h2 className="section-title mt-3">The field</h2>
+            </div>
+            <p className="text-xs text-black/40">
+              {source || (error ? "Handicap sync unavailable" : "Loading GHIN data…")}
+            </p>
           </div>
-          <p className="text-xs text-black/40">
-            {source || (error ? "Handicap sync unavailable" : "Loading GHIN data…")}
-          </p>
-        </div>
+        </Reveal>
 
         <div className="grid gap-px bg-[#e2ddd3] sm:grid-cols-2 lg:grid-cols-4">
-          {STRAND_PLAYERS.map((profile) => {
+          {STRAND_PLAYERS.map((profile, i) => {
             const live = playerMap.get(profile.id);
             const index = live ? formatIndex(live) : "…";
 
             return (
-              <article key={profile.id} className="group bg-white">
+              <Reveal key={profile.id} delay={(i % 4) * 70} className="bg-white">
+              <article className="group h-full bg-white">
                 <div className="relative aspect-[3/4] overflow-hidden bg-[#111]">
                   {getPlayerPhoto(profile.id) ? (
                     <Image
                       src={getPlayerPhoto(profile.id)!}
                       alt={profile.name}
                       fill
-                      className={`object-cover transition duration-500 group-hover:scale-[1.03] ${profile.id === "brian-kerns" ? "object-center scale-110" : "object-top"}`}
+                      className={`photo-tone object-cover transition duration-500 group-hover:scale-[1.04] ${profile.id === "brian-kerns" ? "object-center scale-110" : "object-top"}`}
                       sizes="(max-width: 640px) 100vw, 25vw"
                     />
                   ) : (
@@ -86,6 +90,7 @@ export default function PlayersHandicapSection() {
                   <p className="text-xs leading-relaxed text-black/55 line-clamp-3">{profile.blurb}</p>
                 </div>
               </article>
+              </Reveal>
             );
           })}
         </div>
