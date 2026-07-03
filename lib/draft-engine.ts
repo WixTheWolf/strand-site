@@ -6,6 +6,7 @@ import {
   TEAM_SIZE,
   TOTAL_DRAFT_PICKS,
 } from "./players";
+import { parseHandicapNumber } from "./grint";
 import {
   scrambleTeamHandicap,
 } from "./tournament";
