@@ -3,6 +3,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { getOptimalTeamWithPicks, simulateOptimalSnakeDraft, summarizeTeam } from "@/lib/draft-engine";
 import { MY_CAPTAIN, OPPONENT_CAPTAIN, DRAFT_PICKS_PER_CAPTAIN } from "@/lib/mock-draft";
+import { STRAND_RULES } from "@/lib/tournament";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 
 interface DraftPayload {
@@ -274,6 +275,15 @@ export default function BestTeamView() {
         >
           Refresh data
         </button>
+      </div>
+
+      <div className="mb-8 rounded-[2rem] border border-[#14352a]/10 bg-[#f7f3ea] p-6">
+        <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Rules baked into this model</div>
+        <ul className="mt-3 grid gap-1.5 text-sm text-[#14352a]/75 md:grid-cols-2">
+          {STRAND_RULES.slice(0, 6).map((rule) => (
+            <li key={rule}>• {rule}</li>
+          ))}
+        </ul>
       </div>
 
       <div className="mb-8 grid gap-4 md:grid-cols-4">

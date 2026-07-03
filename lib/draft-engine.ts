@@ -6,7 +6,9 @@ import {
   TEAM_SIZE,
   TOTAL_DRAFT_PICKS,
 } from "./players";
-import { parseHandicapNumber } from "./grint";
+import {
+  scrambleTeamHandicap,
+} from "./tournament";
 import type {
   DraftRecommendation,
   GrintHandicap,
@@ -107,7 +109,9 @@ export function computeMatchPlayValue(player: PlayerDraftStats): number {
 
   const fourball = grossSkill * 1.2 + strategy + (index <= 9 ? (9 - index) * 0.8 : 0);
   const scramble = grossSkill * 0.85 + strategy * 1.15 + reliability;
+  // Singles: full course handicap difference between opponents (stroke leverage matters)
   const singles = grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy;
+  // Shamble uses same 35% low + 15% high team weighting as scramble
   const shamble = grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5;
 
   const eliteAnchor = index <= 8 ? 6 + (8 - index) * 0.5 : 0;
@@ -119,6 +123,16 @@ export function computeMatchPlayValue(player: PlayerDraftStats): number {
     shamble * FORMAT_WEIGHTS.shamble +
     eliteAnchor
   );
+}
+
+function scramblePairBonus(indexA: number, indexB: number): number {
+  const low = Math.min(indexA, indexB);
+  const high = Math.max(indexA, indexB);
+  const teamHc = scrambleTeamHandicap(low, high);
+  // Lower team HC is stronger; reward pairings with useful spread (35% low + 15% high)
+  const spread = high - low;
+  const spreadBonus = spread >= 8 && spread <= 22 ? 3 : spread >= 5 ? 1.5 : 0;
+  return Math.max(0, 28 - teamHc) * 0.4 + spreadBonus;
 }
 
 function teamSynergyBonus(roster: PlayerDraftStats[]): number {
@@ -138,6 +152,18 @@ function teamSynergyBonus(roster: PlayerDraftStats[]): number {
   if (spread >= 14) bonus += 3;
 
   bonus += Math.min(4, roster.filter((p) => p.heat === "heating").length * 2);
+
+  // Scramble / shamble: best pairs are low + high (35% / 15% team HC)
+  let scramblePairScore = 0;
+  const lows = indexes.filter((i) => i <= 14);
+  const highs = indexes.filter((i) => i > 14);
+  for (const lowIdx of lows.slice(0, 4)) {
+    for (const highIdx of highs.slice(0, 4)) {
+      scramblePairScore += scramblePairBonus(lowIdx, highIdx);
+    }
+  }
+  bonus += Math.min(12, scramblePairScore / Math.max(1, Math.min(lows.length, highs.length)));
+
   return bonus;
 }
 

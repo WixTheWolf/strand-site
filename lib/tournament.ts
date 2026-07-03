@@ -76,3 +76,14 @@ export const MATCH_PLAY_RULES = [
   "Breakfast ball off the first hole of the day only.",
   "Gimmies are acceptable. In moments of moral fog, ask: What Would Gord Do?",
 ];
+
+/** Canonical Strand 2026 rules — single source of truth for site + draft model */
+export const STRAND_RULES = [...HANDICAP_RULES, ...MATCH_PLAY_RULES];
+
+/** Scramble / shamble team handicap formula (WHS-style) */
+export const SCRAMBLE_LOW_WEIGHT = 0.35;
+export const SCRAMBLE_HIGH_WEIGHT = 0.15;
+
+export function scrambleTeamHandicap(lowCourseHc: number, highCourseHc: number): number {
+  return lowCourseHc * SCRAMBLE_LOW_WEIGHT + highCourseHc * SCRAMBLE_HIGH_WEIGHT;
+}

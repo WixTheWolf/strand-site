@@ -1,6 +1,6 @@
 import PlayersHandicapSection from "./components/players-handicap-section";
 import TravelSection from "./components/travel-section";
-import { CAPTAINS, HANDICAP_RULES, MATCH_PLAY_RULES, ROUND_FORMATS, TEAM_DRAFT_RULES } from "@/lib/tournament";
+import { CAPTAINS, STRAND_RULES, TEAM_DRAFT_RULES } from "@/lib/tournament";
 
 export default function StrandInvitationalSite() {
   // Deployable asset paths:
@@ -119,7 +119,7 @@ export default function StrandInvitationalSite() {
     ["2nd Low Net (Singles Only)", "$30"],
   ];
 
-  const rules = [...HANDICAP_RULES, ...MATCH_PLAY_RULES];
+  const rules = STRAND_RULES;
 
   const ceremonyTimeline = [
     ["7:00 PM", "Dinner"],

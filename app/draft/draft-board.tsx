@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DRAFT_PICKS_PER_CAPTAIN, isCaptain, TEAM_SIZE } from "@/lib/players";
 import { summarizeTeam } from "@/lib/draft-engine";
+import { STRAND_RULES } from "@/lib/tournament";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 import CaptainMockDraft from "./captain-mock-draft";
 import PlayerMap from "./player-map";
@@ -149,6 +150,19 @@ export default function DraftBoard() {
             {item.label}
           </button>
         ))}
+      </div>
+
+      <div className="mb-8 rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
+        <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Strand 2026 rules</div>
+        <p className="mt-2 max-w-3xl text-sm text-[#14352a]/70">
+          Draft model uses these formats: four-ball best net, scramble/shamble at 35% low + 15% high team
+          handicap, singles with full course handicap difference, 3-point match play.
+        </p>
+        <ul className="mt-4 grid gap-2 text-sm text-[#14352a]/75 md:grid-cols-2">
+          {STRAND_RULES.map((rule) => (
+            <li key={rule}>• {rule}</li>
+          ))}
+        </ul>
       </div>
 
       <div className="mb-8 grid gap-4 md:grid-cols-4">
