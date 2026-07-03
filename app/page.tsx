@@ -1,6 +1,6 @@
 import PlayersHandicapSection from "./components/players-handicap-section";
 import TravelSection from "./components/travel-section";
-import { CAPTAINS, STRAND_RULES, TEAM_DRAFT_RULES } from "@/lib/tournament";
+import { CAPTAINS, ROUND_FORMATS, STRAND_RULES, TEAM_DRAFT_RULES } from "@/lib/tournament";
 
 export default function StrandInvitationalSite() {
   // Deployable asset paths:
