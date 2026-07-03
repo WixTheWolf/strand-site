@@ -25,6 +25,7 @@ export interface StrandPlayer {
   /** Verified GHIN low index when known */
   manualLowest?: number;
   estimatedIndex?: number;
+  photoUrl?: string;
   out?: boolean;
 }
 

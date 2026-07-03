@@ -1,5 +1,8 @@
 import PlayersHandicapSection from "./components/players-handicap-section";
 import TravelSection from "./components/travel-section";
+import CoursesSection from "./components/courses-section";
+import HistorySection from "./components/history-section";
+import { GALLERY_IMAGES } from "@/lib/courses";
 import { CAPTAINS, CAPTAIN_DRAFT_RULES, MATCHMAKER_RULES, ROUND_FORMATS, STRAND_RULES } from "@/lib/tournament";
 
 export default function StrandInvitationalSite() {
@@ -7,7 +10,8 @@ export default function StrandInvitationalSite() {
   // place your files in a public/ folder as:
   // public/logo.png
   // public/hero.jpg
-  const logoSrc = "/logo.png";
+  const strandLogoSrc = "/brand/strand-invitational.png";
+  const eventLogoSrc = "/brand/gamble-sands-2026.png";
   const heroSrc = "/hero.jpg";
 
   const nav = [
@@ -20,6 +24,7 @@ export default function StrandInvitationalSite() {
     { label: "Competitions", href: "#competitions" },
     { label: "Teams", href: "#teams" },
     { label: "Draft Lab", href: "/draft" },
+    { label: "Courses", href: "#courses" },
     { label: "Gallery", href: "#gallery" },
     { label: "History", href: "#history" },
   ];
@@ -142,23 +147,13 @@ export default function StrandInvitationalSite() {
     slots: round.format === "Singles" ? 10 : 5,
   }));
 
-  const pastTrips = [
-    "Monterey 2025",
-    "Ojai 2024",
-    "St. George 2023",
-    "Rams Hill 2022",
-    "La Quinta 2021",
-    "Palm Desert 2020",
-    "Indio 2019",
-    "Palm Springs 2018",
-  ];
-
   return (
     <div className="min-h-screen bg-[#f7f3ea] text-[#14352a]">
       <header className="sticky top-0 z-40 border-b border-[#14352a]/10 bg-[#f7f3ea]/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
-            <img src={logoSrc} alt="The Strand Invitational logo" className="h-14 w-auto object-contain" />
+            <img src={strandLogoSrc} alt="The Strand Invitational logo" className="h-14 w-auto object-contain" />
+            <img src={eventLogoSrc} alt="Gamble Sands 2026 logo" className="hidden h-12 w-auto object-contain lg:block" />
             <div>
               <div className="text-xs uppercase tracking-[0.35em] text-[#14352a]/70">Est. 2018</div>
               <div className="font-serif text-2xl md:text-3xl">THE STRAND INVITATIONAL</div>
@@ -304,6 +299,8 @@ export default function StrandInvitationalSite() {
       </section>
 
       <PlayersHandicapSection />
+
+      <CoursesSection />
 
       <TravelSection />
 
@@ -490,67 +487,30 @@ export default function StrandInvitationalSite() {
           </div>
           <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">Course imagery loaded</div>
         </div>
-        <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="overflow-hidden rounded-[2rem] border border-[#14352a]/10 bg-white shadow-sm">
-            <img src={heroSrc} alt="Gamble Sands panoramic course view" className="h-full w-full object-cover" />
-          </div>
-          <div className="grid gap-5">
-            <div className="overflow-hidden rounded-[2rem] border border-[#14352a]/10 bg-white shadow-sm">
-              <img src={heroSrc} alt="Gamble Sands rolling fairways" className="h-64 w-full object-cover object-center" />
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {GALLERY_IMAGES.map((image) => (
+            <div key={image.src} className="overflow-hidden rounded-[2rem] border border-[#14352a]/10 bg-white shadow-sm">
+              <img src={image.src} alt={image.alt} className="h-64 w-full object-cover" />
+              <div className="px-5 py-3 text-sm font-medium">{image.caption}</div>
             </div>
-            <div className="overflow-hidden rounded-[2rem] border border-[#14352a]/10 bg-white shadow-sm">
-              <img src={heroSrc} alt="Gamble Sands desert and mountain backdrop" className="h-64 w-full object-cover object-bottom" />
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      <section id="history" className="border-y border-[#14352a]/10 bg-white/60">
-        <div className="mx-auto max-w-7xl px-6 py-16">
-          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/60">History</div>
-              <h2 className="mt-2 font-serif text-4xl">The Strand archive</h2>
-              <p className="mt-4 max-w-2xl text-[#14352a]/75">The live Strand site already carries the lineage. This build mirrors that annual structure and leaves room for a proper champions history once it is compiled.</p>
-            </div>
-            <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">Since 2018</div>
-          </div>
-          <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {pastTrips.map((trip) => (
-                <div key={trip} className="rounded-[1.5rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-                  <div className="font-medium">{trip}</div>
-                  <div className="mt-2 text-sm text-[#14352a]/70">Previous Strand destination archived on the current site.</div>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Winning team history</div>
-              <div className="mt-3 font-serif text-3xl text-[#14352a]">Champions board</div>
-              <p className="mt-4 text-sm leading-6 text-[#14352a]/75">I could not verify a complete year-by-year winning team list from the current site, so this section is intentionally staged and ready for the real records.</p>
-              <div className="mt-6 space-y-3">
-                {pastTrips.map((trip) => (
-                  <div key={trip} className="flex items-center justify-between rounded-2xl border border-[#14352a]/10 bg-[#f7f3ea] px-4 py-3 text-sm">
-                    <span>{trip}</span>
-                    <span className="text-[#14352a]/45">Winning team to add</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HistorySection />
 
       <footer className="border-t border-[#14352a]/10 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <img src={logoSrc} alt="The Strand Invitational logo" className="h-10 w-auto object-contain" />
+            <img src={strandLogoSrc} alt="The Strand Invitational logo" className="h-10 w-auto object-contain" />
             <div>
               <div className="font-serif text-xl">THE STRAND INVITATIONAL</div>
               <div className="mt-1 text-sm text-[#14352a]/65">Premium tournament site prototype with TheGrint scoring-link architecture.</div>
             </div>
           </div>
-          <div className="text-sm text-[#14352a]/55">V3 adds the real logo, richer player stories, a hero image, a gallery, and a live-ready pairing reveal board.</div>
+          <div className="text-sm text-[#14352a]/55">
+            Player photos, course imagery, and archive data sourced from strandinvitational.life. Logos by Wix.
+          </div>
         </div>
       </footer>
     </div>
