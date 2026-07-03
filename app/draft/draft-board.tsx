@@ -90,9 +90,9 @@ export default function DraftBoard() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="rounded-3xl border border-[#14352a]/10 bg-white px-8 py-10 text-center shadow-sm">
-          <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/50">Connecting to TheGrint</div>
-          <div className="mt-3 font-serif text-3xl">Loading handicaps & form...</div>
+        <div className="rounded-3xl border border-black/10 bg-white px-8 py-10 text-center shadow-sm">
+          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Connecting to TheGrint</div>
+          <div className="mt-3 text-lg font-medium">Loading handicaps & form...</div>
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ export default function DraftBoard() {
         <p className="text-lg text-red-700">{error ?? "No data"}</p>
         <button
           onClick={loadData}
-          className="mt-6 rounded-2xl bg-[#14352a] px-6 py-3 text-sm uppercase tracking-[0.18em] text-white"
+          className="mt-6 rounded-2xl bg-[#111] px-6 py-3 text-sm uppercase tracking-[0.18em] text-white"
         >
           Retry
         </button>
@@ -118,19 +118,19 @@ export default function DraftBoard() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-[1400px] px-5 py-10 md:px-8">
       <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/55">Strand Draft Lab</div>
-          <h1 className="mt-2 font-serif text-5xl">Captain prep for Gamble Sands</h1>
-          <p className="mt-3 max-w-3xl text-[#14352a]/75">
+          <p className="label">Draft Lab</p>
+          <h1 className="section-title mt-3">Captain prep for Gamble Sands</h1>
+          <p className="mt-3 max-w-3xl text-sm text-black/55">
             Mock snake drafts vs Justin Uribe (J-BONE) — prep for the captain draft ~one month before The
             Strand. Thursday night is The Matchmaker for pairings, not roster picks.
           </p>
         </div>
         <button
           onClick={loadData}
-          className="rounded-2xl border border-[#14352a]/15 bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em]"
+          className="rounded-2xl border border-black/15 bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em]"
         >
           Refresh GHIN
         </button>
@@ -142,7 +142,7 @@ export default function DraftBoard() {
             key={item.key}
             onClick={() => setView(item.key)}
             className={`rounded-2xl px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] ${
-              view === item.key ? "bg-[#14352a] text-white" : "border border-[#14352a]/15 bg-white"
+              view === item.key ? "bg-[#111] text-white" : "border border-black/15 bg-white"
             }`}
           >
             {item.label}
@@ -150,13 +150,13 @@ export default function DraftBoard() {
         ))}
       </div>
 
-      <div className="mb-8 rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-        <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Strand 2026 rules</div>
-        <p className="mt-2 max-w-3xl text-sm text-[#14352a]/70">
+      <div className="mb-8 rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
+        <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Strand 2026 rules</div>
+        <p className="mt-2 max-w-3xl text-sm text-[#111]/70">
           Draft model uses foursomes, shamble (35% low + 15% high), singles with full course handicap
           difference, and scramble pairings — 3-point match play throughout.
         </p>
-        <ul className="mt-4 grid gap-2 text-sm text-[#14352a]/75 md:grid-cols-2">
+        <ul className="mt-4 grid gap-2 text-sm text-[#111]/75 md:grid-cols-2">
           {STRAND_RULES.map((rule) => (
             <li key={rule}>• {rule}</li>
           ))}
@@ -164,23 +164,23 @@ export default function DraftBoard() {
       </div>
 
       <div className="mb-8 grid gap-4 md:grid-cols-4">
-        <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Live TheGrint</div>
+        <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 shadow-sm">
+          <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Live TheGrint</div>
           <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "live").length}/20 linked</div>
         </div>
-        <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">GHIN verified</div>
+        <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 shadow-sm">
+          <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">GHIN verified</div>
           <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "ghin").length} indexes</div>
         </div>
         <div className="rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Heating up</div>
-          <div className="mt-2 font-serif text-2xl">
+          <div className="mt-2 text-lg font-medium">
             {data.players.filter((p) => p.heat === "heating").map((p) => p.nickname).join(", ") || "—"}
           </div>
         </div>
-        <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-[#14352a] p-5 text-white shadow-sm">
+        <div className="rounded-[1.75rem] border border-black/10 bg-[#111] p-5 text-white shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-white/60">Captain draft</div>
-          <div className="mt-2 font-serif text-2xl">WIX vs J-BONE</div>
+          <div className="mt-2 text-lg font-medium">WIX vs J-BONE</div>
           <div className="mt-1 text-sm text-white/70">~1 month before trip · {DRAFT_PICKS_PER_CAPTAIN} picks each</div>
         </div>
       </div>
@@ -190,16 +190,16 @@ export default function DraftBoard() {
       {view === "sandbox" && (
         <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <section className="space-y-6">
-            <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
+            <div className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="font-serif text-3xl">Free-form board</h2>
+                <h2 className="text-xl font-medium">Free-form board</h2>
                 <div className="flex gap-2">
                   {(["A", "B"] as const).map((team) => (
                     <button
                       key={team}
                       onClick={() => setActiveTeam(team)}
                       className={`rounded-2xl px-4 py-2 text-sm font-semibold uppercase ${
-                        activeTeam === team ? "bg-[#14352a] text-white" : "border"
+                        activeTeam === team ? "bg-[#111] text-white" : "border"
                       }`}
                     >
                       Team {team}
@@ -211,7 +211,7 @@ export default function DraftBoard() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search players..."
-                className="mb-4 w-full rounded-2xl border bg-[#f7f3ea] px-4 py-3 text-sm outline-none"
+                className="mb-4 w-full rounded-2xl border bg-[#f7f5f0] px-4 py-3 text-sm outline-none"
               />
               <div className="space-y-2">
                 {availablePlayers.map((player) => (
@@ -222,10 +222,10 @@ export default function DraftBoard() {
                       const current = activeTeam === "A" ? teamA : teamB;
                       if (current.length < DRAFT_PICKS_PER_CAPTAIN) setter([...current, player.id]);
                     }}
-                    className="flex w-full items-center justify-between rounded-2xl border bg-[#f7f3ea] px-4 py-3 text-left hover:bg-white"
+                    className="flex w-full items-center justify-between rounded-2xl border bg-[#f7f5f0] px-4 py-3 text-left hover:bg-white"
                   >
                     <span>#{player.draftRank} {player.nickname}</span>
-                    <span className="font-serif text-xl">{formatIndex(player)}</span>
+                    <span className="text-lg font-medium">{formatIndex(player)}</span>
                   </button>
                 ))}
               </div>
@@ -241,13 +241,13 @@ export default function DraftBoard() {
               return (
                 <div
                   key={team.key}
-                  className={`rounded-[2rem] border p-5 ${team.dark ? "bg-[#14352a] text-white" : "bg-white"}`}
+                  className={`rounded-[2rem] border p-5 ${team.dark ? "bg-[#111] text-white" : "bg-white"}`}
                 >
-                  <h3 className="font-serif text-2xl">Team {team.key}</h3>
+                  <h3 className="text-xl font-medium">Team {team.key}</h3>
                   <div className="mt-1 text-sm opacity-70">Avg {summary.avgIndex?.toFixed(1) ?? "—"}</div>
                   <div className="mt-3 space-y-1">
                     {stats.map((p) => (
-                      <div key={p.id} className={`flex justify-between rounded-xl px-3 py-2 text-sm ${team.dark ? "bg-white/10" : "bg-[#f7f3ea]"}`}>
+                      <div key={p.id} className={`flex justify-between rounded-xl px-3 py-2 text-sm ${team.dark ? "bg-white/10" : "bg-[#f7f5f0]"}`}>
                         <span>{p.nickname}</span>
                         <span>{formatIndex(p)}</span>
                       </div>

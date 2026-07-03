@@ -51,7 +51,7 @@ function formatRaw(value: string | null | undefined) {
 function DataCell({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <div className="text-[10px] uppercase tracking-[0.18em] text-[#14352a]/45">{label}</div>
+      <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">{label}</div>
       <div className="mt-0.5 truncate text-sm font-medium">{value}</div>
     </div>
   );
@@ -70,28 +70,28 @@ function TeamRosterCard({
   return (
     <article
       className={`rounded-[1.5rem] border p-5 shadow-sm ${
-        dark ? "border-white/10 bg-white/10 text-white" : "border-[#14352a]/10 bg-white"
+        dark ? "border-white/10 bg-white/10 text-white" : "border-[#111]/10 bg-white"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className={`text-xs uppercase tracking-[0.2em] ${dark ? "text-white/50" : "text-[#14352a]/50"}`}>
+          <div className={`text-xs uppercase tracking-[0.2em] ${dark ? "text-white/50" : "text-[#111]/50"}`}>
             {snakePick === 0 ? "Captain (locked)" : `Pick #${snakePick}`}
           </div>
-          <h3 className="mt-1 font-serif text-2xl">{player.name}</h3>
-          <div className={`text-sm ${dark ? "text-white/70" : "text-[#14352a]/65"}`}>
+          <h3 className="mt-1 text-lg font-medium">{player.name}</h3>
+          <div className={`text-sm ${dark ? "text-white/70" : "text-[#111]/65"}`}>
             {player.nickname} • #{player.draftRank} overall
           </div>
         </div>
         <div className="text-right">
-          <div className="font-serif text-3xl">{formatNum(player.indexNum)}</div>
-          <div className={`text-xs uppercase tracking-[0.16em] ${dark ? "text-white/50" : "text-[#14352a]/50"}`}>
+          <div className="text-xl font-medium">{formatNum(player.indexNum)}</div>
+          <div className={`text-xs uppercase tracking-[0.16em] ${dark ? "text-white/50" : "text-[#111]/50"}`}>
             index
           </div>
         </div>
       </div>
 
-      <p className={`mt-3 text-sm leading-relaxed ${dark ? "text-white/75" : "text-[#14352a]/75"}`}>
+      <p className={`mt-3 text-sm leading-relaxed ${dark ? "text-white/75" : "text-[#111]/75"}`}>
         {player.blurb}
       </p>
 
@@ -102,7 +102,7 @@ function TeamRosterCard({
         <DataCell label="Form" value={player.heatLabel} />
       </div>
 
-      <div className={`mt-4 rounded-xl px-3 py-2 text-xs ${dark ? "bg-black/20 text-white/80" : "bg-[#f7f3ea] text-[#14352a]/75"}`}>
+      <div className={`mt-4 rounded-xl px-3 py-2 text-xs ${dark ? "bg-black/20 text-white/80" : "bg-[#f7f5f0] text-[#111]/75"}`}>
         {rationale}
       </div>
 
@@ -117,7 +117,7 @@ function TeamRosterCard({
           <span
             key={tag}
             className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] ${
-              dark ? "bg-white/10 text-white/70" : "bg-[#14352a]/5 text-[#14352a]/60"
+              dark ? "bg-white/10 text-white/70" : "bg-[#111]/5 text-[#111]/60"
             }`}
           >
             {tag}
@@ -126,7 +126,7 @@ function TeamRosterCard({
       </div>
 
       {h && (
-        <details className={`mt-4 text-xs ${dark ? "text-white/70" : "text-[#14352a]/65"}`}>
+        <details className={`mt-4 text-xs ${dark ? "text-white/70" : "text-[#111]/65"}`}>
           <summary className="cursor-pointer uppercase tracking-[0.16em]">Raw GHIN fields</summary>
           <div className="mt-2 grid gap-1 sm:grid-cols-2">
             <div>Index: {formatRaw(h.index)}</div>
@@ -232,9 +232,9 @@ export default function BestTeamView() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="rounded-3xl border border-[#14352a]/10 bg-white px-8 py-10 text-center shadow-sm">
-          <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/50">Building optimal roster</div>
-          <div className="mt-3 font-serif text-3xl">Loading full player sheet...</div>
+        <div className="rounded-3xl border border-[#111]/10 bg-white px-8 py-10 text-center shadow-sm">
+          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Building optimal roster</div>
+          <div className="mt-3 text-xl font-medium">Loading full player sheet...</div>
         </div>
       </div>
     );
@@ -246,7 +246,7 @@ export default function BestTeamView() {
         <p className="text-lg text-red-700">{error ?? "No data"}</p>
         <button
           onClick={loadData}
-          className="mt-6 rounded-2xl bg-[#14352a] px-6 py-3 text-sm uppercase tracking-[0.18em] text-white"
+          className="mt-6 rounded-2xl bg-[#111] px-6 py-3 text-sm uppercase tracking-[0.18em] text-white"
         >
           Retry
         </button>
@@ -255,31 +255,31 @@ export default function BestTeamView() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-[1400px] px-5 py-10 md:px-8">
       <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/55">Optimal snake draft</div>
-          <h1 className="mt-2 font-serif text-5xl">{MY_CAPTAIN.nickname}&apos;s best team</h1>
-          <p className="mt-3 max-w-3xl text-[#14352a]/75">
+          <p className="label">Optimal snake draft</p>
+          <h1 className="section-title mt-3">{MY_CAPTAIN.nickname}&apos;s best team</h1>
+          <p className="mt-3 max-w-3xl text-sm text-black/55">
             {MY_CAPTAIN.nickname} is pre-assigned as captain. This snake model drafts your other{" "}
             {DRAFT_PICKS_PER_CAPTAIN} players vs {OPPONENT_CAPTAIN.nickname} using match-play analytics
             across four-ball, scramble, singles, and shamble — including high-handicap net leverage.
           </p>
-          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[#14352a]/45">
+          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[#111]/45">
             Updated {new Date(data.updatedAt).toLocaleString()} • {data.source}
           </p>
         </div>
         <button
           onClick={loadData}
-          className="rounded-2xl border border-[#14352a]/15 bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em]"
+          className="rounded-2xl border border-[#111]/15 bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em]"
         >
           Refresh data
         </button>
       </div>
 
-      <div className="mb-8 rounded-[2rem] border border-[#14352a]/10 bg-[#f7f3ea] p-6">
-        <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Rules baked into this model</div>
-        <ul className="mt-3 grid gap-1.5 text-sm text-[#14352a]/75 md:grid-cols-2">
+      <div className="mb-8 rounded-[2rem] border border-[#111]/10 bg-[#f7f5f0] p-6">
+        <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Rules baked into this model</div>
+        <ul className="mt-3 grid gap-1.5 text-sm text-[#111]/75 md:grid-cols-2">
           {STRAND_RULES.slice(0, 6).map((rule) => (
             <li key={rule}>• {rule}</li>
           ))}
@@ -287,27 +287,27 @@ export default function BestTeamView() {
       </div>
 
       <div className="mb-8 grid gap-4 md:grid-cols-4">
-        <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-[#14352a] p-5 text-white shadow-sm">
+        <div className="rounded-[1.75rem] border border-[#111]/10 bg-[#111] p-5 text-white shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-white/55">Team avg index</div>
-          <div className="mt-2 font-serif text-4xl">{formatNum(wixSummary.avgIndex)}</div>
+          <div className="mt-2 text-2xl font-medium">{formatNum(wixSummary.avgIndex)}</div>
         </div>
-        <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Match-play roster value</div>
-          <div className="mt-2 font-serif text-4xl">{formatNum(wixSummary.matchValue, 0)}</div>
+        <div className="rounded-[1.75rem] border border-[#111]/10 bg-white p-5 shadow-sm">
+          <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Match-play roster value</div>
+          <div className="mt-2 text-2xl font-medium">{formatNum(wixSummary.matchValue, 0)}</div>
         </div>
         <div className="rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Heating up on roster</div>
-          <div className="mt-2 font-serif text-4xl">{wixSummary.heating}</div>
+          <div className="mt-2 text-2xl font-medium">{wixSummary.heating}</div>
         </div>
-        <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Justin&apos;s avg index</div>
-          <div className="mt-2 font-serif text-4xl">{formatNum(justinSummary.avgIndex)}</div>
+        <div className="rounded-[1.75rem] border border-[#111]/10 bg-white p-5 shadow-sm">
+          <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Justin&apos;s avg index</div>
+          <div className="mt-2 text-2xl font-medium">{formatNum(justinSummary.avgIndex)}</div>
         </div>
       </div>
 
       <section className="mb-12">
-        <h2 className="font-serif text-3xl">Your roster — {MY_CAPTAIN.nickname} + 9 picks</h2>
-        <p className="mt-1 text-sm text-[#14352a]/65">
+        <h2 className="text-xl font-medium">Your roster — {MY_CAPTAIN.nickname} + 9 picks</h2>
+        <p className="mt-1 text-sm text-[#111]/65">
           Snake order if {MY_CAPTAIN.nickname} picks first: picks #1, 4, 5, 8, 9, 12, 13, 16, 17 (captain locked)
         </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -318,15 +318,15 @@ export default function BestTeamView() {
       </section>
 
       <section className="mb-12">
-        <h2 className="font-serif text-3xl">{OPPONENT_CAPTAIN.nickname}&apos;s counter-roster</h2>
-        <p className="mt-1 text-sm text-[#14352a]/65">What Justin gets if he drafts optimally picking second.</p>
+        <h2 className="text-xl font-medium">{OPPONENT_CAPTAIN.nickname}&apos;s counter-roster</h2>
+        <p className="mt-1 text-sm text-[#111]/65">What Justin gets if he drafts optimally picking second.</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {justinTeam.map((pick) => (
-            <div key={pick.player.id} className="rounded-2xl border border-[#14352a]/10 bg-white p-4 shadow-sm">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-[#14352a]/45">Pick #{pick.snakePick}</div>
+            <div key={pick.player.id} className="rounded-2xl border border-[#111]/10 bg-white p-4 shadow-sm">
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Pick #{pick.snakePick}</div>
               <div className="mt-1 font-medium">{playerLabel(pick.player)}</div>
-              <div className="font-serif text-2xl">{formatNum(pick.player.indexNum)}</div>
-              <div className="text-xs text-[#14352a]/55">#{pick.player.draftRank} value</div>
+              <div className="text-lg font-medium">{formatNum(pick.player.indexNum)}</div>
+              <div className="text-xs text-[#111]/55">#{pick.player.draftRank} value</div>
             </div>
           ))}
         </div>
@@ -335,8 +335,8 @@ export default function BestTeamView() {
       <section>
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-serif text-3xl">Full player data sheet</h2>
-            <p className="mt-1 text-sm text-[#14352a]/65">
+            <h2 className="text-xl font-medium">Full player data sheet</h2>
+            <p className="mt-1 text-sm text-[#111]/65">
               Every field we have — GHIN, location, draft model, tags, and team assignment.
             </p>
           </div>
@@ -348,9 +348,9 @@ export default function BestTeamView() {
           />
         </div>
 
-        <div className="overflow-x-auto rounded-[1.75rem] border border-[#14352a]/10 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-[1.75rem] border border-[#111]/10 bg-white shadow-sm">
           <table className="min-w-[1400px] w-full text-left text-sm">
-            <thead className="border-b bg-[#f7f3ea] text-[10px] uppercase tracking-[0.16em] text-[#14352a]/55">
+            <thead className="border-b bg-[#f7f5f0] text-[10px] uppercase tracking-[0.16em] text-[#111]/55">
               <tr>
                 {[
                   ["draftRank", "Rank"],
@@ -362,7 +362,7 @@ export default function BestTeamView() {
                   ["heat", "Heat"],
                 ].map(([key, label]) => (
                   <th key={key} className="px-3 py-3">
-                    <button type="button" onClick={() => toggleSort(key as SortKey)} className="hover:text-[#14352a]">
+                    <button type="button" onClick={() => toggleSort(key as SortKey)} className="hover:text-[#111]">
                       {label}
                       {sortKey === key ? (sortAsc ? " ↑" : " ↓") : ""}
                     </button>
@@ -384,13 +384,13 @@ export default function BestTeamView() {
                 const expanded = expandedId === player.id;
                 return (
                   <Fragment key={player.id}>
-                    <tr className="border-b border-[#14352a]/5 hover:bg-[#f7f3ea]/50">
+                    <tr className="border-b border-[#111]/5 hover:bg-[#f7f5f0]/50">
                       <td className="px-3 py-3 font-medium">#{player.draftRank}</td>
                       <td className="px-3 py-3">
                         <div className="font-medium">{player.name}</div>
-                        <div className="text-xs text-[#14352a]/55">{player.nickname}</div>
+                        <div className="text-xs text-[#111]/55">{player.nickname}</div>
                       </td>
-                      <td className="px-3 py-3 font-serif text-lg">{formatNum(player.indexNum)}</td>
+                      <td className="px-3 py-3 text-lg font-medium">{formatNum(player.indexNum)}</td>
                       <td className="px-3 py-3">{formatNum(player.lowestNum)}</td>
                       <td className="px-3 py-3">{formatNum(player.draftScore, 1)}</td>
                       <td className="px-3 py-3">{formatNum(player.attestNum, 0)}%</td>
@@ -407,18 +407,18 @@ export default function BestTeamView() {
                       </td>
                       <td className="px-3 py-3 text-xs">
                         {player.location ?? "—"}
-                        {player.origin ? <div className="text-[#14352a]/45">from {player.origin}</div> : null}
+                        {player.origin ? <div className="text-[#111]/45">from {player.origin}</div> : null}
                       </td>
                       <td className="px-3 py-3 text-xs">{player.ghinClub ?? "—"}</td>
                       <td className="px-3 py-3 text-xs">
                         {player.grintProfileUrl ? (
-                          <a href={player.grintProfileUrl} target="_blank" rel="noopener noreferrer" className="font-medium underline decoration-[#14352a]/20">
+                          <a href={player.grintProfileUrl} target="_blank" rel="noopener noreferrer" className="font-medium underline decoration-[#111]/20">
                             {player.grintUsernameResolved ?? player.grintUsername ?? "Profile"}
                           </a>
                         ) : (
                           <div>{player.grintUsernameResolved ?? player.grintUsername ?? "—"}</div>
                         )}
-                        {player.grintId ? <div className="text-[#14352a]/45">id {player.grintId}</div> : null}
+                        {player.grintId ? <div className="text-[#111]/45">id {player.grintId}</div> : null}
                       </td>
                       <td className="px-3 py-3 text-xs">{player.ghinNumberResolved ?? player.ghinNumber ?? "Verify"}</td>
                       <td className="px-3 py-3 text-xs">{player.email ?? "—"}</td>
@@ -426,29 +426,29 @@ export default function BestTeamView() {
                         <button
                           type="button"
                           onClick={() => setExpandedId(expanded ? null : player.id)}
-                          className="text-xs uppercase tracking-[0.14em] text-[#14352a]/60 hover:text-[#14352a]"
+                          className="text-xs uppercase tracking-[0.14em] text-[#111]/60 hover:text-[#111]"
                         >
                           {expanded ? "Hide" : "Expand"}
                         </button>
                       </td>
                     </tr>
                     {expanded && (
-                      <tr className="border-b bg-[#f7f3ea]/60">
+                      <tr className="border-b bg-[#f7f5f0]/60">
                         <td colSpan={15} className="px-4 py-4">
                           <div className="grid gap-4 lg:grid-cols-3">
                             <div>
-                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#14352a]/45">Profile</div>
+                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Profile</div>
                               <p className="mt-2 text-sm leading-relaxed">{player.blurb}</p>
                               <div className="mt-2 flex flex-wrap gap-1">
                                 {player.tags.map((tag) => (
-                                  <span key={tag} className="rounded-full bg-[#14352a]/5 px-2 py-0.5 text-[10px] uppercase">
+                                  <span key={tag} className="rounded-full bg-[#111]/5 px-2 py-0.5 text-[10px] uppercase">
                                     {tag}
                                   </span>
                                 ))}
                               </div>
                             </div>
                             <div>
-                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#14352a]/45">Draft model</div>
+                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Draft model</div>
                               <div className="mt-2 space-y-1 text-sm">
                                 <div>Heat label: {player.heatLabel}</div>
                                 <div>Form delta: {formatNum(player.formDelta)}</div>
@@ -456,7 +456,7 @@ export default function BestTeamView() {
                               </div>
                             </div>
                             <div>
-                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#14352a]/45">GHIN / TheGrint</div>
+                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">GHIN / TheGrint</div>
                               <div className="mt-2 space-y-1 text-sm">
                                 <div>Grint profile: {player.grintProfileUrl ?? "—"}</div>
                                 <div>Grint location: {player.grintLocation ?? "—"}</div>

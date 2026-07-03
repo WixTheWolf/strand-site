@@ -50,15 +50,15 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
 
           <div className="relative mx-auto flex min-h-[92vh] max-w-[1400px] flex-col justify-end px-5 pb-16 pt-28 md:px-8 md:pb-24">
-            <p className="label mb-4 text-white/70">Gamble Sands · August 2026</p>
+            <p className="label mb-4 text-white/70">Gamble Sands · August 20–23, 2026</p>
             <h1 className="headline max-w-[14ch] text-white">
               Golf trip.<br />
               Boys trip.<br />
               Since 2018.
             </h1>
             <p className="mt-6 max-w-md text-base leading-relaxed text-white/80 md:text-lg">
-              Three David McLay Kidd courses, one onsite resort, live scoring, and a Thursday night
-              pairings reveal that sets the tone for the whole weekend.
+              Three David McLay Kidd courses on sandy Columbia Basin soil. Walk to the first tee,
+              live scoring on TheGrint, and a Thursday night pairings reveal that sets the tone.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#players" className="btn-primary">

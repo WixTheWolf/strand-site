@@ -1,5 +1,6 @@
 /** Player headshots sourced from strandinvitational.life/players */
 export const PLAYER_PHOTOS: Record<string, string> = {
+  "andrew-mager": "/players/drew.jpg",
   "brett-comfort": "/players/brett.jpg",
   "brian-kerns": "/players/kerns-cartoon.png",
   "fred-geisinger": "/players/fred.jpg",

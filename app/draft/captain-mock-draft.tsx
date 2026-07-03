@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { getPlayerPhoto } from "@/lib/player-assets";
 import { TEAM_SIZE } from "@/lib/players";
 import { summarizeTeam } from "@/lib/draft-engine";
 import {
@@ -146,12 +148,12 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
   return (
     <div className="space-y-6">
       {/* Scenario manager */}
-      <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
+      <div className="rounded-[2rem] border border-[#111]/10 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Captain prep</div>
-            <h2 className="mt-1 font-serif text-3xl">Mock draft scenarios</h2>
-            <p className="mt-2 max-w-2xl text-sm text-[#14352a]/70">
+            <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Captain prep</div>
+            <h2 className="mt-1 text-xl font-medium">Mock draft scenarios</h2>
+            <p className="mt-2 max-w-2xl text-sm text-[#111]/70">
               You&apos;re <strong>{MY_CAPTAIN.nickname}</strong> — already on your team. Draft{" "}
               <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a snake vs{" "}
               <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned). Live captain draft is ~one
@@ -163,11 +165,11 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="New scenario name..."
-              className="rounded-xl border border-[#14352a]/10 bg-[#f7f3ea] px-4 py-2 text-sm outline-none"
+              className="rounded-xl border border-[#111]/10 bg-[#f7f5f0] px-4 py-2 text-sm outline-none"
             />
             <button
               onClick={() => createNew(newName)}
-              className="rounded-xl bg-[#14352a] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white"
+              className="rounded-xl bg-[#111] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white"
             >
               + New scenario
             </button>
@@ -179,7 +181,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             <button
               key={template.name}
               onClick={() => createNew(template.name, index)}
-              className="rounded-full border border-[#14352a]/15 bg-[#f7f3ea] px-3 py-1.5 text-xs uppercase tracking-[0.12em] hover:bg-white"
+              className="rounded-full border border-black/15 bg-[#f7f5f0] px-3 py-1.5 text-xs uppercase tracking-[0.12em] hover:bg-white"
             >
               {template.name}
             </button>
@@ -193,18 +195,18 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               onClick={() => setActiveId(scenario.id)}
               className={`min-w-[180px] rounded-2xl border px-4 py-3 text-left ${
                 activeId === scenario.id
-                  ? "border-[#14352a] bg-[#14352a] text-white"
-                  : "border-[#14352a]/10 bg-[#f7f3ea]"
+                  ? "border-[#111] bg-[#111] text-white"
+                  : "border-[#111]/10 bg-[#f7f5f0]"
               }`}
             >
               <div className="text-sm font-medium">{scenario.name}</div>
-              <div className={`mt-1 text-xs ${activeId === scenario.id ? "text-white/70" : "text-[#14352a]/55"}`}>
+              <div className={`mt-1 text-xs ${activeId === scenario.id ? "text-white/70" : "text-[#111]/55"}`}>
                 {scenario.picks.length}/{TOTAL_DRAFT_PICKS} picks
               </div>
             </button>
           ))}
           {!scenarios.length && (
-            <div className="rounded-2xl border border-dashed border-[#14352a]/20 px-6 py-4 text-sm text-[#14352a]/55">
+            <div className="rounded-2xl border border-dashed border-[#111]/20 px-6 py-4 text-sm text-[#111]/55">
               No scenarios yet — create one above
             </div>
           )}
@@ -245,18 +247,18 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               draftComplete
                 ? "border-emerald-200 bg-emerald-50"
                 : currentOwner === "mine"
-                  ? "border-[#14352a] bg-[#14352a] text-white"
-                  : "border-orange-200 bg-orange-50 text-[#14352a]"
+                  ? "border-[#111] bg-[#111] text-white"
+                  : "border-orange-200 bg-orange-50 text-[#111]"
             }`}
           >
             {draftComplete ? (
-              <div className="font-serif text-2xl">Draft complete — compare your roster below</div>
+              <div className="text-lg font-medium">Draft complete — compare your roster below</div>
             ) : (
               <>
                 <div className="text-xs uppercase tracking-[0.22em] opacity-70">
                   Pick {nextPick} of {TOTAL_DRAFT_PICKS}
                 </div>
-                <div className="mt-1 font-serif text-3xl">
+                <div className="mt-1 text-xl font-medium">
                   {currentOwner === "mine"
                     ? `Your pick — ${MY_CAPTAIN.name}`
                     : `Justin\u2019s pick — ${OPPONENT_CAPTAIN.name}`}
@@ -276,13 +278,13 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
           <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             {/* Available pool */}
-            <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Available players</div>
+            <div className="rounded-[2rem] border border-[#111]/10 bg-white p-6 shadow-sm">
+              <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Available players</div>
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search..."
-                className="mt-3 mb-4 w-full rounded-2xl border border-[#14352a]/10 bg-[#f7f3ea] px-4 py-3 text-sm outline-none"
+                className="mt-3 mb-4 w-full rounded-2xl border border-[#111]/10 bg-[#f7f5f0] px-4 py-3 text-sm outline-none"
               />
               <div className="max-h-[480px] space-y-2 overflow-y-auto">
                 {filtered.map((player) => (
@@ -293,19 +295,34 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                       else if (currentOwner === "justin") makePick(player.id, "justin");
                     }}
                     disabled={draftComplete}
-                    className="flex w-full items-center justify-between rounded-2xl border border-[#14352a]/10 bg-[#f7f3ea] px-4 py-3 text-left transition hover:bg-white disabled:opacity-50"
+                    className="flex w-full items-center gap-3 rounded-2xl border border-[#111]/10 bg-[#f7f5f0] px-4 py-3 text-left transition hover:bg-white disabled:opacity-50"
                   >
-                    <div>
+                    {getPlayerPhoto(player.id) ? (
+                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-black/10">
+                        <Image
+                          src={getPlayerPhoto(player.id)!}
+                          alt=""
+                          fill
+                          className="object-cover object-top"
+                          sizes="40px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black/10 text-xs font-medium">
+                        {player.initials}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
                       <div className="font-medium">
                         #{player.draftRank} {player.nickname} — {player.name}
                       </div>
-                      <div className="text-xs text-[#14352a]/60">
+                      <div className="text-xs text-[#111]/60">
                         {player.location ?? "—"}
                         {player.origin ? ` • from ${player.origin}` : ""}
                         {" • "}{player.heatLabel}
                       </div>
                     </div>
-                    <div className="font-serif text-xl">{formatIndex(player)}</div>
+                    <div className="text-lg font-medium">{formatIndex(player)}</div>
                   </button>
                 ))}
               </div>
@@ -320,16 +337,16 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                 <div
                   key={block.side}
                   className={`rounded-[2rem] border p-5 ${
-                    block.dark ? "border-[#14352a] bg-[#14352a] text-white" : "border-[#14352a]/10 bg-white"
+                    block.dark ? "border-[#111] bg-[#111] text-white" : "border-[#111]/10 bg-white"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-serif text-2xl">{block.label}</h3>
-                    <span className={`text-sm ${block.dark ? "text-white/70" : "text-[#14352a]/60"}`}>
+                    <h3 className="text-lg font-medium">{block.label}</h3>
+                    <span className={`text-sm ${block.dark ? "text-white/70" : "text-[#111]/60"}`}>
                       {block.roster.length}/{TEAM_SIZE}
                     </span>
                   </div>
-                  <div className={`mt-1 text-xs ${block.dark ? "text-white/60" : "text-[#14352a]/55"}`}>
+                  <div className={`mt-1 text-xs ${block.dark ? "text-white/60" : "text-[#111]/55"}`}>
                     Avg {block.summary.avgIndex?.toFixed(1) ?? "—"} • {block.summary.heating} heating • match value {block.summary.matchValue?.toFixed(0) ?? "—"}
                   </div>
                   <div className="mt-3 space-y-1.5">
@@ -337,7 +354,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                       <div
                         key={player.id}
                         className={`flex justify-between rounded-xl px-3 py-2 text-sm ${
-                          block.dark ? "bg-white/10" : "bg-[#f7f3ea]"
+                          block.dark ? "bg-white/10" : "bg-[#f7f5f0]"
                         }`}
                       >
                         <span>
@@ -351,7 +368,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                       <div
                         key={`open-${i}`}
                         className={`rounded-xl border border-dashed px-3 py-2 text-xs ${
-                          block.dark ? "border-white/20 text-white/40" : "border-[#14352a]/15 text-[#14352a]/40"
+                          block.dark ? "border-white/20 text-white/40" : "border-black/15 text-[#111]/40"
                         }`}
                       >
                         Open spot
@@ -361,23 +378,23 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                 </div>
               ))}
 
-              <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-                <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Pick log</div>
+              <div className="rounded-[2rem] border border-[#111]/10 bg-white p-5 shadow-sm">
+                <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Pick log</div>
                 <div className="mt-3 max-h-56 space-y-1 overflow-y-auto text-sm">
                   {active.picks.map((pick) => {
                     const player = playerMap.get(pick.playerId);
                     if (!player) return null;
                     return (
-                      <div key={pick.pickNumber} className="flex justify-between rounded-lg bg-[#f7f3ea] px-3 py-2">
+                      <div key={pick.pickNumber} className="flex justify-between rounded-lg bg-[#f7f5f0] px-3 py-2">
                         <span>
                           {pick.pickNumber}. {pick.side === "mine" ? MY_CAPTAIN.nickname : OPPONENT_CAPTAIN.nickname} → {player.nickname}
                         </span>
-                        <span className="text-[#14352a]/60">{formatIndex(player)}</span>
+                        <span className="text-[#111]/60">{formatIndex(player)}</span>
                       </div>
                     );
                   })}
                   {!active.picks.length && (
-                    <div className="text-[#14352a]/50">No picks yet</div>
+                    <div className="text-[#111]/50">No picks yet</div>
                   )}
                 </div>
               </div>
@@ -386,8 +403,8 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
           {/* Scenario compare strip */}
           {scenarios.length > 1 && (
-            <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Scenario comparison</div>
+            <div className="rounded-[2rem] border border-[#111]/10 bg-white p-6 shadow-sm">
+              <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Scenario comparison</div>
               <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {scenarios.map((scenario) => {
                   const mine = getFullRoster(players, scenario.picks, "mine");
@@ -398,14 +415,14 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                       key={scenario.id}
                       onClick={() => setActiveId(scenario.id)}
                       className={`rounded-2xl border p-4 text-left ${
-                        activeId === scenario.id ? "border-[#14352a] bg-[#f7f3ea]" : "border-[#14352a]/10"
+                        activeId === scenario.id ? "border-[#111] bg-[#f7f5f0]" : "border-[#111]/10"
                       }`}
                     >
                       <div className="font-medium">{scenario.name}</div>
-                      <div className="mt-2 text-xs text-[#14352a]/60">
+                      <div className="mt-2 text-xs text-[#111]/60">
                         Your team avg: {sum.avgIndex?.toFixed(1) ?? "—"} • {drafted}/{DRAFT_PICKS_PER_CAPTAIN} drafted
                       </div>
-                      <div className="mt-2 text-xs text-[#14352a]/55">
+                      <div className="mt-2 text-xs text-[#111]/55">
                         {mine.map((p) => p.nickname).join(", ") || "No picks yet"}
                       </div>
                     </button>

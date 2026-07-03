@@ -15,10 +15,11 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
   {
     id: "andrew-mager",
     name: "Andrew Mager",
-    nickname: "MAGER",
+    nickname: "DREW",
     initials: "AM",
     email: "magerag1@gmail.com",
-    blurb: "Strand veteran — at nearly every tournament — with low-handicap firepower and a calm, efficient game. GHIN index 5.2 out of CS Southern California Golf Club.",
+    blurb:
+      "Formerly the best golfer in the group with a personal best of 74 — low scores, high vibes. Cracks jokes mid-swing and turns competitive rounds into comedy hours. GHIN index 5.2 out of CS Southern California Golf Club.",
     grintId: null,
     grintSearchTerms: ["magerag1@gmail.com", "Andrew Mager", "CS Southern California Golf Club"],
     location: "Southern California",
