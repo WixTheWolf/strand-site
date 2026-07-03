@@ -12,8 +12,10 @@ export async function GET() {
       const resolved = await resolvePlayerGrint(player);
       return buildPlayerStats(player, resolved.handicap, {
         location: resolved.match?.location,
-        username: resolved.match?.username,
+        username: resolved.match?.username ?? player.grintUsername,
         dataSource: resolved.dataSource,
+        grintProfileUrl: resolved.grintProfileUrl,
+        ghinNumber: resolved.ghinNumber,
       });
     }),
   );
@@ -34,10 +36,19 @@ export async function GET() {
 
   const linked = stats.filter((player) => player.dataSource === "live").length;
   const manual = stats.filter((player) => player.dataSource === "manual").length;
+  const missing = stats.filter((player) => player.dataSource === "missing").length;
+  const withGrintProfile = stats.filter((player) => player.grintProfileUrl).length;
 
   return NextResponse.json({
     updatedAt: new Date().toISOString(),
-    source: `TheGrint / GHIN — ${linked}/20 live${manual ? `, ${manual} captain-verified` : ""}`,
+    source: `TheGrint / GHIN — ${linked}/20 live${manual ? `, ${manual} captain-verified` : ""}${missing ? `, ${missing} pending link` : ""}`,
+    summary: {
+      live: linked,
+      manual,
+      missing,
+      withGrintProfile,
+      withGhin: stats.filter((p) => p.ghinNumberResolved).length,
+    },
     players: ranked,
     recommendations,
     optimalTeams: { A: teamA, B: teamB },

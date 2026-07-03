@@ -150,10 +150,14 @@ export default function DraftBoard() {
         ))}
       </div>
 
-      <div className="mb-8 grid gap-4 md:grid-cols-3">
+      <div className="mb-8 grid gap-4 md:grid-cols-4">
         <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Live GHIN</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Live TheGrint</div>
           <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "live").length}/20 linked</div>
+        </div>
+        <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
+          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Captain-verified</div>
+          <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "manual").length} indexes</div>
         </div>
         <div className="rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Heating up</div>
@@ -162,9 +166,9 @@ export default function DraftBoard() {
           </div>
         </div>
         <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-[#14352a] p-5 text-white shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-white/60">Your opponent</div>
-          <div className="mt-2 font-serif text-2xl">Justin Uribe (J-BONE)</div>
-          <div className="mt-1 text-sm text-white/70">Index 8.4 • fierce competitor</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-white/60">Snake draft</div>
+          <div className="mt-2 font-serif text-2xl">WIX vs J-BONE</div>
+          <div className="mt-1 text-sm text-white/70">9 picks each • 10 per team</div>
         </div>
       </div>
 

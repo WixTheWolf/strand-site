@@ -356,7 +356,8 @@ export default function BestTeamView() {
                 <th className="px-3 py-3">Team</th>
                 <th className="px-3 py-3">Source</th>
                 <th className="px-3 py-3">Location</th>
-                <th className="px-3 py-3">Grint</th>
+                <th className="px-3 py-3">TheGrint</th>
+                <th className="px-3 py-3">GHIN #</th>
                 <th className="px-3 py-3">Email</th>
                 <th className="px-3 py-3">Details</th>
               </tr>
@@ -393,9 +394,16 @@ export default function BestTeamView() {
                         {player.origin ? <div className="text-[#14352a]/45">from {player.origin}</div> : null}
                       </td>
                       <td className="px-3 py-3 text-xs">
-                        <div>{player.grintUsernameResolved ?? player.grintUsername ?? "—"}</div>
+                        {player.grintProfileUrl ? (
+                          <a href={player.grintProfileUrl} target="_blank" rel="noopener noreferrer" className="font-medium underline decoration-[#14352a]/20">
+                            {player.grintUsernameResolved ?? player.grintUsername ?? "Profile"}
+                          </a>
+                        ) : (
+                          <div>{player.grintUsernameResolved ?? player.grintUsername ?? "—"}</div>
+                        )}
                         {player.grintId ? <div className="text-[#14352a]/45">id {player.grintId}</div> : null}
                       </td>
+                      <td className="px-3 py-3 text-xs">{player.ghinNumberResolved ?? player.ghinNumber ?? "Verify"}</td>
                       <td className="px-3 py-3 text-xs">{player.email ?? "—"}</td>
                       <td className="px-3 py-3">
                         <button
@@ -409,7 +417,7 @@ export default function BestTeamView() {
                     </tr>
                     {expanded && (
                       <tr className="border-b bg-[#f7f3ea]/60">
-                        <td colSpan={13} className="px-4 py-4">
+                        <td colSpan={14} className="px-4 py-4">
                           <div className="grid gap-4 lg:grid-cols-3">
                             <div>
                               <div className="text-[10px] uppercase tracking-[0.18em] text-[#14352a]/45">Profile</div>
@@ -433,7 +441,9 @@ export default function BestTeamView() {
                             <div>
                               <div className="text-[10px] uppercase tracking-[0.18em] text-[#14352a]/45">GHIN / TheGrint</div>
                               <div className="mt-2 space-y-1 text-sm">
-                                <div>Resolved location: {player.grintLocation ?? "—"}</div>
+                                <div>Grint profile: {player.grintProfileUrl ?? "—"}</div>
+                                <div>Grint location: {player.grintLocation ?? "—"}</div>
+                                <div>GHIN #: {player.ghinNumberResolved ?? player.ghinNumber ?? "Pending verification"}</div>
                                 {player.handicap ? (
                                   <>
                                     <div>Index raw: {formatRaw(player.handicap.index)}</div>

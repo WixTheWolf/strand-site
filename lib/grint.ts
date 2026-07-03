@@ -41,6 +41,13 @@ export async function searchGrintUsers(query: string): Promise<GrintSearchResult
   return response.json();
 }
 
+export function getGrintProfileUrl(username?: string | null): string | null {
+  if (!username?.trim()) return null;
+  const slug = username.trim().replace(/^@/, "").replace(/\s+/g, "");
+  if (!slug || slug.includes("@")) return null;
+  return `${GRINT_BASE}/profile/${encodeURIComponent(slug)}`;
+}
+
 export async function fetchGrintHandicap(userId: string): Promise<GrintHandicap> {
   const body = new URLSearchParams({ user_id: userId });
   const response = await fetch(`${GRINT_BASE}/user/get_handicap_info/`, {

@@ -1,3 +1,7 @@
+import PlayersHandicapSection from "./components/players-handicap-section";
+import TravelSection from "./components/travel-section";
+import { CAPTAINS, HANDICAP_RULES, MATCH_PLAY_RULES, ROUND_FORMATS, TEAM_DRAFT_RULES } from "@/lib/tournament";
+
 export default function StrandInvitationalSite() {
   // Deployable asset paths:
   // place your files in a public/ folder as:
@@ -36,43 +40,23 @@ export default function StrandInvitationalSite() {
 
   const schedule = [
     { day: "Thursday • August 20", title: "QuickSands Warm-Up", time: "5:00 PM", note: "Kick off the trip with QuickSands, then roll straight into dinner and the opening ceremony." },
-    { day: "Thursday • August 20", title: "Dinner + Opening Ceremony", time: "7:00 PM / 8:00 PM", note: "Dinner at 7, then opening ceremony at 8 where pairings and teams get revealed." },
-    { day: "Friday • August 21", title: "Gamble Sands - Foursomes", time: "8:20 AM", note: "Round 1 begins at Gamble Sands. Lunch at 1:00 PM before the afternoon match." },
-    { day: "Friday • August 21", title: "Scarecrow - 2 Man Shamble", time: "2:45 PM", note: "Round 2 at Scarecrow, then dinner at 8:00 PM." },
-    { day: "Saturday • August 22", title: "Scarecrow - Singles", time: "9:00 AM", note: "Round 3 singles session. Lunch at 2:00 PM before the closing push." },
-    { day: "Saturday • August 22", title: "Gamble Sands - 2 Man Scramble", time: "3:00 PM", note: "Round 4 closes the competition, followed by the closing ceremony and awards dinner at 8:00 PM." },
+    { day: "Thursday • August 20", title: "Dinner + Opening Ceremony", time: "7:00 PM / 8:00 PM", note: "Dinner at 7, then opening ceremony at 8 — captain snake draft and team reveal." },
+    ...ROUND_FORMATS.map((round) => ({
+      day: round.day,
+      title: `Round ${round.round} • ${round.format}`,
+      time: round.teeTime,
+      note: `${round.course}. ${round.note}`,
+    })),
     { day: "Sunday • August 23", title: "Departure", time: "AM", note: "Checkout, load up, and head home before the stories get even less accurate." },
-  ];
-
-  const playerProfiles = [
-    { name: "Andrew Mager", nickname: "MAGER", initials: "AM", blurb: "First-timer with low-handicap firepower and a calm, efficient game." },
-    { name: "Brett Comfort", nickname: "BRETT", initials: "BC", blurb: "New dad, Clemson loyalist, and permanently down-for-whatever." },
-    { name: "Brian Kerns", nickname: "KERNS", initials: "BK", blurb: "New to the 2026 field — stepping in for Eric Therrien with everything to prove at Gamble Sands." },
-    { name: "Fred Geisinger", nickname: "FRED", initials: "FG", blurb: "Chief planner, spreadsheet artist, and annual guardian of tee times, dinners, and logistics." },
-    { name: "Jack Groot", nickname: "JACK", initials: "JG", blurb: "First trip, zero rookie energy. Midwest golfer with instant chemistry." },
-    { name: "Jason Olson", nickname: "JASON", initials: "JO", blurb: "Steady, reliable, easygoing, and exactly the kind of rock-solid presence every golf trip needs." },
-    { name: "Jordan Brodbeck", nickname: "GORD", initials: "JB", blurb: "Heart-and-soul guy with elite vibes, strong low-net energy, and executive-committee usefulness." },
-    { name: "Justin Uribe", nickname: "J-BONE", initials: "JU", blurb: "Former baseball standout turned golf alpha and fierce competitor." },
-    { name: "Kevin Gordon", nickname: "KEV", initials: "KG", blurb: "Bay Area local with a sneakily nasty golf game and supreme post-round chill." },
-    { name: "Matt Onorato", nickname: "MATTY O.", initials: "MO", blurb: "Winningest man in Strand history with high style points and full-send commitment." },
-    { name: "Matt Schroeder", nickname: "TONY SCHROE", initials: "MS", blurb: "Walking rulebook, serious golf purist, and trip organizer with by-the-book instincts." },
-    { name: "Matt Wixted", nickname: "WIX", initials: "MW", blurb: "Natural athlete, former Most Improved, and the creative hand behind the yearly Strand look." },
-    { name: "Nick Kane", nickname: "KANE", initials: "NK", blurb: "Southern flavor, golf obsession, and a swing built through pure stubbornness." },
-    { name: "Nick Sprowls", nickname: "NICK", initials: "NS", blurb: "Resident funny man with emotional-volatility major-championship energy." },
-    { name: "Pat Morse", nickname: "P-MO", initials: "PM", blurb: "Founding Pounder and proven bringer of good vibes, good company, and timely golf." },
-    { name: "Rhett Fahrney", nickname: "RHETT", initials: "RF", blurb: "Not always textbook, often dangerous. Great hands and enough shotmaking chaos to keep every match alive." },
-    { name: "Ryan Darcy", nickname: "D'ARCY", initials: "RD", blurb: "Innovative golf mind, former simulator-business leader, and proven captain." },
-    { name: "Sam Blonski", nickname: "BLONSKI", initials: "SB", blurb: "Detroit distance, Manhattan Beach energy, and effortless fit with the crew." },
-    { name: "Shaun Eipper", nickname: "SHAUN", initials: "SE", blurb: "Easy energy, strong hang, quietly competitive, and one of those guys who makes the trip feel complete." },
-    { name: "Tim Hummel", nickname: "HUMMEL", initials: "TH", blurb: "Utility player of the trip. Helpful, funny, grill-capable, and always ready to keep the crew moving." },
   ];
 
   const tripFacts = [
     ["Dates", "August 20–23, 2026"],
     ["Destination", "Brewster, Washington"],
     ["Courses", "Gamble Sands • Scarecrow • QuickSands"],
-    ["Field Size", "20 players"],
-    ["Scoring", "TheGrint live leaderboard links"],
+    ["Field Size", "20 players • 2 teams of 10"],
+    ["Captains", "Matt Wixted (WIX) vs Justin Uribe (J-BONE)"],
+    ["Scoring", "TheGrint / GHIN • PGA handicap rules"],
     ["Vibe", "Golf trip meets boys trip"],
   ];
 
@@ -117,19 +101,7 @@ export default function StrandInvitationalSite() {
     "Coordinate room splits early if you want the cheaper option.",
   ];
 
-  const travelCards = [
-    { title: "Fly into Spokane", body: "Thursday morning arrivals are the move. Coordinate especially with the LA group." },
-    { title: "Drive to the resort", body: "From Spokane, rent cars and head to Gamble Sands at 200 Sand Trails Road, Brewster, WA 98812." },
-    { title: "Check-in / Check-out", body: "Check-in on Thursday is 3:00 PM. Check-out on Sunday is 10:00 AM." },
-    { title: "No reason to leave", body: "Golf, food, drinks, lodging, and leaderboard-watching are all right there." },
-  ];
-
-  const formats = [
-    "Round 1 • Fourball",
-    "Round 2 • Two-Man Scramble",
-    "Round 3 • Singles",
-    "Round 4 • Two-Man Shamble",
-  ];
+  const formats = ROUND_FORMATS.map((round) => `Round ${round.round} • ${round.format} (${round.course})`);
 
   const competitions = [
     "Closest to the Pin on every par 3.",
@@ -147,28 +119,19 @@ export default function StrandInvitationalSite() {
     ["2nd Low Net (Singles Only)", "$30"],
   ];
 
-  const rules = [
-    "Match play is 1 point for front, back, and overall — 3 points total per match.",
-    "Every man throws in $100, creating a $1,600 pot.",
-    "Play all penalties like a lateral hazard with a one-stroke penalty.",
-    "Drops occur where the ball last crossed land or inbounds. When in doubt, ask your opponent.",
-    "Scrambles get one club length and can place, but must stay on the same turf.",
-    "Play quickly and keep up with the group in front. Lost-ball search limit is 2 minutes.",
-    "Breakfast ball off the first hole of the day only.",
-    "Gimmies are acceptable. In moments of moral fog, ask: What Would Gord Do?",
-  ];
+  const rules = [...HANDICAP_RULES, ...MATCH_PLAY_RULES];
 
   const ceremonyTimeline = [
     ["7:00 PM", "Dinner"],
     ["8:00 PM", "Opening ceremony"],
-    ["8:15 PM", "Captain / team draw"],
+    ["8:15 PM", `${CAPTAINS.wix.nickname} vs ${CAPTAINS.justin.nickname} snake draft`],
     ["8:30 PM", "Round 1 pairings reveal"],
     ["8:45 PM", "Leaderboard links live"],
   ];
 
   const teamPlaceholders = [
-    { title: "Team A", subtitle: "Captain TBD", dark: true },
-    { title: "Team B", subtitle: "Captain TBD", dark: false },
+    { title: CAPTAINS.wix.teamName, subtitle: `${CAPTAINS.wix.name} • Captain`, dark: true },
+    { title: CAPTAINS.justin.teamName, subtitle: `${CAPTAINS.justin.name} • Captain`, dark: false },
   ];
 
   const pastTrips = [
@@ -331,44 +294,9 @@ export default function StrandInvitationalSite() {
         </div>
       </section>
 
-      <section id="players" className="mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/60">Players</div>
-            <h2 className="mt-2 font-serif text-4xl">The field, with actual personality</h2>
-          </div>
-          <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">20 player stories loaded</div>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {playerProfiles.map((player) => (
-            <div key={player.name} className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">{player.nickname}</div>
-                  <div className="mt-2 font-serif text-2xl leading-tight">{player.name}</div>
-                </div>
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#14352a] text-xs tracking-[0.15em] text-white">{player.initials}</div>
-              </div>
-              <p className="mt-5 text-sm leading-6 text-[#14352a]/78">{player.blurb}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <PlayersHandicapSection />
 
-      <section id="travel" className="border-y border-[#14352a]/10 bg-[#14352a] text-white">
-        <div className="mx-auto max-w-7xl px-6 py-16">
-          <div className="text-xs uppercase tracking-[0.3em] text-white/60">Travel</div>
-          <h2 className="mt-2 font-serif text-4xl">Get there without turning it into a side quest</h2>
-          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {travelCards.map((card) => (
-              <div key={card.title} className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur">
-                <div className="font-serif text-2xl text-white">{card.title}</div>
-                <p className="mt-4 text-sm text-white/75">{card.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TravelSection />
 
       <section id="stay-pay" className="mx-auto max-w-7xl px-6 py-16">
         <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/60">Stay & Pay</div>
@@ -416,15 +344,25 @@ export default function StrandInvitationalSite() {
             <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">Pairings decided Thursday night</div>
           </div>
           <div className="grid gap-6 xl:grid-cols-[0.75fr_1.25fr]">
-            <div className="rounded-[2rem] border border-[#14352a]/10 bg-[#14352a] p-6 text-white shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-white/60">Ceremony timeline</div>
-              <div className="mt-4 space-y-4">
-                {ceremonyTimeline.map(([time, event]) => (
-                  <div key={time} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
-                    <div className="font-medium">{time}</div>
-                    <div className="text-white/75">{event}</div>
-                  </div>
-                ))}
+            <div className="space-y-6">
+              <div className="rounded-[2rem] border border-[#14352a]/10 bg-[#14352a] p-6 text-white shadow-sm">
+                <div className="text-xs uppercase tracking-[0.22em] text-white/60">Ceremony timeline</div>
+                <div className="mt-4 space-y-4">
+                  {ceremonyTimeline.map(([time, event]) => (
+                    <div key={time} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
+                      <div className="font-medium">{time}</div>
+                      <div className="text-right text-white/75">{event}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
+                <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Snake draft rules</div>
+                <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">
+                  {TEAM_DRAFT_RULES.map((rule) => (
+                    <li key={rule}>• {rule}</li>
+                  ))}
+                </ul>
               </div>
             </div>
             <div className="grid gap-6 lg:grid-cols-2">

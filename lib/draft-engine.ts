@@ -112,7 +112,13 @@ function buildRationale(player: PlayerDraftStats): string {
 export function buildPlayerStats(
   player: StrandPlayer,
   handicap: GrintHandicap | null,
-  grintMeta?: { location?: string; username?: string; dataSource?: PlayerDraftStats["dataSource"] },
+  grintMeta?: {
+    location?: string;
+    username?: string;
+    dataSource?: PlayerDraftStats["dataSource"];
+    grintProfileUrl?: string | null;
+    ghinNumber?: string | null;
+  },
 ): PlayerDraftStats {
   const indexNum = player.manualIndex ?? (
     handicap
@@ -145,6 +151,8 @@ export function buildPlayerStats(
             : "missing"),
     grintLocation: grintMeta?.location,
     grintUsernameResolved: grintMeta?.username,
+    grintProfileUrl: grintMeta?.grintProfileUrl ?? null,
+    ghinNumberResolved: grintMeta?.ghinNumber ?? player.ghinNumber ?? null,
   };
 }
 

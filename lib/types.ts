@@ -8,6 +8,8 @@ export interface StrandPlayer {
   blurb: string;
   email?: string;
   grintId: string | null;
+  /** USGA GHIN number when linked — requires player verification if unknown */
+  ghinNumber?: string | null;
   grintUsername?: string;
   /** Where the player actually lives (may differ from stale TheGrint location) */
   location?: string;
@@ -45,6 +47,8 @@ export interface PlayerDraftStats extends StrandPlayer {
   dataSource: "live" | "manual" | "estimated" | "missing";
   grintLocation?: string;
   grintUsernameResolved?: string;
+  grintProfileUrl?: string | null;
+  ghinNumberResolved?: string | null;
 }
 
 export interface DraftRecommendation {

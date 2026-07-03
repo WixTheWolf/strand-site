@@ -1,4 +1,4 @@
-import { fetchGrintHandicap, searchGrintUsers, type GrintSearchResult } from "./grint";
+import { fetchGrintHandicap, getGrintProfileUrl, searchGrintUsers, type GrintSearchResult } from "./grint";
 import type { GrintHandicap, StrandPlayer } from "./types";
 
 export interface ResolvedGrintPlayer {
@@ -6,6 +6,8 @@ export interface ResolvedGrintPlayer {
   match: GrintSearchResult | null;
   matchedTerm: string | null;
   dataSource: "live" | "manual" | "estimated" | "missing";
+  grintProfileUrl: string | null;
+  ghinNumber: string | null;
 }
 
 function normalizeTerm(term: string): string {
@@ -44,6 +46,8 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
       match: null,
       matchedTerm: null,
       dataSource: "manual",
+      grintProfileUrl: getGrintProfileUrl(player.grintUsername),
+      ghinNumber: player.ghinNumber ?? null,
     };
   }
 
@@ -69,6 +73,8 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         },
         matchedTerm: player.grintId,
         dataSource: "live",
+        grintProfileUrl: getGrintProfileUrl(player.grintUsername),
+        ghinNumber: player.ghinNumber ?? null,
       };
     } catch {
       // fall through to search
@@ -103,9 +109,18 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         match: bestHit,
         matchedTerm: bestTerm,
         dataSource: "live",
+        grintProfileUrl: getGrintProfileUrl(bestHit.username),
+        ghinNumber: player.ghinNumber ?? null,
       };
     } catch {
-      return { handicap: null, match: bestHit, matchedTerm: bestTerm, dataSource: "estimated" };
+      return {
+        handicap: null,
+        match: bestHit,
+        matchedTerm: bestTerm,
+        dataSource: "estimated",
+        grintProfileUrl: getGrintProfileUrl(bestHit.username),
+        ghinNumber: player.ghinNumber ?? null,
+      };
     }
   }
 
@@ -114,5 +129,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
     match: null,
     matchedTerm: null,
     dataSource: player.estimatedIndex ? "estimated" : "missing",
+    grintProfileUrl: getGrintProfileUrl(player.grintUsername),
+    ghinNumber: player.ghinNumber ?? null,
   };
 }
