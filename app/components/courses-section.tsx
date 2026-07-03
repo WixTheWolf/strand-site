@@ -60,41 +60,59 @@ export default function CoursesSection() {
           ))}
         </div>
 
-        {/* Dining — editorial, menu-style (no stand-in photos) */}
-        <div className="mt-16 grid gap-px overflow-hidden bg-[#e2ddd3] md:grid-cols-2">
+        {/* Dining — full menus, editorial (no stand-in photos) */}
+        <div id="dining" className="mt-16 space-y-px">
           {STRAND_DINING.map((spot, i) => (
-            <Reveal key={spot.id} delay={i * 110} className="h-full">
-            <article className="group relative h-full bg-[#14352a] p-7 text-white md:p-10">
+            <Reveal key={spot.id} delay={i * 110}>
+            <article className="group relative overflow-hidden bg-[#14352a] p-7 text-white md:p-12">
               <div
                 aria-hidden
-                className="pointer-events-none absolute -right-8 -top-10 select-none text-[10rem] font-medium leading-none text-white/[0.045] transition duration-500 group-hover:text-white/[0.08]"
+                className="pointer-events-none absolute -right-6 -top-14 select-none text-[14rem] font-medium leading-none text-white/[0.045] transition duration-500 group-hover:text-white/[0.08]"
               >
                 {spot.name.charAt(0)}
               </div>
-              <p className="label text-white/40">{spot.kind}</p>
-              <h3 className="mt-2 text-2xl font-medium">{spot.name}</h3>
-              <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/60">{spot.tagline}</p>
 
-              <div className="mt-6 flex flex-wrap gap-2">
-                {spot.menu.map((item) => (
-                  <span
-                    key={item}
-                    className="border border-white/15 px-3 py-1.5 text-[11px] uppercase tracking-[0.14em] text-white/75"
-                  >
-                    {item}
-                  </span>
+              <div className="relative flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="label text-white/40">{spot.kind}</p>
+                  <h3 className="mt-2 text-2xl font-medium md:text-3xl">{spot.name}</h3>
+                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/60">{spot.tagline}</p>
+                </div>
+                <div className="shrink-0 text-left md:text-right">
+                  <p className="font-mono text-xs text-white/70">{spot.hours}</p>
+                  <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-[#c4b59a]">{spot.when}</p>
+                </div>
+              </div>
+
+              {/* Full menu */}
+              <div className="relative mt-9 grid gap-9 border-t border-white/12 pt-8 md:grid-cols-3 md:gap-10">
+                {spot.menu.map((section) => (
+                  <div key={section.title}>
+                    <h4 className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.26em] text-[#c4b59a]">
+                      {section.title}
+                      <span className="h-px flex-1 bg-white/10" aria-hidden />
+                    </h4>
+                    <ul className="mt-4 space-y-3.5">
+                      {section.items.map((item) => (
+                        <li key={item.name}>
+                          <div className="text-sm font-medium text-white/90">{item.name}</div>
+                          {item.note && (
+                            <div className="mt-0.5 text-xs italic leading-snug text-white/45">{item.note}</div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
               </div>
 
-              <ul className="mt-6 space-y-2 text-sm text-white/55">
+              <div className="relative mt-9 flex flex-wrap gap-x-8 gap-y-2 border-t border-white/12 pt-5">
                 {spot.facts.map((fact) => (
-                  <li key={fact}>{fact}</li>
+                  <span key={fact} className="text-xs text-white/45">
+                    {fact}
+                  </span>
                 ))}
-              </ul>
-
-              <p className="mt-6 border-t border-white/10 pt-4 text-xs uppercase tracking-[0.14em] text-white/40">
-                {spot.when}
-              </p>
+              </div>
             </article>
             </Reveal>
           ))}

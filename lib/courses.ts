@@ -8,6 +8,16 @@ export interface StrandCourse {
   playedIn: string;
 }
 
+export interface MenuItem {
+  name: string;
+  note?: string;
+}
+
+export interface MenuSection {
+  title: string;
+  items: MenuItem[];
+}
+
 export interface StrandDining {
   id: string;
   name: string;
@@ -15,7 +25,8 @@ export interface StrandDining {
   tagline: string;
   facts: string[];
   when: string;
-  menu: string[];
+  hours: string;
+  menu: MenuSection[];
 }
 
 export const GAMBLE_SANDS_FACTS = [
@@ -78,33 +89,96 @@ export const STRAND_COURSES: StrandCourse[] = [
   },
 ];
 
-/** Resort dining — rendered editorially (no stand-in photos; swap real shots into /public/courses when we have them) */
+/**
+ * Resort dining — rendered editorially (no stand-in photos; swap real shots into
+ * /public/courses when we have them). Menu items verified against Gamble Sands
+ * food & drink pages, OpenTable, and diner reviews.
+ */
 export const STRAND_DINING: StrandDining[] = [
   {
     id: "danny-boy",
     name: "Danny Boy Bar & Grill",
     kind: "Dinner house",
-    tagline: "Dinner-only classics above the first tee — ice-cold beer and a sommelier-curated list.",
+    tagline:
+      "Chef Chris Lamkin's dinner-only classics above the first tee — Gebbers-raised beef, fresh-baked bread, and a regional wine list.",
     facts: [
-      "Signature grill fare with ingredients from onsite Gebbers Farms.",
-      "Creative cocktails and sommelier-curated wine list.",
+      "Signature grill fare with beef and produce from onsite Gebbers Farms.",
+      "Creative cocktails, craft beer, and a sommelier-curated regional wine list.",
       "Thursday dinner at 7:00 PM kicks off the opening ceremony weekend.",
     ],
     when: "Thu & Fri dinner • 7:00 / 8:00 PM",
-    menu: ["Tower of Tots", "Ribeye", "Prime Rib", "Ice-cold beer"],
+    hours: "Dinner service 4:00–8:00 PM",
+    menu: [
+      {
+        title: "To Start",
+        items: [
+          { name: "Tower of Tots", note: "the table-stakes shareable — order two" },
+          { name: "Steak Skewers", note: "Gebbers beef, flame-grilled" },
+          { name: "Grilled Shrimp", note: "charred lemon" },
+          { name: "Fresh-Baked Bread", note: "baked on property" },
+          { name: "Caesar Salad", note: "add tri-tip skewers" },
+        ],
+      },
+      {
+        title: "Mains",
+        items: [
+          { name: "16 oz Ribeye", note: "local Gebbers-raised beef" },
+          { name: "12 oz Prime Rib", note: "slow-roasted, au jus" },
+          { name: "Danny Boy Burger", note: "the house signature" },
+          { name: "Fish & Chips", note: "golden-fried, tartar" },
+          { name: "Fettuccine", note: "blackened chicken" },
+        ],
+      },
+      {
+        title: "To Drink",
+        items: [
+          { name: "Craft Beer", note: "ice-cold, Northwest taps" },
+          { name: "Regional Wine", note: "sommelier-curated Washington list" },
+          { name: "House Cocktails", note: "creative, seasonal" },
+        ],
+      },
+    ],
   },
   {
     id: "the-barn",
     name: "The Barn",
     kind: "All-day fuel",
-    tagline: "Grab-and-go golf staples, canned course cocktails, and both tournament lunches.",
+    tagline:
+      "Open 7 AM to 11 PM — grab-and-go breakfast before the tee, craft pizzas and sliders at lunch, cold draft beer and games late.",
     facts: [
-      "Grab-and-go golf staples for early tee times.",
+      "Grab-and-go golf staples for early tee times — both tournament lunches are here.",
       "Custom cocktail canning machine — take drinks to the course in your cooler.",
-      "More than doubled the resort's bar space for the full Strand weekend.",
+      "Lounge seating, TVs, fireplace, and late-night games; more than doubled the resort's bar space.",
     ],
     when: "Breakfast & lunch all weekend",
-    menu: ["Breakfast burritos", "Pizza", "Sliders", "Canned cocktails"],
+    hours: "Open daily 7:00 AM–11:00 PM",
+    menu: [
+      {
+        title: "Morning",
+        items: [
+          { name: "Breakfast Burritos", note: "built for the walk to the tee" },
+          { name: "Coffee & Espresso", note: "pre-round essential" },
+          { name: "Grab-and-Go Staples", note: "early tee time fuel" },
+        ],
+      },
+      {
+        title: "Midday",
+        items: [
+          { name: "Craft Pizzas", note: "mouthwatering, wood-fired style" },
+          { name: "Mix & Match Sliders", note: "pick your lineup" },
+          { name: "Hearty Sandwiches", note: "post-round recovery" },
+          { name: "Daily Special Entrées", note: "chef's rotation" },
+        ],
+      },
+      {
+        title: "Bar",
+        items: [
+          { name: "Cold Draft Beer", note: "Northwest craft on tap" },
+          { name: "Canned Cocktails", note: "custom-canned for your cooler" },
+          { name: "Late-Night Games", note: "TVs, fireplace, and the 19th hole" },
+        ],
+      },
+    ],
   },
 ];
 
