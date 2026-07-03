@@ -2,7 +2,7 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { getOptimalTeamWithPicks, summarizeTeam } from "@/lib/draft-engine";
-import { MY_CAPTAIN, OPPONENT_CAPTAIN } from "@/lib/mock-draft";
+import { MY_CAPTAIN, OPPONENT_CAPTAIN, DRAFT_PICKS_PER_CAPTAIN } from "@/lib/mock-draft";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 
 interface DraftPayload {
@@ -75,7 +75,7 @@ function TeamRosterCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className={`text-xs uppercase tracking-[0.2em] ${dark ? "text-white/50" : "text-[#14352a]/50"}`}>
-            Pick #{snakePick}
+            {snakePick === 0 ? "Captain (locked)" : `Pick #${snakePick}`}
           </div>
           <h3 className="mt-1 font-serif text-2xl">{player.name}</h3>
           <div className={`text-sm ${dark ? "text-white/70" : "text-[#14352a]/65"}`}>
@@ -248,8 +248,6 @@ export default function BestTeamView() {
     );
   }
 
-  const totalDraftScore = wixTeam.reduce((sum, p) => sum + p.player.draftScore, 0);
-
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
       <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -257,8 +255,9 @@ export default function BestTeamView() {
           <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/55">Optimal snake draft</div>
           <h1 className="mt-2 font-serif text-5xl">{MY_CAPTAIN.nickname}&apos;s best team</h1>
           <p className="mt-3 max-w-3xl text-[#14352a]/75">
-            If you pick first vs {OPPONENT_CAPTAIN.name} ({OPPONENT_CAPTAIN.nickname}) and both draft
-            by value, this is your squad. Full GHIN + draft model data for all 20 players below.
+            {MY_CAPTAIN.nickname} is pre-assigned as captain. This snake model drafts your other{" "}
+            {DRAFT_PICKS_PER_CAPTAIN} players vs {OPPONENT_CAPTAIN.nickname} using match-play analytics
+            across four-ball, scramble, singles, and shamble — including high-handicap net leverage.
           </p>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[#14352a]/45">
             Updated {new Date(data.updatedAt).toLocaleString()} • {data.source}
@@ -278,8 +277,8 @@ export default function BestTeamView() {
           <div className="mt-2 font-serif text-4xl">{formatNum(wixSummary.avgIndex)}</div>
         </div>
         <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Combined draft score</div>
-          <div className="mt-2 font-serif text-4xl">{formatNum(totalDraftScore, 1)}</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Match-play roster value</div>
+          <div className="mt-2 font-serif text-4xl">{formatNum(wixSummary.matchValue, 0)}</div>
         </div>
         <div className="rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Heating up on roster</div>
@@ -292,9 +291,9 @@ export default function BestTeamView() {
       </div>
 
       <section className="mb-12">
-        <h2 className="font-serif text-3xl">Your 10 picks</h2>
+        <h2 className="font-serif text-3xl">Your roster — {MY_CAPTAIN.nickname} + 9 picks</h2>
         <p className="mt-1 text-sm text-[#14352a]/65">
-          Snake order if {MY_CAPTAIN.nickname} picks first: picks #1, 4, 5, 8, 9, 12, 13, 16, 17, 20
+          Snake order if {MY_CAPTAIN.nickname} picks first: picks #1, 4, 5, 8, 9, 12, 13, 16, 17 (captain locked)
         </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {wixTeam.map((pick) => (

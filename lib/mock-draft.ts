@@ -1,4 +1,11 @@
-import { TEAM_SIZE } from "./players";
+import {
+  CAPTAIN_IDS,
+  DRAFT_PICKS_PER_CAPTAIN,
+  isCaptain,
+  TEAM_SIZE,
+  TOTAL_DRAFT_PICKS,
+} from "./players";
+import { computeMatchPlayValue, marginalTeamValue } from "./draft-engine";
 import type { PlayerDraftStats } from "./types";
 
 export type DraftSide = "mine" | "justin";
@@ -20,13 +27,13 @@ export interface MockDraftScenario {
 }
 
 export const MY_CAPTAIN = {
-  id: "matt-wixted",
+  id: CAPTAIN_IDS[0],
   name: "Matt Wixted",
   nickname: "WIX",
 };
 
 export const OPPONENT_CAPTAIN = {
-  id: "justin-uribe",
+  id: CAPTAIN_IDS[1],
   name: "Justin Uribe",
   nickname: "J-BONE",
 };
@@ -50,7 +57,7 @@ export function getNextPickNumber(picks: DraftPick[]): number {
 }
 
 export function getCurrentOwner(picks: DraftPick[], iPickFirst: boolean): DraftSide | null {
-  if (picks.length >= TEAM_SIZE * 2) return null;
+  if (picks.length >= TOTAL_DRAFT_PICKS) return null;
   return getSnakeOwner(getNextPickNumber(picks), iPickFirst);
 }
 
@@ -64,54 +71,50 @@ export function getDraftedIds(picks: DraftPick[]): Set<string> {
 
 export function getAvailablePlayers(players: PlayerDraftStats[], picks: DraftPick[]): PlayerDraftStats[] {
   const drafted = getDraftedIds(picks);
-  return players.filter((player) => !drafted.has(player.id));
+  return players.filter((player) => !drafted.has(player.id) && !isCaptain(player.id));
+}
+
+export function getFullRoster(
+  players: PlayerDraftStats[],
+  picks: DraftPick[],
+  side: DraftSide,
+): PlayerDraftStats[] {
+  const captainId = side === "mine" ? MY_CAPTAIN.id : OPPONENT_CAPTAIN.id;
+  const captain = players.find((player) => player.id === captainId);
+  const drafted = getPicksForSide(picks, side)
+    .map((pick) => players.find((player) => player.id === pick.playerId))
+    .filter(Boolean) as PlayerDraftStats[];
+
+  return captain ? [captain, ...drafted] : drafted;
 }
 
 export function suggestJustinPick(
   available: PlayerDraftStats[],
   myPicks: DraftPick[],
-  playerMap: Map<string, PlayerDraftStats>,
-  totalPicks: number,
+  allPlayers: PlayerDraftStats[],
 ): PlayerDraftStats | null {
   if (!available.length) return null;
 
-  const myTeam = myPicks
-    .map((pick) => playerMap.get(pick.playerId))
-    .filter(Boolean) as PlayerDraftStats[];
+  const justinCaptain = allPlayers.find((player) => player.id === OPPONENT_CAPTAIN.id);
+  const justinBase = justinCaptain ? [justinCaptain] : [];
+  const myTeam = getFullRoster(allPlayers, myPicks, "mine");
+  const myValue = marginalTeamValue(myTeam);
 
-  const myAvg = averageIndex(myTeam);
-  const ranked = [...available].sort((a, b) => b.draftScore - a.draftScore);
-  const earlyRound = totalPicks <= 6;
+  let best = available[0];
+  let bestScore = -Infinity;
 
-  const justinFavorites = ranked.filter(
-    (player) =>
-      player.tags.includes("competitor") ||
-      player.tags.includes("low-handicap") ||
-      player.tags.includes("champion") ||
-      (player.indexNum !== null && player.indexNum <= 10),
-  );
-
-  if (earlyRound && justinFavorites.length) {
-    return justinFavorites[0];
+  for (const candidate of available) {
+    const score =
+      marginalTeamValue([...justinBase, candidate]) -
+      myValue * 0.1 +
+      computeMatchPlayValue(candidate) * 0.05;
+    if (score > bestScore) {
+      bestScore = score;
+      best = candidate;
+    }
   }
 
-  if (myAvg !== null && totalPicks >= 12) {
-    const counter = available.find((player) => {
-      const idx = player.indexNum ?? player.estimatedIndex ?? 20;
-      return idx <= myAvg - 1;
-    });
-    if (counter) return counter;
-  }
-
-  return ranked[0] ?? null;
-}
-
-function averageIndex(team: PlayerDraftStats[]): number | null {
-  const values = team
-    .map((player) => player.indexNum ?? player.estimatedIndex)
-    .filter((value): value is number => value !== undefined && value !== null);
-  if (!values.length) return null;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return best;
 }
 
 export function createScenario(name: string, iPickFirst = true): MockDraftScenario {
@@ -166,6 +169,8 @@ export function formatPickLabel(pickNumber: number, iPickFirst: boolean): string
   const owner = getSnakeOwner(pickNumber, iPickFirst);
   return owner === "mine" ? `${MY_CAPTAIN.nickname} picks` : `${OPPONENT_CAPTAIN.nickname} picks`;
 }
+
+export { DRAFT_PICKS_PER_CAPTAIN, TEAM_SIZE, TOTAL_DRAFT_PICKS };
 
 export const SCENARIO_TEMPLATES = [
   { name: "Justin takes Fred #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "fred-geisinger") },

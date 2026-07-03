@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { TEAM_SIZE } from "@/lib/players";
+import { DRAFT_PICKS_PER_CAPTAIN, isCaptain, TEAM_SIZE } from "@/lib/players";
 import { summarizeTeam } from "@/lib/draft-engine";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 import CaptainMockDraft from "./captain-mock-draft";
@@ -75,6 +75,7 @@ export default function DraftBoard() {
   const availablePlayers = useMemo(() => {
     if (!data) return [];
     return data.players.filter((player) => {
+      if (isCaptain(player.id)) return false;
       if (draftedIds.has(player.id)) return false;
       if (!search.trim()) return true;
       const q = search.toLowerCase();
@@ -168,7 +169,7 @@ export default function DraftBoard() {
         <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-[#14352a] p-5 text-white shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-white/60">Snake draft</div>
           <div className="mt-2 font-serif text-2xl">WIX vs J-BONE</div>
-          <div className="mt-1 text-sm text-white/70">9 picks each • 10 per team</div>
+          <div className="mt-1 text-sm text-white/70">{DRAFT_PICKS_PER_CAPTAIN} picks each + captains locked</div>
         </div>
       </div>
 
@@ -228,7 +229,7 @@ export default function DraftBoard() {
                     onClick={() => {
                       const setter = activeTeam === "A" ? setTeamA : setTeamB;
                       const current = activeTeam === "A" ? teamA : teamB;
-                      if (current.length < TEAM_SIZE) setter([...current, player.id]);
+                      if (current.length < DRAFT_PICKS_PER_CAPTAIN) setter([...current, player.id]);
                     }}
                     className="flex w-full items-center justify-between rounded-2xl border bg-[#f7f3ea] px-4 py-3 text-left hover:bg-white"
                   >

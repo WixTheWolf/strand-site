@@ -1,6 +1,15 @@
 import type { StrandPlayer } from "./types";
 
 export const TEAM_SIZE = 10;
+/** Each captain drafts 9 players; captains are pre-assigned to their own team */
+export const DRAFT_PICKS_PER_CAPTAIN = 9;
+export const TOTAL_DRAFT_PICKS = DRAFT_PICKS_PER_CAPTAIN * 2;
+
+export const CAPTAIN_IDS = ["matt-wixted", "justin-uribe"] as const;
+
+export function isCaptain(playerId: string): boolean {
+  return (CAPTAIN_IDS as readonly string[]).includes(playerId);
+}
 
 export const STRAND_PLAYERS: StrandPlayer[] = [
   {
@@ -9,12 +18,12 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     nickname: "MAGER",
     initials: "AM",
     email: "magerag1@gmail.com",
-    blurb: "First-timer with low-handicap firepower and a calm, efficient game. GHIN index 5.2 out of CS Southern California Golf Club.",
+    blurb: "Strand veteran — at nearly every tournament — with low-handicap firepower and a calm, efficient game. GHIN index 5.2 out of CS Southern California Golf Club.",
     grintId: null,
     grintSearchTerms: ["magerag1@gmail.com", "Andrew Mager", "CS Southern California Golf Club"],
     location: "Southern California",
     ghinClub: "CS Southern California Golf Club",
-    tags: ["rookie", "low-handicap", "calm"],
+    tags: ["veteran", "experience", "low-handicap", "calm"],
     manualIndex: 5.2,
     manualLowest: 4.9,
   },
@@ -115,12 +124,12 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     nickname: "KEV",
     initials: "KG",
     email: "gordon.kevin.g@gmail.com",
-    blurb: "Bay Area local with supreme post-round chill and the kind of high-handicap chaos that keeps every match interesting. GHIN index 21.2 (low 21.2) out of EClub North Bay.",
-    grintId: null,
-    grintSearchTerms: ["gordon.kevin.g@gmail.com", "Kevin Gordon", "EClub North Bay"],
+    blurb: "Bay Area local with supreme post-round chill and high-handicap net-match upside. TheGrint linked — GHIN 21.2 out of EClub North Bay.",
+    grintId: "2330390",
+    grintSearchTerms: ["gordon.kevin.g@gmail.com", "Kevin Gordon", "EClub North Bay", "2330390"],
     location: "San Francisco Bay Area, CA",
     ghinClub: "EClub North Bay",
-    tags: ["vibes", "match-play", "high-handicap"],
+    tags: ["vibes", "match-play", "high-handicap", "net-leverage"],
     manualIndex: 21.2,
     manualLowest: 21.2,
   },

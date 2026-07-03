@@ -48,6 +48,16 @@ export function getGrintProfileUrl(username?: string | null): string | null {
   return `${GRINT_BASE}/profile/${encodeURIComponent(slug)}`;
 }
 
+export function getGrintProfileUrlForPlayer(player: {
+  grintId?: string | null;
+  grintUsername?: string;
+}): string | null {
+  if (player.grintId) {
+    return `${GRINT_BASE}/profile/index/${player.grintId}`;
+  }
+  return getGrintProfileUrl(player.grintUsername);
+}
+
 export async function fetchGrintHandicap(userId: string): Promise<GrintHandicap> {
   const body = new URLSearchParams({ user_id: userId });
   const response = await fetch(`${GRINT_BASE}/user/get_handicap_info/`, {

@@ -1,4 +1,4 @@
-import { fetchGrintHandicap, getGrintProfileUrl, searchGrintUsers, type GrintSearchResult } from "./grint";
+import { fetchGrintHandicap, getGrintProfileUrlForPlayer, searchGrintUsers, type GrintSearchResult } from "./grint";
 import type { GrintHandicap, StrandPlayer } from "./types";
 
 export interface ResolvedGrintPlayer {
@@ -44,25 +44,7 @@ function verifiedDataSource(player: StrandPlayer): ResolvedGrintPlayer["dataSour
 }
 
 export async function resolvePlayerGrint(player: StrandPlayer): Promise<ResolvedGrintPlayer> {
-  if (player.manualIndex !== undefined) {
-    return {
-      handicap: null,
-      match: null,
-      matchedTerm: null,
-      dataSource: verifiedDataSource(player),
-      grintProfileUrl: getGrintProfileUrl(player.grintUsername),
-      ghinNumber: player.ghinNumber ?? null,
-    };
-  }
-
-  const terms = [
-    ...(player.grintSearchTerms ?? []),
-    player.email,
-    player.grintUsername,
-    player.name,
-  ].filter((term): term is string => Boolean(term && term.trim()));
-
-  const uniqueTerms = [...new Set(terms)];
+  const profileUrl = getGrintProfileUrlForPlayer(player);
 
   if (player.grintId) {
     try {
@@ -76,14 +58,34 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
           location: player.location,
         },
         matchedTerm: player.grintId,
-        dataSource: "live",
-        grintProfileUrl: getGrintProfileUrl(player.grintUsername),
+        dataSource: player.manualIndex !== undefined && player.ghinClub ? "ghin" : "live",
+        grintProfileUrl: profileUrl,
         ghinNumber: player.ghinNumber ?? null,
       };
     } catch {
-      // fall through to search
+      // fall through
     }
   }
+
+  if (player.manualIndex !== undefined) {
+    return {
+      handicap: null,
+      match: null,
+      matchedTerm: null,
+      dataSource: verifiedDataSource(player),
+      grintProfileUrl: profileUrl,
+      ghinNumber: player.ghinNumber ?? null,
+    };
+  }
+
+  const terms = [
+    ...(player.grintSearchTerms ?? []),
+    player.email,
+    player.grintUsername,
+    player.name,
+  ].filter((term): term is string => Boolean(term && term.trim()));
+
+  const uniqueTerms = [...new Set(terms)];
 
   let bestHit: GrintSearchResult | null = null;
   let bestTerm: string | null = null;
@@ -113,7 +115,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         match: bestHit,
         matchedTerm: bestTerm,
         dataSource: "live",
-        grintProfileUrl: getGrintProfileUrl(bestHit.username),
+        grintProfileUrl: getGrintProfileUrlForPlayer({ grintId: bestHit.id, grintUsername: bestHit.username }),
         ghinNumber: player.ghinNumber ?? null,
       };
     } catch {
@@ -122,7 +124,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         match: bestHit,
         matchedTerm: bestTerm,
         dataSource: "estimated",
-        grintProfileUrl: getGrintProfileUrl(bestHit.username),
+        grintProfileUrl: getGrintProfileUrlForPlayer({ grintId: bestHit.id, grintUsername: bestHit.username }),
         ghinNumber: player.ghinNumber ?? null,
       };
     }
@@ -133,7 +135,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
     match: null,
     matchedTerm: null,
     dataSource: player.estimatedIndex ? "estimated" : "missing",
-    grintProfileUrl: getGrintProfileUrl(player.grintUsername),
+    grintProfileUrl: getGrintProfileUrlForPlayer(player),
     ghinNumber: player.ghinNumber ?? null,
   };
 }

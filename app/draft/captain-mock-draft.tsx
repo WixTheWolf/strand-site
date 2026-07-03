@@ -10,6 +10,7 @@ import {
   getAvailablePlayers,
   getCurrentOwner,
   getDraftedIds,
+  getFullRoster,
   getNextPickNumber,
   getPicksForSide,
   loadScenarios,
@@ -17,6 +18,8 @@ import {
   OPPONENT_CAPTAIN,
   SCENARIO_TEMPLATES,
   suggestJustinPick,
+  TOTAL_DRAFT_PICKS,
+  DRAFT_PICKS_PER_CAPTAIN,
   upsertScenario,
   type DraftPick,
   type MockDraftScenario,
@@ -80,7 +83,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
   const makePick = (playerId: string, forcedSide?: "mine" | "justin") => {
     if (!active) return;
     const pickNumber = getNextPickNumber(active.picks);
-    if (pickNumber > TEAM_SIZE * 2) return;
+    if (pickNumber > TOTAL_DRAFT_PICKS) return;
     const side = forcedSide ?? getCurrentOwner(active.picks, active.iPickFirst);
     if (!side) return;
     if (getDraftedIds(active.picks).has(playerId)) return;
@@ -109,8 +112,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
     const suggestion = suggestJustinPick(
       available,
       getPicksForSide(active.picks, "mine"),
-      playerMap,
-      active.picks.length,
+      players,
     );
     if (suggestion) makePick(suggestion.id, "justin");
   };
@@ -127,21 +129,15 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
   const currentOwner = active ? getCurrentOwner(active.picks, active.iPickFirst) : null;
   const nextPick = active ? getNextPickNumber(active.picks) : 1;
-  const draftComplete = active ? active.picks.length >= TEAM_SIZE * 2 : false;
+  const draftComplete = active ? active.picks.length >= TOTAL_DRAFT_PICKS : false;
 
-  const myPicks = active
-    ? getPicksForSide(active.picks, "mine")
-        .map((pick) => playerMap.get(pick.playerId))
-        .filter(Boolean) as PlayerDraftStats[]
-    : [];
-  const justinPicks = active
-    ? getPicksForSide(active.picks, "justin")
-        .map((pick) => playerMap.get(pick.playerId))
-        .filter(Boolean) as PlayerDraftStats[]
-    : [];
+  const myRoster = active ? getFullRoster(players, active.picks, "mine") : [];
+  const justinRoster = active ? getFullRoster(players, active.picks, "justin") : [];
+  const myDraftedCount = active ? getPicksForSide(active.picks, "mine").length : 0;
+  const justinDraftedCount = active ? getPicksForSide(active.picks, "justin").length : 0;
 
-  const mySummary = summarizeTeam(myPicks);
-  const justinSummary = summarizeTeam(justinPicks);
+  const mySummary = summarizeTeam(myRoster);
+  const justinSummary = summarizeTeam(justinRoster);
 
   return (
     <div className="space-y-6">
@@ -152,9 +148,9 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Captain prep</div>
             <h2 className="mt-1 font-serif text-3xl">Mock draft scenarios</h2>
             <p className="mt-2 max-w-2xl text-sm text-[#14352a]/70">
-              You&apos;re <strong>{MY_CAPTAIN.nickname}</strong>. Opponent captain is{" "}
-              <strong>{OPPONENT_CAPTAIN.nickname}</strong>. Build multiple what-if boards depending on
-              who Justin grabs early.
+              You&apos;re <strong>{MY_CAPTAIN.nickname}</strong> — already on your team. Draft{" "}
+              <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a snake vs{" "}
+              <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned).
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -198,7 +194,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             >
               <div className="text-sm font-medium">{scenario.name}</div>
               <div className={`mt-1 text-xs ${activeId === scenario.id ? "text-white/70" : "text-[#14352a]/55"}`}>
-                {scenario.picks.length}/{TEAM_SIZE * 2} picks
+                {scenario.picks.length}/{TOTAL_DRAFT_PICKS} picks
               </div>
             </button>
           ))}
@@ -253,7 +249,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             ) : (
               <>
                 <div className="text-xs uppercase tracking-[0.22em] opacity-70">
-                  Pick {nextPick} of {TEAM_SIZE * 2}
+                  Pick {nextPick} of {TOTAL_DRAFT_PICKS}
                 </div>
                 <div className="mt-1 font-serif text-3xl">
                   {currentOwner === "mine"
@@ -323,8 +319,8 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             {/* Teams + pick log */}
             <div className="space-y-4">
               {[
-                { side: "mine" as const, label: MY_CAPTAIN.nickname, team: myPicks, summary: mySummary, dark: true },
-                { side: "justin" as const, label: OPPONENT_CAPTAIN.nickname, team: justinPicks, summary: justinSummary, dark: false },
+                { side: "mine" as const, label: MY_CAPTAIN.nickname, roster: myRoster, drafted: myDraftedCount, summary: mySummary, dark: true },
+                { side: "justin" as const, label: OPPONENT_CAPTAIN.nickname, roster: justinRoster, drafted: justinDraftedCount, summary: justinSummary, dark: false },
               ].map((block) => (
                 <div
                   key={block.side}
@@ -335,25 +331,28 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                   <div className="flex items-center justify-between">
                     <h3 className="font-serif text-2xl">{block.label}</h3>
                     <span className={`text-sm ${block.dark ? "text-white/70" : "text-[#14352a]/60"}`}>
-                      {block.team.length}/{TEAM_SIZE}
+                      {block.roster.length}/{TEAM_SIZE}
                     </span>
                   </div>
                   <div className={`mt-1 text-xs ${block.dark ? "text-white/60" : "text-[#14352a]/55"}`}>
-                    Avg {block.summary.avgIndex?.toFixed(1) ?? "—"} • {block.summary.heating} heating
+                    Avg {block.summary.avgIndex?.toFixed(1) ?? "—"} • {block.summary.heating} heating • match value {block.summary.matchValue?.toFixed(0) ?? "—"}
                   </div>
                   <div className="mt-3 space-y-1.5">
-                    {block.team.map((player, i) => (
+                    {block.roster.map((player, i) => (
                       <div
                         key={player.id}
                         className={`flex justify-between rounded-xl px-3 py-2 text-sm ${
                           block.dark ? "bg-white/10" : "bg-[#f7f3ea]"
                         }`}
                       >
-                        <span>{i + 1}. {player.nickname}</span>
+                        <span>
+                          {i === 0 ? "C" : i}. {player.nickname}
+                          {i === 0 ? " (captain)" : ""}
+                        </span>
                         <span>{formatIndex(player)}</span>
                       </div>
                     ))}
-                    {Array.from({ length: TEAM_SIZE - block.team.length }).map((_, i) => (
+                    {Array.from({ length: DRAFT_PICKS_PER_CAPTAIN - block.drafted }).map((_, i) => (
                       <div
                         key={`open-${i}`}
                         className={`rounded-xl border border-dashed px-3 py-2 text-xs ${
@@ -396,10 +395,9 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Scenario comparison</div>
               <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {scenarios.map((scenario) => {
-                  const mine = getPicksForSide(scenario.picks, "mine")
-                    .map((p) => playerMap.get(p.playerId))
-                    .filter(Boolean) as PlayerDraftStats[];
+                  const mine = getFullRoster(players, scenario.picks, "mine");
                   const sum = summarizeTeam(mine);
+                  const drafted = getPicksForSide(scenario.picks, "mine").length;
                   return (
                     <button
                       key={scenario.id}
@@ -410,7 +408,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                     >
                       <div className="font-medium">{scenario.name}</div>
                       <div className="mt-2 text-xs text-[#14352a]/60">
-                        Your team avg: {sum.avgIndex?.toFixed(1) ?? "—"} • {mine.length}/{TEAM_SIZE} picked
+                        Your team avg: {sum.avgIndex?.toFixed(1) ?? "—"} • {drafted}/{DRAFT_PICKS_PER_CAPTAIN} drafted
                       </div>
                       <div className="mt-2 text-xs text-[#14352a]/55">
                         {mine.map((p) => p.nickname).join(", ") || "No picks yet"}
