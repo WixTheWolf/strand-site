@@ -153,8 +153,8 @@ export default function DraftBoard() {
       <div className="mb-8 rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
         <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Strand 2026 rules</div>
         <p className="mt-2 max-w-3xl text-sm text-[#14352a]/70">
-          Draft model uses these formats: four-ball best net, scramble/shamble at 35% low + 15% high team
-          handicap, singles with full course handicap difference, 3-point match play.
+          Draft model uses foursomes, shamble (35% low + 15% high), singles with full course handicap
+          difference, and scramble pairings — 3-point match play throughout.
         </p>
         <ul className="mt-4 grid gap-2 text-sm text-[#14352a]/75 md:grid-cols-2">
           {STRAND_RULES.map((rule) => (

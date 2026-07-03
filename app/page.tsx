@@ -3,7 +3,7 @@ import TravelSection from "./components/travel-section";
 import CoursesSection from "./components/courses-section";
 import HistorySection from "./components/history-section";
 import { GALLERY_IMAGES } from "@/lib/courses";
-import { CAPTAINS, CAPTAIN_DRAFT_RULES, MATCHMAKER_RULES, ROUND_FORMATS, STRAND_RULES } from "@/lib/tournament";
+import { CAPTAINS, CAPTAIN_DRAFT_RULES, LOGISTICS_NOTES, MATCHMAKER_RULES, ON_COURSE_RULES, ROUND_FORMATS, STRAND_FORMAT, STRAND_RULES, WEEKEND_SCHEDULE } from "@/lib/tournament";
 
 export default function StrandInvitationalSite() {
   // Deployable asset paths:
@@ -43,17 +43,12 @@ export default function StrandInvitationalSite() {
     { rank: 4, name: "Andrew Mager", thru: "36", score: "+2", status: "One run away" },
   ];
 
-  const schedule = [
-    { day: "Thursday • August 20", title: "QuickSands Warm-Up", time: "5:00 PM", note: "Kick off the trip with QuickSands, then roll straight into dinner and the opening ceremony." },
-    { day: "Thursday • August 20", title: "Dinner + Opening Ceremony", time: "7:00 PM / 8:00 PM", note: "Dinner at 7, opening ceremony at 8, then The Matchmaker — captains reveal round pairings." },
-    ...ROUND_FORMATS.map((round) => ({
-      day: round.day,
-      title: `Round ${round.round} • ${round.format}`,
-      time: round.teeTime,
-      note: `${round.course}. ${round.note}`,
-    })),
-    { day: "Sunday • August 23", title: "Departure", time: "AM", note: "Checkout, load up, and head home before the stories get even less accurate." },
-  ];
+  const schedule = WEEKEND_SCHEDULE.map((item) => ({
+    day: item.day,
+    title: item.title,
+    time: item.time,
+    note: item.note,
+  }));
 
   const tripFacts = [
     ["Dates", "August 20–23, 2026"],
@@ -77,7 +72,8 @@ export default function StrandInvitationalSite() {
   ];
 
   const lodgingNotes = [
-    "Staying at the new hotel at the Scarecrow course.",
+    "New hotel at Scarecrow — short shuttle from original onsite lodging (that block was fully booked).",
+    "200 Sand Trails Road, Brewster, WA 98812.",
     "Rooms have double king beds.",
     "Two to a room is the default feel-good choice.",
     "Four to a room is the budget choice.",
@@ -106,7 +102,9 @@ export default function StrandInvitationalSite() {
     "Coordinate room splits early if you want the cheaper option.",
   ];
 
-  const formats = ROUND_FORMATS.map((round) => `Round ${round.round} • ${round.format} (${round.course})`);
+  const formats = STRAND_FORMAT;
+
+  const onCourseRules = ON_COURSE_RULES;
 
   const competitions = [
     "Closest to the Pin on every par 3.",
@@ -429,12 +427,16 @@ export default function StrandInvitationalSite() {
         <div className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
           <div className="space-y-6">
             <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">On-course competitions</div>
-              <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{competitions.map((item) => <li key={item}>• {item}</li>)}</ul>
+              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Format</div>
+              <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">
+                {formats.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
             </div>
             <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Match play formats</div>
-              <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{formats.map((item) => <li key={item}>• {item}</li>)}</ul>
+              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">On-course competitions</div>
+              <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{competitions.map((item) => <li key={item}>• {item}</li>)}</ul>
             </div>
           </div>
           <div className="space-y-6">
@@ -453,8 +455,16 @@ export default function StrandInvitationalSite() {
                 ))}
               </div>
             </div>
+            <div className="rounded-[2rem] border border-orange-200 bg-orange-50 p-6 shadow-sm">
+              <div className="text-xs uppercase tracking-[0.22em] text-orange-800/70">On-course rules</div>
+              <ul className="mt-4 space-y-3 text-sm text-orange-950/85">
+                {onCourseRules.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
+            </div>
             <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Rules</div>
+              <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Handicap & match play</div>
               <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">{rules.map((item) => <li key={item}>• {item}</li>)}</ul>
             </div>
           </div>

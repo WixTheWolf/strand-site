@@ -77,7 +77,7 @@ export default function PlayersHandicapSection() {
                     src={getPlayerPhoto(profile.id)!}
                     alt={profile.name}
                     fill
-                    className="object-cover object-top"
+                    className={`object-cover ${profile.id === "brian-kerns" ? "object-center scale-110" : "object-top"}`}
                     sizes="(max-width: 640px) 100vw, 25vw"
                   />
                 ) : (
