@@ -25,7 +25,7 @@ import {
   type MockDraftScenario,
 } from "@/lib/mock-draft";
 import type { PlayerDraftStats } from "@/lib/types";
-import PlayerMap from "./player-map";
+import { PlayerSkillGraph } from "./player-skill-graph";
 
 function formatIndex(player: PlayerDraftStats) {
   if (player.indexNum !== null) return player.indexNum.toFixed(1);
@@ -138,6 +138,10 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
   const mySummary = summarizeTeam(myRoster);
   const justinSummary = summarizeTeam(justinRoster);
+  const draftedIds = useMemo(
+    () => (active ? getDraftedIds(active.picks) : new Set<string>()),
+    [active],
+  );
 
   return (
     <div className="space-y-6">
@@ -268,16 +272,6 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               </>
             )}
           </div>
-
-          <PlayerMap
-            players={players}
-            picks={active.picks}
-            onSelectPlayer={(id) => {
-              if (draftComplete) return;
-              if (currentOwner === "mine") makePick(id);
-              else makePick(id, "justin");
-            }}
-          />
 
           <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             {/* Available pool */}
@@ -419,6 +413,8 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               </div>
             </div>
           )}
+
+          <PlayerSkillGraph players={players} draftedIds={draftedIds} />
         </>
       )}
     </div>
