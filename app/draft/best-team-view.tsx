@@ -31,6 +31,7 @@ const heatStyles = {
 
 const sourceStyles = {
   live: "bg-emerald-50 text-emerald-800",
+  ghin: "bg-blue-50 text-blue-900",
   manual: "bg-amber-50 text-amber-900",
   estimated: "bg-stone-100 text-stone-700",
   missing: "bg-red-50 text-red-800",
@@ -356,6 +357,7 @@ export default function BestTeamView() {
                 <th className="px-3 py-3">Team</th>
                 <th className="px-3 py-3">Source</th>
                 <th className="px-3 py-3">Location</th>
+                <th className="px-3 py-3">GHIN club</th>
                 <th className="px-3 py-3">TheGrint</th>
                 <th className="px-3 py-3">GHIN #</th>
                 <th className="px-3 py-3">Email</th>
@@ -393,6 +395,7 @@ export default function BestTeamView() {
                         {player.location ?? "—"}
                         {player.origin ? <div className="text-[#14352a]/45">from {player.origin}</div> : null}
                       </td>
+                      <td className="px-3 py-3 text-xs">{player.ghinClub ?? "—"}</td>
                       <td className="px-3 py-3 text-xs">
                         {player.grintProfileUrl ? (
                           <a href={player.grintProfileUrl} target="_blank" rel="noopener noreferrer" className="font-medium underline decoration-[#14352a]/20">
@@ -417,7 +420,7 @@ export default function BestTeamView() {
                     </tr>
                     {expanded && (
                       <tr className="border-b bg-[#f7f3ea]/60">
-                        <td colSpan={14} className="px-4 py-4">
+                        <td colSpan={15} className="px-4 py-4">
                           <div className="grid gap-4 lg:grid-cols-3">
                             <div>
                               <div className="text-[10px] uppercase tracking-[0.18em] text-[#14352a]/45">Profile</div>

@@ -35,15 +35,17 @@ export async function GET() {
   }
 
   const linked = stats.filter((player) => player.dataSource === "live").length;
+  const ghin = stats.filter((player) => player.dataSource === "ghin").length;
   const manual = stats.filter((player) => player.dataSource === "manual").length;
   const missing = stats.filter((player) => player.dataSource === "missing").length;
   const withGrintProfile = stats.filter((player) => player.grintProfileUrl).length;
 
   return NextResponse.json({
     updatedAt: new Date().toISOString(),
-    source: `TheGrint / GHIN — ${linked}/20 live${manual ? `, ${manual} captain-verified` : ""}${missing ? `, ${missing} pending link` : ""}`,
+    source: `TheGrint / GHIN — ${linked}/20 live, ${ghin}/20 GHIN-verified${manual ? `, ${manual} manual` : ""}${missing ? `, ${missing} pending` : ""}`,
     summary: {
       live: linked,
+      ghin,
       manual,
       missing,
       withGrintProfile,

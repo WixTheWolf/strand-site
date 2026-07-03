@@ -13,6 +13,7 @@ function formatIndex(player: PlayerDraftStats) {
 
 const sourceStyles: Record<PlayerDraftStats["dataSource"], string> = {
   live: "bg-emerald-50 text-emerald-800 border-emerald-200",
+  ghin: "bg-blue-50 text-blue-900 border-blue-200",
   manual: "bg-amber-50 text-amber-900 border-amber-200",
   estimated: "bg-sky-50 text-sky-900 border-sky-200",
   missing: "bg-rose-50 text-rose-900 border-rose-200",
@@ -49,7 +50,7 @@ export default function PlayersHandicapSection() {
           <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/60">Players</div>
           <h2 className="mt-2 font-serif text-4xl">The field, with live handicaps</h2>
           <p className="mt-3 max-w-2xl text-[#14352a]/75">
-            Handicap indexes pulled from TheGrint / GHIN where linked. Captain-verified indexes marked with *.
+            Handicap indexes pulled from TheGrint / GHIN where linked. GHIN-verified indexes show home club; * marks captain-verified only.
           </p>
         </div>
         <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">
@@ -98,6 +99,10 @@ export default function PlayersHandicapSection() {
                   ) : (
                     <span className="text-[#14352a]/45">Not linked</span>
                   )}
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[#14352a]/50">GHIN club</span>
+                  <span className="text-right">{profile.ghinClub ?? (live?.dataSource === "live" ? "TheGrint linked" : "—")}</span>
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[#14352a]/50">GHIN #</span>

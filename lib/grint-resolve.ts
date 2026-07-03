@@ -5,7 +5,7 @@ export interface ResolvedGrintPlayer {
   handicap: GrintHandicap | null;
   match: GrintSearchResult | null;
   matchedTerm: string | null;
-  dataSource: "live" | "manual" | "estimated" | "missing";
+  dataSource: "live" | "ghin" | "manual" | "estimated" | "missing";
   grintProfileUrl: string | null;
   ghinNumber: string | null;
 }
@@ -39,13 +39,17 @@ function scoreMatch(player: StrandPlayer, hit: GrintSearchResult, term: string):
   return score;
 }
 
+function verifiedDataSource(player: StrandPlayer): ResolvedGrintPlayer["dataSource"] {
+  return player.ghinClub ? "ghin" : "manual";
+}
+
 export async function resolvePlayerGrint(player: StrandPlayer): Promise<ResolvedGrintPlayer> {
   if (player.manualIndex !== undefined) {
     return {
       handicap: null,
       match: null,
       matchedTerm: null,
-      dataSource: "manual",
+      dataSource: verifiedDataSource(player),
       grintProfileUrl: getGrintProfileUrl(player.grintUsername),
       ghinNumber: player.ghinNumber ?? null,
     };

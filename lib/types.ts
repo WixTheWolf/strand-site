@@ -10,6 +10,8 @@ export interface StrandPlayer {
   grintId: string | null;
   /** USGA GHIN number when linked — requires player verification if unknown */
   ghinNumber?: string | null;
+  /** GHIN home club when verified off TheGrint */
+  ghinClub?: string;
   grintUsername?: string;
   /** Where the player actually lives (may differ from stale TheGrint location) */
   location?: string;
@@ -20,6 +22,8 @@ export interface StrandPlayer {
   tags: string[];
   /** Captain-verified index when GHIN/TheGrint cannot be linked reliably */
   manualIndex?: number;
+  /** Verified GHIN low index when known */
+  manualLowest?: number;
   estimatedIndex?: number;
   out?: boolean;
 }
@@ -44,7 +48,7 @@ export interface PlayerDraftStats extends StrandPlayer {
   draftScore: number;
   draftRank: number;
   formDelta: number | null;
-  dataSource: "live" | "manual" | "estimated" | "missing";
+  dataSource: "live" | "ghin" | "manual" | "estimated" | "missing";
   grintLocation?: string;
   grintUsernameResolved?: string;
   grintProfileUrl?: string | null;

@@ -89,7 +89,7 @@ function buildRationale(player: PlayerDraftStats): string {
   const parts: string[] = [];
 
   if (player.indexNum !== null) {
-    const label = player.dataSource === "manual" ? "verified index" : "index";
+    const label = player.dataSource === "ghin" || player.dataSource === "manual" ? "verified index" : "index";
     parts.push(`${player.indexNum.toFixed(1)} ${label}`);
   } else if (player.estimatedIndex) {
     parts.push(`~${player.estimatedIndex} estimated index`);
@@ -125,7 +125,9 @@ export function buildPlayerStats(
       ? parseHandicapNumber(handicap.index) ?? parseHandicapNumber(handicap.lowest)
       : player.estimatedIndex ?? null
   );
-  const lowestNum = handicap ? parseHandicapNumber(handicap.lowest) : null;
+  const lowestNum = handicap
+    ? parseHandicapNumber(handicap.lowest)
+    : player.manualLowest ?? null;
   const attestNum = handicap ? parseFloat(handicap.attest || "0") : 0;
   const { heat, heatLabel, formDelta } = getHeat(indexNum, lowestNum, attestNum);
   const draftScore = computeDraftScore(player, indexNum, lowestNum, attestNum, heat, formDelta);
@@ -143,7 +145,9 @@ export function buildPlayerStats(
     formDelta,
     dataSource: grintMeta?.dataSource
       ?? (player.manualIndex !== undefined
-        ? "manual"
+        ? player.ghinClub
+          ? "ghin"
+          : "manual"
         : handicap
           ? "live"
           : player.estimatedIndex

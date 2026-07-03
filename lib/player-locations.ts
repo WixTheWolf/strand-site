@@ -18,7 +18,7 @@ export const GAMBLE_SANDS: MapPoint = {
 
 /** Home-base coordinates — uses actual residence, not stale TheGrint location */
 export const PLAYER_LOCATIONS: Record<string, Omit<MapPoint, "id" | "kind">> = {
-  "andrew-mager": { label: "Andrew Mager", city: "California", lat: 34.05, lng: -118.25 },
+  "andrew-mager": { label: "Andrew Mager", city: "Southern California", lat: 34.05, lng: -118.25 },
   "brett-comfort": { label: "Brett Comfort", city: "La Mirada, CA", lat: 33.917, lng: -118.012 },
   "brian-kerns": { label: "Brian Kerns", city: "Colorado", lat: 39.739, lng: -104.99 },
   "fred-geisinger": { label: "Fred Geisinger", city: "Encinitas, CA", lat: 33.037, lng: -117.292 },

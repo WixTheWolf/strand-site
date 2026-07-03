@@ -156,8 +156,8 @@ export default function DraftBoard() {
           <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "live").length}/20 linked</div>
         </div>
         <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">Captain-verified</div>
-          <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "manual").length} indexes</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/50">GHIN verified</div>
+          <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "ghin").length} indexes</div>
         </div>
         <div className="rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Heating up</div>
