@@ -1,6 +1,6 @@
 export default function StrandGoogleEmbedHomeFred() {
   const logoSrc = "/logo.png";
-  const heroSrc = "/hero.jpg";
+  const heroSrc = "/courses/gamble-sands.jpg";
 
   const nav = ["Home", "The Strand", "The Plan", "Players", "Logistics", "Competition"];
 

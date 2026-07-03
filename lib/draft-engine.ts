@@ -92,8 +92,15 @@ const FORMAT_WEIGHTS = {
   shamble: 0.2,
 } as const;
 
-/** Cross-format match-play value — weights singles net leverage higher */
-export function computeMatchPlayValue(player: PlayerDraftStats): number {
+export interface FormatValues {
+  fourball: number;
+  scramble: number;
+  singles: number;
+  shamble: number;
+}
+
+/** Per-format match-play value breakdown for one player */
+export function computeFormatValues(player: PlayerDraftStats): FormatValues {
   const index = player.indexNum ?? player.estimatedIndex ?? 24;
   const grossSkill = Math.max(0, 40 - index);
   const netLeverage = strokeLeverage(index);
@@ -108,22 +115,54 @@ export function computeMatchPlayValue(player: PlayerDraftStats): number {
   const reliability = Math.min(5, player.attestNum / 12);
   const strategy = strategicBonus(player);
 
-  const fourball = grossSkill * 1.2 + strategy + (index <= 9 ? (9 - index) * 0.8 : 0);
-  const scramble = grossSkill * 0.85 + strategy * 1.15 + reliability;
-  // Singles: full course handicap difference between opponents (stroke leverage matters)
-  const singles = grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy;
-  // Shamble uses same 35% low + 15% high team weighting as scramble
-  const shamble = grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5;
+  return {
+    fourball: grossSkill * 1.2 + strategy + (index <= 9 ? (9 - index) * 0.8 : 0),
+    scramble: grossSkill * 0.85 + strategy * 1.15 + reliability,
+    // Singles: full course handicap difference between opponents (stroke leverage matters)
+    singles: grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy,
+    // Shamble uses same 35% low + 15% high team weighting as scramble
+    shamble: grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5,
+  };
+}
 
+/** Cross-format match-play value — weights singles net leverage higher */
+export function computeMatchPlayValue(player: PlayerDraftStats): number {
+  const index = player.indexNum ?? player.estimatedIndex ?? 24;
+  const formats = computeFormatValues(player);
   const eliteAnchor = index <= 8 ? 6 + (8 - index) * 0.5 : 0;
 
   return (
-    fourball * FORMAT_WEIGHTS.fourball +
-    scramble * FORMAT_WEIGHTS.scramble +
-    singles * FORMAT_WEIGHTS.singles +
-    shamble * FORMAT_WEIGHTS.shamble +
+    formats.fourball * FORMAT_WEIGHTS.fourball +
+    formats.scramble * FORMAT_WEIGHTS.scramble +
+    formats.singles * FORMAT_WEIGHTS.singles +
+    formats.shamble * FORMAT_WEIGHTS.shamble +
     eliteAnchor
   );
+}
+
+/** Sum of per-format values across a roster */
+export function summarizeTeamFormats(team: PlayerDraftStats[]): FormatValues {
+  return team.reduce<FormatValues>(
+    (acc, player) => {
+      const v = computeFormatValues(player);
+      return {
+        fourball: acc.fourball + v.fourball,
+        scramble: acc.scramble + v.scramble,
+        singles: acc.singles + v.singles,
+        shamble: acc.shamble + v.shamble,
+      };
+    },
+    { fourball: 0, scramble: 0, singles: 0, shamble: 0 },
+  );
+}
+
+/**
+ * Logistic model estimate of match-week win probability from total
+ * roster value difference (synergy included). Scale tuned so a full
+ * first-round-pick edge (~12 pts) reads as roughly a 62/38 split.
+ */
+export function winProbability(myValue: number, oppValue: number): number {
+  return 1 / (1 + Math.exp(-(myValue - oppValue) / 24));
 }
 
 function scramblePairBonus(indexA: number, indexB: number): number {
@@ -240,6 +279,17 @@ function simulateRemainingDraft(
   return { wix, justin };
 }
 
+/** Greedy completion of an in-progress draft — projects both final rosters from the current board */
+export function projectRemainingDraft(
+  nextPick: number,
+  wixPicksFirst: boolean,
+  available: PlayerDraftStats[],
+  wixRoster: PlayerDraftStats[],
+  justinRoster: PlayerDraftStats[],
+): { wix: PlayerDraftStats[]; justin: PlayerDraftStats[] } {
+  return simulateRemainingDraft(nextPick, wixPicksFirst, available, wixRoster, justinRoster);
+}
+
 export interface SimulatedDraftResult {
   wixPicks: PlayerDraftStats[];
   justinPicks: PlayerDraftStats[];
@@ -257,8 +307,8 @@ export function simulateOptimalSnakeDraft(
   const justinCaptain = stats.find((player) => player.id === CAPTAIN_IDS[1])!;
 
   let available = [...draftable];
-  let wixRoster: PlayerDraftStats[] = [wixCaptain];
-  let justinRoster: PlayerDraftStats[] = [justinCaptain];
+  const wixRoster: PlayerDraftStats[] = [wixCaptain];
+  const justinRoster: PlayerDraftStats[] = [justinCaptain];
   const wixPicks: PlayerDraftStats[] = [];
   const justinPicks: PlayerDraftStats[] = [];
 
@@ -329,7 +379,7 @@ function computeDraftScore(
   return handicapScore + formScore + attestScore + strategyScore;
 }
 
-function buildRationale(player: PlayerDraftStats): string {
+export function buildRationale(player: PlayerDraftStats): string {
   const parts: string[] = [];
 
   if (player.indexNum !== null) {
