@@ -15,12 +15,21 @@ export const CAPTAINS = {
   },
 } as const;
 
-export const TEAM_DRAFT_RULES = [
+export const CAPTAIN_DRAFT_RULES = [
   "Two captains: Matt Wixted (WIX) and Justin Uribe (J-BONE).",
   "Snake draft — each captain selects 9 players; captains play on their own teams (10 per side).",
-  "Teams revealed Thursday night after the opening ceremony.",
+  "~One month before The Strand: live captain snake draft locks both rosters.",
   "Use Draft Lab to model picks before the live draw.",
 ];
+
+export const MATCHMAKER_RULES = [
+  "Thursday night at Gamble Sands — after opening ceremony, captains run The Matchmaker.",
+  "WIX vs J-BONE set round-by-round pairings and matchups for all four rounds.",
+  "Pairings post live to this board; leaderboard links activate after reveal.",
+];
+
+/** @deprecated Use CAPTAIN_DRAFT_RULES + MATCHMAKER_RULES */
+export const TEAM_DRAFT_RULES = [...CAPTAIN_DRAFT_RULES, ...MATCHMAKER_RULES];
 
 export const ROUND_FORMATS = [
   {

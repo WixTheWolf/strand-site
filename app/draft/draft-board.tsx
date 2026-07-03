@@ -124,8 +124,8 @@ export default function DraftBoard() {
           <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/55">Strand Draft Lab</div>
           <h1 className="mt-2 font-serif text-5xl">Captain prep for Gamble Sands</h1>
           <p className="mt-3 max-w-3xl text-[#14352a]/75">
-            Mock snake drafts vs Justin Uribe (J-BONE). Save multiple scenarios, study the skill graph
-            and risk tiers at the bottom of the board, and walk in Thursday night ready for any opening pick.
+            Mock snake drafts vs Justin Uribe (J-BONE) — prep for the captain draft ~one month before The
+            Strand. Thursday night is The Matchmaker for pairings, not roster picks.
           </p>
         </div>
         <button
@@ -179,9 +179,9 @@ export default function DraftBoard() {
           </div>
         </div>
         <div className="rounded-[1.75rem] border border-[#14352a]/10 bg-[#14352a] p-5 text-white shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-white/60">Snake draft</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-white/60">Captain draft</div>
           <div className="mt-2 font-serif text-2xl">WIX vs J-BONE</div>
-          <div className="mt-1 text-sm text-white/70">{DRAFT_PICKS_PER_CAPTAIN} picks each + captains locked</div>
+          <div className="mt-1 text-sm text-white/70">~1 month before trip · {DRAFT_PICKS_PER_CAPTAIN} picks each</div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import PlayersHandicapSection from "./components/players-handicap-section";
 import TravelSection from "./components/travel-section";
-import { CAPTAINS, ROUND_FORMATS, STRAND_RULES, TEAM_DRAFT_RULES } from "@/lib/tournament";
+import { CAPTAINS, CAPTAIN_DRAFT_RULES, MATCHMAKER_RULES, ROUND_FORMATS, STRAND_RULES } from "@/lib/tournament";
 
 export default function StrandInvitationalSite() {
   // Deployable asset paths:
@@ -40,7 +40,7 @@ export default function StrandInvitationalSite() {
 
   const schedule = [
     { day: "Thursday • August 20", title: "QuickSands Warm-Up", time: "5:00 PM", note: "Kick off the trip with QuickSands, then roll straight into dinner and the opening ceremony." },
-    { day: "Thursday • August 20", title: "Dinner + Opening Ceremony", time: "7:00 PM / 8:00 PM", note: "Dinner at 7, then opening ceremony at 8 — captain snake draft and team reveal." },
+    { day: "Thursday • August 20", title: "Dinner + Opening Ceremony", time: "7:00 PM / 8:00 PM", note: "Dinner at 7, opening ceremony at 8, then The Matchmaker — captains reveal round pairings." },
     ...ROUND_FORMATS.map((round) => ({
       day: round.day,
       title: `Round ${round.round} • ${round.format}`,
@@ -124,8 +124,8 @@ export default function StrandInvitationalSite() {
   const ceremonyTimeline = [
     ["7:00 PM", "Dinner"],
     ["8:00 PM", "Opening ceremony"],
-    ["8:15 PM", `${CAPTAINS.wix.nickname} vs ${CAPTAINS.justin.nickname} snake draft`],
-    ["8:30 PM", "Round 1 pairings reveal"],
+    ["8:15 PM", `The Matchmaker — ${CAPTAINS.wix.nickname} vs ${CAPTAINS.justin.nickname}`],
+    ["8:30 PM", "Round 1 pairings posted"],
     ["8:45 PM", "Leaderboard links live"],
   ];
 
@@ -133,6 +133,14 @@ export default function StrandInvitationalSite() {
     { title: CAPTAINS.wix.teamName, subtitle: `${CAPTAINS.wix.name} • Captain`, dark: true },
     { title: CAPTAINS.justin.teamName, subtitle: `${CAPTAINS.justin.name} • Captain`, dark: false },
   ];
+
+  const pairingRounds = ROUND_FORMATS.map((round) => ({
+    round: round.round,
+    format: round.format,
+    label: `Round ${round.round} • ${round.format}`,
+    day: round.day,
+    slots: round.format === "Singles" ? 10 : 5,
+  }));
 
   const pastTrips = [
     "Monterey 2025",
@@ -220,7 +228,8 @@ export default function StrandInvitationalSite() {
                   ))}
                 </div>
                 <div className="mt-5 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/75">
-                  Thursday night: opening ceremony, team draw, pairings reveal, then the site flips from teaser mode to battle board.
+                  Captain snake draft ~one month out locks rosters. Thursday night: opening ceremony, then
+                  The Matchmaker pairings reveal — the site flips from teaser mode to battle board.
                 </div>
               </div>
             </div>
@@ -341,7 +350,9 @@ export default function StrandInvitationalSite() {
               <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/60">Teams & Pairings</div>
               <h2 className="mt-2 font-serif text-4xl">Thursday night reveal board</h2>
             </div>
-            <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">Pairings decided Thursday night</div>
+            <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">
+              Pairings decided Thursday night at The Matchmaker
+            </div>
           </div>
           <div className="grid gap-6 xl:grid-cols-[0.75fr_1.25fr]">
             <div className="space-y-6">
@@ -357,29 +368,59 @@ export default function StrandInvitationalSite() {
                 </div>
               </div>
               <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
-                <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Snake draft rules</div>
+                <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Captain draft</div>
+                <p className="mt-2 text-xs text-[#14352a]/60">~One month before The Strand</p>
                 <ul className="mt-4 space-y-3 text-sm text-[#14352a]/75">
-                  {TEAM_DRAFT_RULES.map((rule) => (
+                  {CAPTAIN_DRAFT_RULES.map((rule) => (
+                    <li key={rule}>• {rule}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-[2rem] border border-orange-200 bg-orange-50 p-6 shadow-sm">
+                <div className="text-xs uppercase tracking-[0.22em] text-orange-800/70">The Matchmaker</div>
+                <p className="mt-2 text-xs text-orange-900/65">Thursday night • Gamble Sands</p>
+                <ul className="mt-4 space-y-3 text-sm text-orange-950/80">
+                  {MATCHMAKER_RULES.map((rule) => (
                     <li key={rule}>• {rule}</li>
                   ))}
                 </ul>
               </div>
             </div>
-            <div className="grid gap-6 lg:grid-cols-2">
-              {teamPlaceholders.map((team) => (
-                <div key={team.title} className={`rounded-[2rem] border p-6 shadow-sm ${team.dark ? "border-[#14352a] bg-[#14352a] text-white" : "border-[#14352a]/15 bg-white text-[#14352a]"}`}>
-                  <div className="text-xs uppercase tracking-[0.22em] opacity-60">Thursday night reveal</div>
-                  <div className="mt-2 font-serif text-3xl">{team.title}</div>
-                  <div className="mt-2 text-sm opacity-75">{team.subtitle}</div>
-                  <div className="mt-6 space-y-3">
-                    {Array.from({ length: 10 }).map((_, index) => (
-                      <div key={index} className={`rounded-2xl border px-4 py-3 text-sm ${team.dark ? "border-white/10 bg-white/10" : "border-[#14352a]/10 bg-[#f7f3ea]"}`}>
-                        Player slot {index + 1}
-                      </div>
-                    ))}
+            <div className="space-y-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                {teamPlaceholders.map((team) => (
+                  <div key={team.title} className={`rounded-[2rem] border p-6 shadow-sm ${team.dark ? "border-[#14352a] bg-[#14352a] text-white" : "border-[#14352a]/15 bg-white text-[#14352a]"}`}>
+                    <div className="text-xs uppercase tracking-[0.22em] opacity-60">Roster locked at captain draft</div>
+                    <div className="mt-2 font-serif text-3xl">{team.title}</div>
+                    <div className="mt-2 text-sm opacity-75">{team.subtitle}</div>
+                    <div className="mt-6 space-y-3">
+                      {Array.from({ length: 10 }).map((_, index) => (
+                        <div key={index} className={`rounded-2xl border px-4 py-3 text-sm ${team.dark ? "border-white/10 bg-white/10" : "border-[#14352a]/10 bg-[#f7f3ea]"}`}>
+                          Player slot {index + 1}
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                ))}
+              </div>
+              <div className="rounded-[2rem] border border-[#14352a]/10 bg-white p-6 shadow-sm">
+                <div className="text-xs uppercase tracking-[0.22em] text-[#14352a]/55">Pairings board — revealed at The Matchmaker</div>
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  {pairingRounds.map((round) => (
+                    <div key={round.round} className="rounded-2xl border border-[#14352a]/10 bg-[#f7f3ea] p-4">
+                      <div className="font-serif text-xl">{round.label}</div>
+                      <div className="mt-1 text-xs text-[#14352a]/55">{round.day}</div>
+                      <div className="mt-4 space-y-2">
+                        {Array.from({ length: round.slots }).map((_, index) => (
+                          <div key={index} className="rounded-xl border border-dashed border-[#14352a]/20 bg-white px-3 py-2 text-sm text-[#14352a]/50">
+                            {round.format === "Singles" ? `Match ${index + 1}` : `Pairing ${index + 1}`} — TBD
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
@@ -426,10 +467,11 @@ export default function StrandInvitationalSite() {
       <section id="draft-lab" className="mx-auto max-w-7xl px-6 py-16">
         <div className="rounded-[2rem] border border-[#14352a]/10 bg-[#14352a] p-8 text-white shadow-sm md:p-10">
           <div className="text-xs uppercase tracking-[0.3em] text-white/60">Draft Lab</div>
-          <h2 className="mt-2 font-serif text-4xl">Build your winning team before Thursday night</h2>
+          <h2 className="mt-2 font-serif text-4xl">Prep your roster before the captain draft</h2>
           <p className="mt-4 max-w-3xl text-white/80">
-            Interactive player map, captain mock draft vs Justin Uribe, and saved what-if scenarios with live
-            TheGrint handicaps for all 20 players.
+            Captain snake draft happens ~one month before The Strand. Thursday night is The Matchmaker —
+            pairings only. Use Draft Lab now for mock snakes, skill graphs, and saved what-if scenarios
+            with live TheGrint handicaps for all 20 players.
           </p>
           <a
             href="/draft"

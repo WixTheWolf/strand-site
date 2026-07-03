@@ -154,7 +154,8 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             <p className="mt-2 max-w-2xl text-sm text-[#14352a]/70">
               You&apos;re <strong>{MY_CAPTAIN.nickname}</strong> — already on your team. Draft{" "}
               <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a snake vs{" "}
-              <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned).
+              <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned). Live captain draft is ~one
+              month before The Strand; Thursday night is <strong>The Matchmaker</strong> for pairings.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
