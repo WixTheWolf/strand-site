@@ -14,48 +14,47 @@ export default function TravelSection() {
   });
 
   return (
-    <section id="travel" className="border-y border-[#14352a]/10 bg-[#14352a] text-white">
-      <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-[0.3em] text-white/60">Travel</div>
-            <h2 className="mt-2 font-serif text-4xl">GEG flight board</h2>
-            <p className="mt-3 max-w-2xl text-white/75">
-              Thursday arrivals into Spokane (GEG). Most of the LA crew connects through PDX on Alaska morning banks.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white/80 backdrop-blur">
-            Fly into GEG • rent cars • drive to Brewster
-          </div>
+    <section id="travel" className="divider bg-[#111] text-white">
+      <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
+        <div className="mb-12 max-w-lg">
+          <p className="label text-white/40">Travel</p>
+          <h2 className="section-title mt-3 text-white">GEG flight board</h2>
+          <p className="mt-4 text-sm leading-relaxed text-white/50">
+            Thursday arrivals into Spokane. Most of the LA crew connects through PDX on Alaska morning
+            banks.
+          </p>
         </div>
 
-        <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur">
-          <div className="grid grid-cols-[1.1fr_1.4fr_1.4fr] bg-white/10 px-4 py-3 text-xs uppercase tracking-[0.2em] text-white/65">
-            <div>Player</div>
-            <div>Arrival to GEG</div>
-            <div>Departure from GEG</div>
-          </div>
-          {rows.map(({ player, arrival, departure, notes }) => (
-            <div
-              key={player.id}
-              className="grid grid-cols-1 gap-2 border-t border-white/10 px-4 py-4 text-sm md:grid-cols-[1.1fr_1.4fr_1.4fr] md:gap-4"
-            >
-              <div>
-                <div className="font-medium">{player.name}</div>
-                <div className="text-xs text-white/55">{player.nickname}</div>
-                {notes ? <div className="mt-1 text-xs text-amber-200/90">{notes}</div> : null}
-              </div>
-              <div className="text-white/80">{arrival}</div>
-              <div className="text-white/80">{departure}</div>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-white/10 text-[10px] uppercase tracking-[0.18em] text-white/35">
+                <th className="pb-4 pr-6 font-medium">Player</th>
+                <th className="pb-4 pr-6 font-medium">Arrival</th>
+                <th className="pb-4 font-medium">Departure</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(({ player, arrival, departure, notes }) => (
+                <tr key={player.id} className="border-b border-white/6">
+                  <td className="py-3.5 pr-6">
+                    <div className="font-medium">{player.name}</div>
+                    <div className="text-xs text-white/35">{player.nickname}</div>
+                    {notes ? <div className="mt-0.5 text-xs text-amber-300/70">{notes}</div> : null}
+                  </td>
+                  <td className="py-3.5 pr-6 text-white/60">{arrival}</td>
+                  <td className="py-3.5 text-white/60">{departure}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-12 flex flex-wrap gap-x-8 gap-y-2">
           {LOGISTICS_NOTES.map((note) => (
-            <div key={note} className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur text-sm text-white/80">
+            <span key={note} className="text-xs text-white/40">
               {note}
-            </div>
+            </span>
           ))}
         </div>
       </div>

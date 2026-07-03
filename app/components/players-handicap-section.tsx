@@ -13,14 +13,6 @@ function formatIndex(player: PlayerDraftStats) {
   return "—";
 }
 
-const sourceStyles: Record<PlayerDraftStats["dataSource"], string> = {
-  live: "bg-emerald-50 text-emerald-800 border-emerald-200",
-  ghin: "bg-blue-50 text-blue-900 border-blue-200",
-  manual: "bg-amber-50 text-amber-900 border-amber-200",
-  estimated: "bg-sky-50 text-sky-900 border-sky-200",
-  missing: "bg-rose-50 text-rose-900 border-rose-200",
-};
-
 export default function PlayersHandicapSection() {
   const [players, setPlayers] = useState<PlayerDraftStats[] | null>(null);
   const [source, setSource] = useState<string>("");
@@ -46,103 +38,57 @@ export default function PlayersHandicapSection() {
   }, [players]);
 
   return (
-    <section id="players" className="mx-auto max-w-7xl px-6 py-16">
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-[#14352a]/60">Players</div>
-          <h2 className="mt-2 font-serif text-4xl">The field, with live handicaps</h2>
-          <p className="mt-3 max-w-2xl text-[#14352a]/75">
-            Handicap indexes pulled from TheGrint / GHIN where linked. GHIN-verified indexes show home club; * marks captain-verified only.
+    <section id="players" className="divider bg-white">
+      <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
+        <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="label">Players</p>
+            <h2 className="section-title mt-3">The field</h2>
+          </div>
+          <p className="text-xs text-black/40">
+            {source || (error ? "Handicap sync unavailable" : "Loading GHIN data…")}
           </p>
         </div>
-        <div className="rounded-2xl border border-[#14352a]/10 bg-white px-4 py-3 text-sm text-[#14352a]/70 shadow-sm">
-          {source || (error ? "Handicap sync unavailable" : "Loading GHIN data…")}
-        </div>
-      </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {STRAND_PLAYERS.map((profile) => {
-          const live = playerMap.get(profile.id);
-          const index = live ? formatIndex(live) : "…";
-          const dataSource = live?.dataSource ?? "missing";
+        <div className="grid gap-px bg-[#e2ddd3] sm:grid-cols-2 lg:grid-cols-4">
+          {STRAND_PLAYERS.map((profile) => {
+            const live = playerMap.get(profile.id);
+            const index = live ? formatIndex(live) : "…";
 
-          return (
-            <div
-              key={profile.id}
-              className="overflow-hidden rounded-[1.75rem] border border-[#14352a]/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className="relative aspect-[4/5] overflow-hidden bg-[#14352a]">
-                {getPlayerPhoto(profile.id) ? (
-                  <Image
-                    src={getPlayerPhoto(profile.id)!}
-                    alt={profile.name}
-                    fill
-                    className={`object-cover ${profile.id === "brian-kerns" ? "object-center scale-110" : "object-top"}`}
-                    sizes="(max-width: 640px) 100vw, 25vw"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center font-serif text-5xl text-white/80">
-                    {profile.initials}
-                  </div>
-                )}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#14352a]/90 to-transparent px-5 pb-4 pt-16">
-                  <div className="text-xs uppercase tracking-[0.22em] text-white/70">{profile.nickname}</div>
-                  <div className="font-serif text-2xl text-white">{profile.name}</div>
-                </div>
-                <div className="absolute right-4 top-4 rounded-2xl bg-white/95 px-3 py-2 text-center shadow">
-                  <div className="font-serif text-2xl text-[#14352a]">{index}</div>
-                  <div className="text-[10px] uppercase tracking-[0.14em] text-[#14352a]/50">Index</div>
-                </div>
-              </div>
-
-              <div className="p-6">
-              <p className="text-sm leading-6 text-[#14352a]/78">{profile.blurb}</p>
-
-              <div className="mt-4 space-y-2 border-t border-[#14352a]/8 pt-4 text-xs">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[#14352a]/50">TheGrint</span>
-                  {live?.grintProfileUrl ? (
-                    <a
-                      href={live.grintProfileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="truncate font-medium text-[#14352a] underline decoration-[#14352a]/25"
-                    >
-                      {live.grintUsernameResolved ?? profile.grintUsername ?? "Profile"}
-                    </a>
-                  ) : profile.grintId ? (
-                    <span className="font-medium">ID {profile.grintId}</span>
+            return (
+              <article key={profile.id} className="group bg-white">
+                <div className="relative aspect-[3/4] overflow-hidden bg-[#111]">
+                  {getPlayerPhoto(profile.id) ? (
+                    <Image
+                      src={getPlayerPhoto(profile.id)!}
+                      alt={profile.name}
+                      fill
+                      className={`object-cover transition duration-500 group-hover:scale-[1.03] ${profile.id === "brian-kerns" ? "object-center scale-110" : "object-top"}`}
+                      sizes="(max-width: 640px) 100vw, 25vw"
+                    />
                   ) : (
-                    <span className="text-[#14352a]/45">Not linked</span>
+                    <div className="flex h-full items-center justify-center text-4xl font-medium text-white/30">
+                      {profile.initials}
+                    </div>
                   )}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 pt-12">
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-white/50">
+                      {profile.nickname}
+                    </p>
+                    <h3 className="text-lg font-medium text-white">{profile.name}</h3>
+                  </div>
+                  <div className="absolute right-3 top-3 bg-white px-2.5 py-1.5 text-center">
+                    <div className="text-lg font-medium leading-none">{index}</div>
+                    <div className="text-[9px] uppercase tracking-[0.12em] text-black/40">Index</div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[#14352a]/50">GHIN club</span>
-                  <span className="text-right">{profile.ghinClub ?? (live?.dataSource === "live" ? "TheGrint linked" : "—")}</span>
+                <div className="p-4">
+                  <p className="text-xs leading-relaxed text-black/55 line-clamp-3">{profile.blurb}</p>
                 </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[#14352a]/50">GHIN #</span>
-                  <span className="font-medium">
-                    {live?.ghinNumberResolved ?? profile.ghinNumber ?? "Verify at draw"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[#14352a]/50">Location</span>
-                  <span>{profile.location ?? "—"}</span>
-                </div>
-              </div>
-
-              {live ? (
-                <div className="mt-3">
-                  <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.14em] ${sourceStyles[dataSource]}`}>
-                    {dataSource}
-                  </span>
-                </div>
-              ) : null}
-              </div>
-            </div>
-          );
-        })}
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
