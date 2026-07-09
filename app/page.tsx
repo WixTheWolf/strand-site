@@ -189,7 +189,7 @@ export default function HomePage() {
                 <p className="label">Thursday Night</p>
                 <h2 className="section-title mt-3">The Matchmaker</h2>
                 <p className="mt-4 text-sm leading-relaxed text-black/55">
-                  Captain snake draft locks rosters ~one month out. Thursday is pairings only —
+                  Captain draft locks rosters ~one month out. Thursday is pairings only —
                   {CAPTAINS.wix.nickname} vs {CAPTAINS.justin.nickname} set every matchup live.
                 </p>
                 <ul className="mt-6 space-y-2 text-sm text-black/65">
@@ -282,7 +282,7 @@ export default function HomePage() {
                 Model your roster before the captain draft.
               </h2>
               <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70">
-                Mock snakes, win probability, format-by-format edges, and saved what-if scenarios
+                Mock drafts, win probability, format-by-format edges, and saved what-if scenarios
                 with live TheGrint handicaps for all 20 players.
               </p>
               <Link href="/draft" className="btn-primary mt-8 bg-white text-black hover:opacity-90">

@@ -124,7 +124,7 @@ export default function DraftBoard() {
           <p className="label">Draft Lab</p>
           <h1 className="section-title mt-3">Captain prep for Gamble Sands</h1>
           <p className="mt-3 max-w-3xl text-sm text-black/55">
-            Mock snake drafts vs Justin Uribe (J-BONE) — prep for the captain draft ~one month before The
+            Mock traditional drafts vs Justin Uribe (J-BONE) — prep for the captain draft ~one month before The
             Strand. Thursday night is The Matchmaker for pairings, not roster picks.
           </p>
         </div>

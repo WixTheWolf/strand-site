@@ -158,7 +158,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             <h2 className="mt-1 text-xl font-medium">Mock draft scenarios</h2>
             <p className="mt-2 max-w-2xl text-sm text-[#111]/70">
               You&apos;re <strong>{MY_CAPTAIN.nickname}</strong> — already on your team. Draft{" "}
-              <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a snake vs{" "}
+              <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a traditional draft vs{" "}
               <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned). Live captain draft is ~one
               month before The Strand; Thursday night is <strong>The Matchmaker</strong> for pairings.
             </p>
@@ -224,7 +224,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                 onChange={(e) => persist({ ...active, iPickFirst: e.target.checked, picks: [] })}
                 disabled={active.picks.length > 0}
               />
-              I pick first in snake
+              I pick first every round
             </label>
             <button onClick={undoPick} className="rounded-xl border px-3 py-1.5 text-xs uppercase tracking-[0.12em]">
               Undo pick

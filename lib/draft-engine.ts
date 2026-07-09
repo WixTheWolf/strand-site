@@ -225,17 +225,10 @@ export function getCaptainRoster(
   return [captain, ...drafted];
 }
 
-function getSnakeOwnerForPick(pickNumber: number, wixPicksFirst: boolean): "wix" | "justin" {
-  const round = Math.floor((pickNumber - 1) / 2);
-  const positionInRound = (pickNumber - 1) % 2;
-  const wixFirstInRound = round % 2 === 0 ? wixPicksFirst : !wixPicksFirst;
-  return positionInRound === 0
-    ? wixFirstInRound
-      ? "wix"
-      : "justin"
-    : wixFirstInRound
-      ? "justin"
-      : "wix";
+/** Traditional (linear) order — the same captain leads off every round */
+function getOwnerForPick(pickNumber: number, wixPicksFirst: boolean): "wix" | "justin" {
+  const wixOnOdd = wixPicksFirst;
+  return pickNumber % 2 === 1 ? (wixOnOdd ? "wix" : "justin") : wixOnOdd ? "justin" : "wix";
 }
 
 function greedyBestPick(available: PlayerDraftStats[], roster: PlayerDraftStats[]): PlayerDraftStats {
@@ -264,7 +257,7 @@ function simulateRemainingDraft(
 
   for (let pick = startPick; pick <= TOTAL_DRAFT_PICKS; pick += 1) {
     if (!pool.length) break;
-    const owner = getSnakeOwnerForPick(pick, wixPicksFirst);
+    const owner = getOwnerForPick(pick, wixPicksFirst);
     if (owner === "wix") {
       const choice = greedyBestPick(pool, wix);
       wix.push(choice);
@@ -297,8 +290,8 @@ export interface SimulatedDraftResult {
   justinRoster: PlayerDraftStats[];
 }
 
-/** Optimal snake draft with match-play roster analytics; captains pre-assigned */
-export function simulateOptimalSnakeDraft(
+/** Optimal traditional draft with match-play roster analytics; captains pre-assigned */
+export function simulateOptimalDraft(
   stats: PlayerDraftStats[],
   wixPicksFirst = true,
 ): SimulatedDraftResult {
@@ -313,7 +306,7 @@ export function simulateOptimalSnakeDraft(
   const justinPicks: PlayerDraftStats[] = [];
 
   for (let pick = 1; pick <= TOTAL_DRAFT_PICKS; pick += 1) {
-    const owner = getSnakeOwnerForPick(pick, wixPicksFirst);
+    const owner = getOwnerForPick(pick, wixPicksFirst);
     if (!available.length) break;
 
     if (owner === "wix") {
@@ -481,24 +474,13 @@ export function getOptimalDraftOrder(stats: PlayerDraftStats[]): DraftRecommenda
   }));
 }
 
-export function getTeamSnakePickSlots(teamName: "A" | "B", rounds = DRAFT_PICKS_PER_CAPTAIN): number[] {
-  const slots: number[] = [];
-  for (let round = 0; round < rounds; round += 1) {
-    const aFirst = round % 2 === 0;
-    const overallPick = aFirst
-      ? teamName === "A"
-        ? round * 2 + 1
-        : round * 2 + 2
-      : teamName === "A"
-        ? round * 2 + 2
-        : round * 2 + 1;
-    slots.push(overallPick);
-  }
-  return slots;
+/** Traditional order: team A owns every odd overall pick, team B every even one */
+export function getTeamPickSlots(teamName: "A" | "B", rounds = DRAFT_PICKS_PER_CAPTAIN): number[] {
+  return Array.from({ length: rounds }, (_, round) => round * 2 + (teamName === "A" ? 1 : 2));
 }
 
 export interface OptimalTeamPick {
-  snakePick: number;
+  overallPick: number;
   player: PlayerDraftStats;
   rationale: string;
 }
@@ -509,22 +491,22 @@ export function getOptimalTeamWithPicks(
   teamName: "A" | "B" = "A",
   simulation?: SimulatedDraftResult,
 ): OptimalTeamPick[] {
-  const sim = simulation ?? simulateOptimalSnakeDraft(stats, teamName === "A");
+  const sim = simulation ?? simulateOptimalDraft(stats, teamName === "A");
   const picks = teamName === "A" ? sim.wixPicks : sim.justinPicks;
   const captain = stats.find((player) =>
     player.id === (teamName === "A" ? CAPTAIN_IDS[0] : CAPTAIN_IDS[1]),
   )!;
   const rationaleMap = new Map(recommendations.map((rec) => [rec.playerId, rec.rationale]));
-  const pickSlots = getTeamSnakePickSlots(teamName);
+  const pickSlots = getTeamPickSlots(teamName);
 
   const captainPick: OptimalTeamPick = {
-    snakePick: 0,
+    overallPick: 0,
     player: captain,
     rationale: "Captain — pre-assigned to your team",
   };
 
   const drafted = picks.map((player, index) => ({
-    snakePick: pickSlots[index] ?? index + 1,
+    overallPick: pickSlots[index] ?? index + 1,
     player,
     rationale: rationaleMap.get(player.id) ?? buildRationale(player),
   }));
@@ -537,7 +519,7 @@ export function getOptimalTeam(
   teamName: "A" | "B" = "A",
   simulation?: SimulatedDraftResult,
 ): PlayerDraftStats[] {
-  const sim = simulation ?? simulateOptimalSnakeDraft(stats, teamName === "A");
+  const sim = simulation ?? simulateOptimalDraft(stats, teamName === "A");
   return teamName === "A" ? sim.wixRoster : sim.justinRoster;
 }
 
