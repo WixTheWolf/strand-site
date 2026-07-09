@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { CountUp, Holo } from "./fx";
 import Reveal from "./reveal";
 import { LOGISTICS_NOTES } from "@/lib/tournament";
 import { getPlayerPhoto } from "@/lib/player-assets";
@@ -113,7 +114,9 @@ export default function TravelSection() {
           <div className="flex gap-8 text-sm">
             <div>
               <div className="text-[10px] uppercase tracking-[0.18em] text-white/35">Booked</div>
-              <div className="mt-1 font-mono text-2xl font-medium">{booked}/{passes.length}</div>
+              <div className="mt-1 font-mono text-2xl font-medium">
+                <CountUp value={booked} />/{passes.length}
+              </div>
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-[0.18em] text-white/35">Arrive</div>
@@ -133,6 +136,7 @@ export default function TravelSection() {
             const captain = isCaptain(player.id);
             return (
               <Reveal key={player.id} delay={(i % 2) * 100}>
+              <Holo className="rounded-xl">
               <article
                 className="group relative flex flex-col overflow-hidden rounded-xl bg-[#f7f5f0] text-[#111] shadow-[0_1px_0_rgba(255,255,255,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.45)] sm:flex-row"
               >
@@ -235,6 +239,7 @@ export default function TravelSection() {
                   </div>
                 </div>
               </article>
+              </Holo>
               </Reveal>
             );
           })}

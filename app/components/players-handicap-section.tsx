@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getPlayerPhoto } from "@/lib/player-assets";
 import { STRAND_PLAYERS } from "@/lib/players";
 import type { PlayerDraftStats } from "@/lib/types";
+import { TiltCard } from "./fx";
 import Reveal from "./reveal";
 
 function formatIndex(player: PlayerDraftStats) {
@@ -60,6 +61,7 @@ export default function PlayersHandicapSection() {
 
             return (
               <Reveal key={profile.id} delay={(i % 4) * 70} className="bg-white">
+              <TiltCard className="h-full">
               <article className="group h-full bg-white">
                 <div className="relative aspect-[3/4] overflow-hidden bg-[#111]">
                   {getPlayerPhoto(profile.id) ? (
@@ -90,6 +92,7 @@ export default function PlayersHandicapSection() {
                   <p className="text-xs leading-relaxed text-black/55 line-clamp-3">{profile.blurb}</p>
                 </div>
               </article>
+              </TiltCard>
               </Reveal>
             );
           })}

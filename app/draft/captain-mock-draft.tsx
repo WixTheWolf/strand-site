@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Confetti } from "@/app/components/fx";
 import { getPlayerPhoto } from "@/lib/player-assets";
 import { TEAM_SIZE } from "@/lib/players";
 import { summarizeTeam } from "@/lib/draft-engine";
@@ -44,6 +45,12 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const [search, setSearch] = useState("");
+  const [celebrate, setCelebrate] = useState(false);
+  const celebrateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (celebrateTimer.current) clearTimeout(celebrateTimer.current);
+  }, []);
 
   const playerMap = useMemo(() => new Map(players.map((p) => [p.id, p])), [players]);
 
@@ -97,6 +104,12 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
       ...active,
       picks: [...active.picks, { pickNumber, playerId, side }],
     });
+
+    if (pickNumber === TOTAL_DRAFT_PICKS) {
+      setCelebrate(true);
+      if (celebrateTimer.current) clearTimeout(celebrateTimer.current);
+      celebrateTimer.current = setTimeout(() => setCelebrate(false), 6000);
+    }
   };
 
   const undoPick = () => {
@@ -150,6 +163,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
   return (
     <div className="space-y-6">
+      {celebrate && <Confetti />}
       {/* Scenario manager */}
       <div className="rounded-[2rem] border border-[#111]/10 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
