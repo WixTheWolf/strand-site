@@ -408,14 +408,13 @@ export function buildPlayerStats(
     ghinNumber?: string | null;
   },
 ): PlayerDraftStats {
-  const indexNum = player.manualIndex ?? (
-    handicap
-      ? parseHandicapNumber(handicap.index) ?? parseHandicapNumber(handicap.lowest)
-      : player.estimatedIndex ?? null
-  );
-  const lowestNum = handicap
-    ? parseHandicapNumber(handicap.lowest)
-    : player.manualLowest ?? null;
+  // Live TheGrint index always wins; manual/estimated values are fallbacks only
+  const liveIndex = handicap
+    ? parseHandicapNumber(handicap.index) ?? parseHandicapNumber(handicap.lowest)
+    : null;
+  const indexNum = liveIndex ?? player.manualIndex ?? player.estimatedIndex ?? null;
+  const lowestNum =
+    (handicap ? parseHandicapNumber(handicap.lowest) : null) ?? player.manualLowest ?? null;
   const attestNum = handicap ? parseFloat(handicap.attest || "0") : 0;
   const { heat, heatLabel, formDelta } = getHeat(indexNum, lowestNum, attestNum);
   const draftScore = computeMatchPlayValue({
@@ -443,13 +442,13 @@ export function buildPlayerStats(
     draftScore,
     draftRank: 0,
     formDelta,
-    dataSource: grintMeta?.dataSource
-      ?? (player.manualIndex !== undefined
-        ? player.ghinClub
-          ? "ghin"
-          : "manual"
-        : handicap
-          ? "live"
+    dataSource: liveIndex !== null
+      ? "live"
+      : grintMeta?.dataSource
+        ?? (player.manualIndex !== undefined
+          ? player.ghinClub
+            ? "ghin"
+            : "manual"
           : player.estimatedIndex
             ? "estimated"
             : "missing"),

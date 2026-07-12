@@ -19,7 +19,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     initials: "AM",
     email: "magerag1@gmail.com",
     blurb:
-      "Formerly the best golfer in the group with a personal best of 74 — low scores, high vibes. Cracks jokes mid-swing and turns competitive rounds into comedy hours. GHIN index 5.2 out of CS Southern California Golf Club.",
+      "Formerly the best golfer in the group with a personal best of 74 — low scores, high vibes. Cracks jokes mid-swing and turns competitive rounds into comedy hours. GHIN out of CS Southern California Golf Club.",
     grintId: null,
     grintSearchTerms: ["magerag1@gmail.com", "Andrew Mager", "CS Southern California Golf Club"],
     location: "Southern California",
@@ -126,7 +126,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     nickname: "KEV",
     initials: "KG",
     email: "gordon.kevin.g@gmail.com",
-    blurb: "Bay Area local with supreme post-round chill and high-handicap net-match upside. TheGrint linked — GHIN 21.2 out of EClub North Bay.",
+    blurb: "Bay Area local with supreme post-round chill and high-handicap net-match upside. TheGrint linked — GHIN out of EClub North Bay.",
     grintId: "2330390",
     grintSearchTerms: ["gordon.kevin.g@gmail.com", "Kevin Gordon", "EClub North Bay", "2330390"],
     location: "San Francisco Bay Area, CA",

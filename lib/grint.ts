@@ -12,7 +12,15 @@ export interface GrintSearchResult {
 
 export function parseHandicapNumber(value: string | null | undefined): number | null {
   if (!value || value === "N/A") return null;
-  const normalized = String(value).replace(/~/g, "-");
+  const raw = String(value).trim();
+
+  // Plus handicaps ("+2.0") are better than scratch — numerically negative
+  if (raw.startsWith("+")) {
+    const plus = parseFloat(raw.slice(1));
+    return Number.isNaN(plus) ? null : -plus;
+  }
+
+  const normalized = raw.replace(/~/g, "-");
   if (normalized.includes("-")) {
     const parts = normalized
       .split("-")
@@ -64,7 +72,8 @@ export async function fetchGrintHandicap(userId: string): Promise<GrintHandicap>
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
-    next: { revalidate: 1800 },
+    // Keep indexes fresh — 5 minutes, not 30
+    next: { revalidate: 300 },
   });
 
   if (!response.ok) {

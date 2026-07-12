@@ -58,7 +58,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
           location: player.location,
         },
         matchedTerm: player.grintId,
-        dataSource: player.manualIndex !== undefined && player.ghinClub ? "ghin" : "live",
+        dataSource: "live",
         grintProfileUrl: profileUrl,
         ghinNumber: player.ghinNumber ?? null,
       };
@@ -67,17 +67,8 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
     }
   }
 
-  if (player.manualIndex !== undefined) {
-    return {
-      handicap: null,
-      match: null,
-      matchedTerm: null,
-      dataSource: verifiedDataSource(player),
-      grintProfileUrl: profileUrl,
-      ghinNumber: player.ghinNumber ?? null,
-    };
-  }
-
+  // No grintId — try to find the player on TheGrint before settling for a
+  // manual/estimated index, so every handicap that CAN be live is live.
   const terms = [
     ...(player.grintSearchTerms ?? []),
     player.email,
@@ -123,11 +114,22 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         handicap: null,
         match: bestHit,
         matchedTerm: bestTerm,
-        dataSource: "estimated",
+        dataSource: player.manualIndex !== undefined ? verifiedDataSource(player) : "estimated",
         grintProfileUrl: getGrintProfileUrlForPlayer({ grintId: bestHit.id, grintUsername: bestHit.username }),
         ghinNumber: player.ghinNumber ?? null,
       };
     }
+  }
+
+  if (player.manualIndex !== undefined) {
+    return {
+      handicap: null,
+      match: null,
+      matchedTerm: null,
+      dataSource: verifiedDataSource(player),
+      grintProfileUrl: profileUrl,
+      ghinNumber: player.ghinNumber ?? null,
+    };
   }
 
   return {
