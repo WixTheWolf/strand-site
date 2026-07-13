@@ -197,7 +197,11 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintSearchTerms: ["mwixted1@gmail.com", "Matt Wixted"],
     location: "Anaheim, CA",
     ghinNumber: "11634237",
+    ghinClub: "Silverhart Golf",
     tags: ["athlete", "improving", "creative"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 12.4,
+    manualLowest: 12.4,
   },
   {
     id: "nick-kane",
