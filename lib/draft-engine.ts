@@ -408,9 +408,13 @@ export function buildPlayerStats(
     ghinNumber?: string | null;
   },
 ): PlayerDraftStats {
-  // Live TheGrint index always wins; manual/estimated values are fallbacks only
+  // Live TheGrint index always wins; manual/estimated values are fallbacks only.
+  // Federation (USGA/WHS) is the official number per Strand rules — TheGrint's
+  // own "index" field can freeze when a player stops attesting rounds.
   const liveIndex = handicap
-    ? parseHandicapNumber(handicap.index) ?? parseHandicapNumber(handicap.lowest)
+    ? parseHandicapNumber(handicap.index_federation) ??
+      parseHandicapNumber(handicap.index) ??
+      parseHandicapNumber(handicap.lowest)
     : null;
   const indexNum = liveIndex ?? player.manualIndex ?? player.estimatedIndex ?? null;
   const lowestNum =
