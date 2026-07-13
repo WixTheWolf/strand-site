@@ -410,12 +410,13 @@ export function buildPlayerStats(
   },
 ): PlayerDraftStats {
   // GHIN is the official source per Strand rules. Priority:
-  // live GHIN index → hand-verified GHIN value (manualIndex) → TheGrint
-  // federation approximation → TheGrint index → estimated.
+  // live GHIN index → hand-verified GHIN value (manualIndex) → TheGrint index
+  // (verified against GHIN favorites, it mirrors GHIN far better than the
+  // federation band) → federation band → estimated.
   const ghinLiveIndex = parseHandicapNumber(grintMeta?.ghinIndex);
   const grintIndex = handicap
-    ? parseHandicapNumber(handicap.index_federation) ??
-      parseHandicapNumber(handicap.index) ??
+    ? parseHandicapNumber(handicap.index) ??
+      parseHandicapNumber(handicap.index_federation) ??
       parseHandicapNumber(handicap.lowest)
     : null;
   const liveIndex = ghinLiveIndex ?? grintIndex;

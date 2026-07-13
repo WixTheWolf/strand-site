@@ -25,8 +25,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     location: "Southern California",
     ghinClub: "CS Southern California Golf Club",
     tags: ["veteran", "experience", "low-handicap", "calm"],
-    manualIndex: 5.2,
-    manualLowest: 4.9,
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 5.6,
   },
   {
     id: "brett-comfort",
@@ -39,7 +39,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "brettcomfort1@gmail.com",
     grintSearchTerms: ["brettcomfort1@gmail.com", "Brett Comfort"],
     location: "La Mirada, CA",
+    ghinClub: "USGA/SCGA GC",
     tags: ["vibes", "team-player"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 24.8,
   },
   {
     id: "brian-kerns",
@@ -66,7 +69,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "fgeisinger22",
     grintSearchTerms: ["fred.geisinger@gmail.com", "fgeisinger22", "Fred Geisinger"],
     location: "Encinitas, CA",
+    ghinClub: "Point Sebago Golf Club",
     tags: ["planner", "low-handicap", "steady"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 7.7,
   },
   {
     id: "jack-groot",
@@ -105,7 +111,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "JordanBrodbeck",
     grintSearchTerms: ["jydeezy465@gmail.com", "JordanBrodbeck", "Jordan Brodbeck"],
     location: "Manhattan Beach, CA",
+    ghinClub: "Westside Golf Collective",
     tags: ["low-net", "match-play", "leader"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 14.4,
   },
   {
     id: "justin-uribe",
@@ -118,7 +127,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "ureebs",
     grintSearchTerms: ["uribe.justin@gmail.com", "ureebs", "Justin Uribe"],
     location: "Los Angeles, CA",
+    ghinClub: "Griffith Park GC",
     tags: ["competitor", "athlete", "low-handicap"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 8.4,
   },
   {
     id: "kevin-gordon",
@@ -159,7 +171,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "tonyschroe",
     grintSearchTerms: ["matt.c.schroeder@gmail.com", "tonyschroe", "Matt Schroeder"],
     location: "Redondo Beach, CA",
+    ghinClub: "USGA/SCGA GC",
     tags: ["purist", "organizer", "steady"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 13.3,
   },
   {
     id: "matt-wixted",
@@ -215,7 +230,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "P-Mo24",
     grintSearchTerms: ["patrick.k.morse@gmail.com", "P-Mo24", "Patrick Morse", "Pat Morse"],
     location: "Redondo Beach, CA",
+    ghinClub: "USGA/SCGA GC",
     tags: ["founder", "vibes", "timely"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 24.8,
   },
   {
     id: "rhett-fahrney",
@@ -280,7 +298,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "thummel8",
     grintSearchTerms: ["thummel8@gmail.com", "thummel8", "Tim Hummel"],
     location: "Hawthorne, CA",
+    ghinClub: "Rancho Park Golf Club",
     tags: ["utility", "grill", "team-player"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 18.8,
   },
 ];
 
