@@ -172,6 +172,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "bpfsy57k2y@privaterelay.appleid.com",
     grintSearchTerms: ["mwixted1@gmail.com", "Matt Wixted"],
     location: "Anaheim, CA",
+    ghinNumber: "11634237",
     tags: ["athlete", "improving", "creative"],
   },
   {
@@ -198,6 +199,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "nsprowls17",
     grintSearchTerms: ["nsprowls17@gmail.com", "nsprowls17", "Nick Sprowls"],
     location: "Hermosa Beach, CA",
+    ghinClub: "Westside Golf Collective",
     tags: ["clutch", "volatile", "fun"],
     // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
     manualIndex: 16.9,
