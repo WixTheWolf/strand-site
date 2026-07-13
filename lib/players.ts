@@ -85,7 +85,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "jgroot35",
     grintSearchTerms: ["jack.l.groot@gmail.com", "jgroot35", "Jack Groot"],
     location: "Palatine, IL",
+    ghinClub: "USGA/Chicago District GC",
     tags: ["rookie", "improving", "reliable"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 15.8,
   },
   {
     id: "jason-olson",
@@ -98,7 +101,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "olsonj12",
     grintSearchTerms: ["jason.r.olson@gmail.com", "olsonj12", "Jason Olson"],
     location: "Van Nuys, CA",
+    ghinClub: "Knollwood Men's Golf Club",
     tags: ["steady", "rock-solid"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 20.5,
   },
   {
     id: "jordan-brodbeck",
@@ -158,7 +164,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "MattyOoo",
     grintSearchTerms: ["mattonorato@gmail.com", "MattyOoo", "Matt Onorato"],
     location: "Charlotte, NC",
+    ghinClub: "Carolinas eClub NC Foothills",
     tags: ["champion", "clutch", "experience"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 28.0,
   },
   {
     id: "matt-schroeder",
@@ -259,7 +268,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "darcyryan",
     grintSearchTerms: ["darcy024@gmail.com", "darcyryan", "Ryan Darcy"],
     location: "Manhattan Beach, CA",
+    ghinClub: "Westside Golf Collective",
     tags: ["captain", "champion", "strategist"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 12.4,
   },
   {
     id: "sam-blonski",
@@ -272,7 +284,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "SamBlonski",
     grintSearchTerms: ["samuelmblonski@gmail.com", "SamBlonski", "Sam Blonski"],
     location: "Plymouth, MI",
+    ghinClub: "USGA/GAM GC",
     tags: ["distance", "fit"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 24.0,
   },
   {
     id: "shaun-eipper",
