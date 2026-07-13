@@ -16,6 +16,7 @@ export async function GET() {
         dataSource: resolved.dataSource,
         grintProfileUrl: resolved.grintProfileUrl,
         ghinNumber: resolved.ghinNumber,
+        ghinIndex: resolved.ghinIndex,
       });
     }),
   );

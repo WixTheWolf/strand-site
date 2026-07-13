@@ -199,6 +199,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintSearchTerms: ["nsprowls17@gmail.com", "nsprowls17", "Nick Sprowls"],
     location: "Hermosa Beach, CA",
     tags: ["clutch", "volatile", "fun"],
+    // Hand-verified GHIN index (Jul 2026) — overridden automatically once live GHIN is configured
+    manualIndex: 16.9,
   },
   {
     id: "pat-morse",

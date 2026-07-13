@@ -406,17 +406,21 @@ export function buildPlayerStats(
     dataSource?: PlayerDraftStats["dataSource"];
     grintProfileUrl?: string | null;
     ghinNumber?: string | null;
+    ghinIndex?: string | null;
   },
 ): PlayerDraftStats {
-  // Live TheGrint index always wins; manual/estimated values are fallbacks only.
-  // Federation (USGA/WHS) is the official number per Strand rules — TheGrint's
-  // own "index" field can freeze when a player stops attesting rounds.
-  const liveIndex = handicap
+  // GHIN is the official source per Strand rules. Priority:
+  // live GHIN index → hand-verified GHIN value (manualIndex) → TheGrint
+  // federation approximation → TheGrint index → estimated.
+  const ghinLiveIndex = parseHandicapNumber(grintMeta?.ghinIndex);
+  const grintIndex = handicap
     ? parseHandicapNumber(handicap.index_federation) ??
       parseHandicapNumber(handicap.index) ??
       parseHandicapNumber(handicap.lowest)
     : null;
-  const indexNum = liveIndex ?? player.manualIndex ?? player.estimatedIndex ?? null;
+  const liveIndex = ghinLiveIndex ?? grintIndex;
+  const indexNum =
+    ghinLiveIndex ?? player.manualIndex ?? grintIndex ?? player.estimatedIndex ?? null;
   const lowestNum =
     (handicap ? parseHandicapNumber(handicap.lowest) : null) ?? player.manualLowest ?? null;
   const attestNum = handicap ? parseFloat(handicap.attest || "0") : 0;
@@ -446,16 +450,16 @@ export function buildPlayerStats(
     draftScore,
     draftRank: 0,
     formDelta,
-    dataSource: liveIndex !== null
-      ? "live"
-      : grintMeta?.dataSource
-        ?? (player.manualIndex !== undefined
-          ? player.ghinClub
-            ? "ghin"
-            : "manual"
-          : player.estimatedIndex
-            ? "estimated"
-            : "missing"),
+    dataSource: ghinLiveIndex !== null
+      ? "ghin"
+      : player.manualIndex !== undefined
+        ? player.ghinClub
+          ? "ghin"
+          : "manual"
+        : liveIndex !== null
+          ? "live"
+          : grintMeta?.dataSource
+            ?? (player.estimatedIndex ? "estimated" : "missing"),
     grintLocation: grintMeta?.location,
     grintUsernameResolved: grintMeta?.username,
     grintProfileUrl: grintMeta?.grintProfileUrl ?? null,
