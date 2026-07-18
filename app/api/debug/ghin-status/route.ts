@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ghinConfigured, ghinLoginProbe } from "@/lib/ghin";
+import { ghinConfigured, ghinEmail, ghinPassword, ghinLoginProbe } from "@/lib/ghin";
 
 /**
  * Secret-safe diagnostic for the GHIN integration. Reports only booleans
@@ -13,8 +13,8 @@ export async function GET() {
   const probe = await ghinLoginProbe();
   return NextResponse.json({
     envVarsVisibleHere: configured,
-    emailLength: process.env.GHIN_EMAIL?.length ?? 0,
-    passwordPresent: Boolean(process.env.GHIN_PASSWORD),
+    emailLength: ghinEmail()?.length ?? 0,
+    passwordPresent: Boolean(ghinPassword()),
     loginSucceeded: probe.ok,
     httpStatus: probe.status,
     note: probe.note,

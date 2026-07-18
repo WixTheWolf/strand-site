@@ -11,8 +11,18 @@ const GHIN_API = "https://api2.ghin.com/api/v1";
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
+// Env-var names are case-sensitive; accept the common casings so a
+// GHIN_Email / ghin_email entry in the dashboard still resolves.
+export function ghinEmail(): string | undefined {
+  return process.env.GHIN_EMAIL ?? process.env.GHIN_Email ?? process.env.ghin_email;
+}
+
+export function ghinPassword(): string | undefined {
+  return process.env.GHIN_PASSWORD ?? process.env.GHIN_Password ?? process.env.ghin_password;
+}
+
 export function ghinConfigured(): boolean {
-  return Boolean(process.env.GHIN_EMAIL && process.env.GHIN_PASSWORD);
+  return Boolean(ghinEmail() && ghinPassword());
 }
 
 async function ghinLogin(): Promise<string | null> {
@@ -25,8 +35,8 @@ async function ghinLogin(): Promise<string | null> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         user: {
-          email_or_ghin: process.env.GHIN_EMAIL,
-          password: process.env.GHIN_PASSWORD,
+          email_or_ghin: ghinEmail(),
+          password: ghinPassword(),
           remember_me: true,
         },
         token: "nonblank",
@@ -55,8 +65,8 @@ export async function ghinLoginProbe(): Promise<{ ok: boolean; status: number | 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         user: {
-          email_or_ghin: process.env.GHIN_EMAIL,
-          password: process.env.GHIN_PASSWORD,
+          email_or_ghin: ghinEmail(),
+          password: ghinPassword(),
           remember_me: true,
         },
         token: "nonblank",
