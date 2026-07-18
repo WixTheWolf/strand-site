@@ -108,33 +108,48 @@ export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<Gh
   const token = await ghinLogin();
   if (!token) return [];
 
-  try {
-    const response = await fetch(
-      `${GHIN_API}/golfers/${encodeURIComponent(ghinNumber)}/scores.json?source=GHINcom&per_page=${limit}&page=1`,
-      { headers: { Authorization: `Bearer ${token}` }, next: { revalidate: 300 } },
-    );
-    if (!response.ok) return [];
-    const data = await response.json();
-    const rows: GhinScoreRecord[] = data?.scores ?? data?.recent_scores ?? data?.revision_scores ?? [];
+  const id = encodeURIComponent(ghinNumber);
+  // GHIN's web/app clients use slightly different query shapes across
+  // releases; try the known-good variants and take the first that answers.
+  const urls = [
+    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcomWeb&statuses=Validated&per_page=${limit}&page=1`,
+    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcomWeb&per_page=${limit}&page=1`,
+    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcom&per_page=${limit}&page=1`,
+    `${GHIN_API}/golfers/${id}/scores.json?per_page=${limit}&page=1`,
+  ];
 
-    const results: GhinRoundResult[] = [];
-    for (const row of rows) {
-      const score = parseFloat(String(row.adjusted_gross_score ?? row.adjusted_score ?? row.score ?? ""));
-      const date = row.played_at ?? row.date_played ?? row.posted_at ?? "";
-      if (Number.isNaN(score) || !date) continue;
-      const diff = parseFloat(String(row.differential ?? ""));
-      results.push({
-        date,
-        score,
-        course: row.course_name ?? row.facility_name,
-        differential: Number.isNaN(diff) ? null : diff,
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+        next: { revalidate: 300 },
       });
-      if (results.length >= limit) break;
+      if (!response.ok) continue;
+      const data = await response.json();
+      const rows: GhinScoreRecord[] =
+        data?.scores ?? data?.recent_scores ?? data?.revision_scores ?? data?.golfer_scores ?? [];
+      if (!Array.isArray(rows) || !rows.length) continue;
+
+      const results: GhinRoundResult[] = [];
+      for (const row of rows) {
+        const score = parseFloat(String(row.adjusted_gross_score ?? row.adjusted_score ?? row.score ?? ""));
+        const date = row.played_at ?? row.date_played ?? row.posted_at ?? "";
+        if (Number.isNaN(score) || !date) continue;
+        const diff = parseFloat(String(row.differential ?? ""));
+        results.push({
+          date,
+          score,
+          course: row.course_name ?? row.facility_name,
+          differential: Number.isNaN(diff) ? null : diff,
+        });
+        if (results.length >= limit) break;
+      }
+      if (results.length) return results;
+    } catch {
+      continue;
     }
-    return results;
-  } catch {
-    return [];
   }
+  return [];
 }
 
 /** Look a player up on GHIN by GHIN number first, then by exact name match. */
