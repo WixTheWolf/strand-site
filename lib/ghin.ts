@@ -74,6 +74,62 @@ async function ghinLogin(): Promise<string | null> {
   return null;
 }
 
+/**
+ * Diagnostic: exercise the full login → search → scores chain and report raw
+ * HTTP status + a small body snippet at each step, so we can nail the exact
+ * shapes GHIN's authenticated endpoints expect. No password or token in the
+ * output. Temporary.
+ */
+export async function ghinChainDiagnose(
+  ghinNumber: string,
+  name: string,
+): Promise<Record<string, unknown>> {
+  const token = await ghinLogin();
+  if (!token) return { login: false };
+
+  const auth = { Authorization: `Bearer ${token}` };
+  const out: Record<string, unknown> = { login: true };
+
+  // Scores — try each candidate URL, report status + top-level keys + count
+  const id = encodeURIComponent(ghinNumber);
+  const scoreUrls = [
+    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcomWeb&statuses=Validated&per_page=5&page=1`,
+    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcomWeb&per_page=5&page=1`,
+    `${GHIN_API}/scores.json?golfer_id=${id}&source=GHINcomWeb&per_page=5&page=1`,
+    `${GHIN_API}/golfers/${id}/handicap_history.json?source=GHINcomWeb`,
+  ];
+  const scoreResults: unknown[] = [];
+  for (const url of scoreUrls) {
+    try {
+      const r = await fetch(url, { headers: auth, cache: "no-store", signal: AbortSignal.timeout(9000) });
+      const text = await r.text();
+      scoreResults.push({ url: url.replace(GHIN_API, ""), status: r.status, snippet: text.slice(0, 400) });
+    } catch (e) {
+      scoreResults.push({ url: url.replace(GHIN_API, ""), error: e instanceof Error ? e.name : "?" });
+    }
+  }
+  out.scores = scoreResults;
+
+  // Search — by GHIN number, then by name
+  const searchUrls = [
+    `${GHIN_API}/golfers/search.json?golfer_id=${id}&per_page=5&page=1`,
+    `${GHIN_API}/golfers/search.json?last_name=${encodeURIComponent(name.split(" ").slice(-1)[0])}&first_name=${encodeURIComponent(name.split(" ")[0])}&per_page=5&page=1`,
+  ];
+  const searchResults: unknown[] = [];
+  for (const url of searchUrls) {
+    try {
+      const r = await fetch(url, { headers: auth, cache: "no-store", signal: AbortSignal.timeout(9000) });
+      const text = await r.text();
+      searchResults.push({ url: url.replace(GHIN_API, ""), status: r.status, snippet: text.slice(0, 400) });
+    } catch (e) {
+      searchResults.push({ url: url.replace(GHIN_API, ""), error: e instanceof Error ? e.name : "?" });
+    }
+  }
+  out.search = searchResults;
+
+  return out;
+}
+
 export interface GhinLookupResult {
   handicapIndex: string;
   ghinNumber: string;
