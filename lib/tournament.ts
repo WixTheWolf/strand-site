@@ -17,8 +17,8 @@ export const CAPTAINS = {
 
 export const CAPTAIN_DRAFT_RULES = [
   "Two captains: Matt Wixted (WIX) and Justin Uribe (J-BONE).",
-  "Snake draft — each captain selects 9 players; captains play on their own teams (10 per side).",
-  "~One month before The Strand: live captain snake draft locks both rosters.",
+  "Traditional draft — captains alternate in the same order every round; each selects 9 players and plays on their own team (10 per side).",
+  "~One month before The Strand: live captain draft locks both rosters.",
   "Use Draft Lab to model picks before the live draw.",
 ];
 

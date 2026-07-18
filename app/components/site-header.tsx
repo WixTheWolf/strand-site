@@ -15,12 +15,35 @@ const NAV = [
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scrollspy — underline the section currently in view
+  useEffect(() => {
+    const ids = NAV.filter((item) => item.href.startsWith("#")).map((item) => item.href.slice(1));
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (!sections.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActive(`#${visible.target.id}`);
+        else if (window.scrollY < 200) setActive(null);
+      },
+      { rootMargin: "-20% 0px -55% 0px", threshold: [0, 0.2, 0.5] },
+    );
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -55,8 +78,17 @@ export default function SiteHeader() {
 
         <nav className="hidden items-center gap-8 md:flex">
           {NAV.map((item) => {
+            const isActive = active === item.href;
             const cls = `nav-link label transition-colors duration-500 ${
-              scrolled ? "text-black/70 hover:text-black" : "text-white/80 hover:text-white"
+              isActive ? "nav-active " : ""
+            }${
+              scrolled
+                ? isActive
+                  ? "text-black"
+                  : "text-black/70 hover:text-black"
+                : isActive
+                  ? "text-white"
+                  : "text-white/80 hover:text-white"
             }`;
             return item.href.startsWith("/") ? (
               <Link key={item.label} href={item.href} className={cls}>

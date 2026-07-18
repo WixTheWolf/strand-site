@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Confetti } from "@/app/components/fx";
 import { getPlayerPhoto } from "@/lib/player-assets";
 import { TEAM_SIZE } from "@/lib/players";
 import { summarizeTeam } from "@/lib/draft-engine";
@@ -28,6 +29,7 @@ import {
 import type { PlayerDraftStats } from "@/lib/types";
 import DraftAnalytics from "./draft-analytics";
 import { PlayerSkillGraph } from "./player-skill-graph";
+import RecentForm from "./recent-form";
 
 function formatIndex(player: PlayerDraftStats) {
   if (player.indexNum !== null) return player.indexNum.toFixed(1);
@@ -44,6 +46,12 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const [search, setSearch] = useState("");
+  const [celebrate, setCelebrate] = useState(false);
+  const celebrateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (celebrateTimer.current) clearTimeout(celebrateTimer.current);
+  }, []);
 
   const playerMap = useMemo(() => new Map(players.map((p) => [p.id, p])), [players]);
 
@@ -97,6 +105,12 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
       ...active,
       picks: [...active.picks, { pickNumber, playerId, side }],
     });
+
+    if (pickNumber === TOTAL_DRAFT_PICKS) {
+      setCelebrate(true);
+      if (celebrateTimer.current) clearTimeout(celebrateTimer.current);
+      celebrateTimer.current = setTimeout(() => setCelebrate(false), 6000);
+    }
   };
 
   const undoPick = () => {
@@ -150,6 +164,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
   return (
     <div className="space-y-6">
+      {celebrate && <Confetti />}
       {/* Scenario manager */}
       <div className="rounded-[2rem] border border-[#111]/10 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -158,7 +173,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             <h2 className="mt-1 text-xl font-medium">Mock draft scenarios</h2>
             <p className="mt-2 max-w-2xl text-sm text-[#111]/70">
               You&apos;re <strong>{MY_CAPTAIN.nickname}</strong> — already on your team. Draft{" "}
-              <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a snake vs{" "}
+              <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a traditional draft vs{" "}
               <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned). Live captain draft is ~one
               month before The Strand; Thursday night is <strong>The Matchmaker</strong> for pairings.
             </p>
@@ -224,7 +239,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                 onChange={(e) => persist({ ...active, iPickFirst: e.target.checked, picks: [] })}
                 disabled={active.picks.length > 0}
               />
-              I pick first in snake
+              I pick first every round
             </label>
             <button onClick={undoPick} className="rounded-xl border px-3 py-1.5 text-xs uppercase tracking-[0.12em]">
               Undo pick
@@ -445,6 +460,8 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               </div>
             </div>
           )}
+
+          <RecentForm players={players} />
 
           <PlayerSkillGraph players={players} draftedIds={draftedIds} />
         </>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { getOptimalTeamWithPicks, simulateOptimalSnakeDraft, summarizeTeam } from "@/lib/draft-engine";
+import { getOptimalTeamWithPicks, simulateOptimalDraft, summarizeTeam } from "@/lib/draft-engine";
 import { MY_CAPTAIN, OPPONENT_CAPTAIN, DRAFT_PICKS_PER_CAPTAIN } from "@/lib/mock-draft";
 import { STRAND_RULES } from "@/lib/tournament";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
@@ -61,10 +61,10 @@ function TeamRosterCard({
   pick,
   dark = false,
 }: {
-  pick: { snakePick: number; player: PlayerDraftStats; rationale: string };
+  pick: { overallPick: number; player: PlayerDraftStats; rationale: string };
   dark?: boolean;
 }) {
-  const { player, snakePick, rationale } = pick;
+  const { player, overallPick, rationale } = pick;
   const h = player.handicap;
 
   return (
@@ -76,7 +76,7 @@ function TeamRosterCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className={`text-xs uppercase tracking-[0.2em] ${dark ? "text-white/50" : "text-[#111]/50"}`}>
-            {snakePick === 0 ? "Captain (locked)" : `Pick #${snakePick}`}
+            {overallPick === 0 ? "Captain (locked)" : `Pick #${overallPick}`}
           </div>
           <h3 className="mt-1 text-lg font-medium">{player.name}</h3>
           <div className={`text-sm ${dark ? "text-white/70" : "text-[#111]/65"}`}>
@@ -170,7 +170,7 @@ export default function BestTeamView() {
   }, [loadData]);
 
   const simulation = useMemo(
-    () => (data ? simulateOptimalSnakeDraft(data.players, true) : null),
+    () => (data ? simulateOptimalDraft(data.players, true) : null),
     [data],
   );
 
@@ -258,10 +258,10 @@ export default function BestTeamView() {
     <div className="mx-auto max-w-[1400px] px-5 py-10 md:px-8">
       <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="label">Optimal snake draft</p>
+          <p className="label">Optimal draft</p>
           <h1 className="section-title mt-3">{MY_CAPTAIN.nickname}&apos;s best team</h1>
           <p className="mt-3 max-w-3xl text-sm text-black/55">
-            {MY_CAPTAIN.nickname} is pre-assigned as captain. This snake model drafts your other{" "}
+            {MY_CAPTAIN.nickname} is pre-assigned as captain. This traditional-draft model picks your other{" "}
             {DRAFT_PICKS_PER_CAPTAIN} players vs {OPPONENT_CAPTAIN.nickname} using match-play analytics
             across four-ball, scramble, singles, and shamble — including high-handicap net leverage.
           </p>
@@ -308,7 +308,7 @@ export default function BestTeamView() {
       <section className="mb-12">
         <h2 className="text-xl font-medium">Your roster — {MY_CAPTAIN.nickname} + 9 picks</h2>
         <p className="mt-1 text-sm text-[#111]/65">
-          Snake order if {MY_CAPTAIN.nickname} picks first: picks #1, 4, 5, 8, 9, 12, 13, 16, 17 (captain locked)
+          Traditional order if {MY_CAPTAIN.nickname} picks first: picks #1, 3, 5, 7, 9, 11, 13, 15, 17 (captain locked)
         </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {wixTeam.map((pick) => (
@@ -323,7 +323,7 @@ export default function BestTeamView() {
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {justinTeam.map((pick) => (
             <div key={pick.player.id} className="rounded-2xl border border-[#111]/10 bg-white p-4 shadow-sm">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Pick #{pick.snakePick}</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Pick #{pick.overallPick}</div>
               <div className="mt-1 font-medium">{playerLabel(pick.player)}</div>
               <div className="text-lg font-medium">{formatNum(pick.player.indexNum)}</div>
               <div className="text-xs text-[#111]/55">#{pick.player.draftRank} value</div>

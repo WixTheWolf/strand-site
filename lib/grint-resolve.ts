@@ -1,3 +1,4 @@
+import { lookupGhinIndex } from "./ghin";
 import { fetchGrintHandicap, getGrintProfileUrlForPlayer, searchGrintUsers, type GrintSearchResult } from "./grint";
 import type { GrintHandicap, StrandPlayer } from "./types";
 
@@ -8,6 +9,8 @@ export interface ResolvedGrintPlayer {
   dataSource: "live" | "ghin" | "manual" | "estimated" | "missing";
   grintProfileUrl: string | null;
   ghinNumber: string | null;
+  /** Official USGA index straight from GHIN, when GHIN credentials are configured */
+  ghinIndex: string | null;
 }
 
 function normalizeTerm(term: string): string {
@@ -46,6 +49,11 @@ function verifiedDataSource(player: StrandPlayer): ResolvedGrintPlayer["dataSour
 export async function resolvePlayerGrint(player: StrandPlayer): Promise<ResolvedGrintPlayer> {
   const profileUrl = getGrintProfileUrlForPlayer(player);
 
+  // GHIN is the official source — look it up first (no-op without credentials)
+  const ghin = await lookupGhinIndex({ name: player.name, ghinNumber: player.ghinNumber });
+  const ghinIndex = ghin?.handicapIndex ?? null;
+  const ghinNumber = ghin?.ghinNumber ?? player.ghinNumber ?? null;
+
   if (player.grintId) {
     try {
       const handicap = await fetchGrintHandicap(player.grintId);
@@ -58,26 +66,18 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
           location: player.location,
         },
         matchedTerm: player.grintId,
-        dataSource: player.manualIndex !== undefined && player.ghinClub ? "ghin" : "live",
+        dataSource: ghinIndex !== null ? "ghin" : "live",
         grintProfileUrl: profileUrl,
-        ghinNumber: player.ghinNumber ?? null,
+        ghinNumber,
+        ghinIndex,
       };
     } catch {
       // fall through
     }
   }
 
-  if (player.manualIndex !== undefined) {
-    return {
-      handicap: null,
-      match: null,
-      matchedTerm: null,
-      dataSource: verifiedDataSource(player),
-      grintProfileUrl: profileUrl,
-      ghinNumber: player.ghinNumber ?? null,
-    };
-  }
-
+  // No grintId — try to find the player on TheGrint before settling for a
+  // manual/estimated index, so every handicap that CAN be live is live.
   const terms = [
     ...(player.grintSearchTerms ?? []),
     player.email,
@@ -114,28 +114,47 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         handicap,
         match: bestHit,
         matchedTerm: bestTerm,
-        dataSource: "live",
+        dataSource: ghinIndex !== null ? "ghin" : "live",
         grintProfileUrl: getGrintProfileUrlForPlayer({ grintId: bestHit.id, grintUsername: bestHit.username }),
-        ghinNumber: player.ghinNumber ?? null,
+        ghinNumber,
+        ghinIndex,
       };
     } catch {
       return {
         handicap: null,
         match: bestHit,
         matchedTerm: bestTerm,
-        dataSource: "estimated",
+        dataSource: ghinIndex !== null
+          ? "ghin"
+          : player.manualIndex !== undefined
+            ? verifiedDataSource(player)
+            : "estimated",
         grintProfileUrl: getGrintProfileUrlForPlayer({ grintId: bestHit.id, grintUsername: bestHit.username }),
-        ghinNumber: player.ghinNumber ?? null,
+        ghinNumber,
+        ghinIndex,
       };
     }
+  }
+
+  if (player.manualIndex !== undefined) {
+    return {
+      handicap: null,
+      match: null,
+      matchedTerm: null,
+      dataSource: ghinIndex !== null ? "ghin" : verifiedDataSource(player),
+      grintProfileUrl: profileUrl,
+      ghinNumber,
+      ghinIndex,
+    };
   }
 
   return {
     handicap: null,
     match: null,
     matchedTerm: null,
-    dataSource: player.estimatedIndex ? "estimated" : "missing",
+    dataSource: ghinIndex !== null ? "ghin" : player.estimatedIndex ? "estimated" : "missing",
     grintProfileUrl: getGrintProfileUrlForPlayer(player),
-    ghinNumber: player.ghinNumber ?? null,
+    ghinNumber,
+    ghinIndex,
   };
 }

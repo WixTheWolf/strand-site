@@ -3,7 +3,7 @@ import DraftHeader from "../../components/draft-header";
 
 export const metadata = {
   title: "Best Team | Strand Draft Lab",
-  description: "Optimal WIX snake-draft roster and full player data sheet for Gamble Sands 2026",
+  description: "Optimal WIX draft roster and full player data sheet for Gamble Sands 2026",
 };
 
 export default function BestTeamPage() {

@@ -1,9 +1,20 @@
 import Link from "next/link";
+import { CHAMPIONS_BOARD } from "@/lib/history";
+import Marquee from "./marquee";
 import Reveal from "./reveal";
 
 export default function SiteFooter() {
+  const championItems = CHAMPIONS_BOARD.map((row) => `🏆 ${row.label} — ${row.winner}`);
+
   return (
     <footer className="overflow-hidden bg-[#111] text-white">
+      <div className="border-b border-white/10">
+        <Marquee
+          items={championItems}
+          speed="44s"
+          className="py-3 text-[11px] font-medium uppercase tracking-[0.2em] text-white/45"
+        />
+      </div>
       <div className="mx-auto max-w-[1400px] px-5 pb-10 pt-16 md:px-8 md:pt-24">
         <Reveal>
           <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">

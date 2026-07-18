@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import CoursesSection from "./components/courses-section";
+import { BackToTop, Countdown, Magnetic, ScrollProgress } from "./components/fx";
 import HistorySection from "./components/history-section";
 import Marquee from "./components/marquee";
 import PlayersHandicapSection from "./components/players-handicap-section";
@@ -44,9 +45,48 @@ const COSTS = [
   ["Est. total", "$1,600–1,700"],
 ];
 
+/** Per-letter staggered headline line */
+function HeroLine({ text, base }: { text: string; base: number }) {
+  return (
+    <span className="hero-line" aria-hidden>
+      {Array.from(text).map((char, i) => (
+        <span
+          key={`${char}-${i}`}
+          className="hero-letter"
+          style={{ "--d": `${base + i * 28}ms` } as CSSProperties}
+        >
+          {char === " " ? " " : char}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function GolfBall({ id, className, size = 44 }: { id: string; className?: string; size?: number }) {
+  return (
+    <svg viewBox="0 0 44 44" width={size} height={size} className={className} aria-hidden>
+      <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,0.9)" />
+      <circle cx="22" cy="22" r="20" fill={`url(#${id})`} />
+      <defs>
+        <radialGradient id={id} cx="0.35" cy="0.3" r="0.9">
+          <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+          <stop offset="100%" stopColor="rgba(0,0,0,0.35)" />
+        </radialGradient>
+      </defs>
+      {[
+        [14, 14], [22, 12], [30, 14], [12, 22], [20, 20], [28, 20], [34, 24],
+        [16, 28], [24, 27], [31, 31], [20, 34],
+      ].map(([x, y]) => (
+        <circle key={`${x}-${y}`} cx={x} cy={y} r="1.5" fill="rgba(0,0,0,0.14)" />
+      ))}
+    </svg>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
+      <ScrollProgress />
       <SiteHeader />
 
       <main className="bg-[#f7f5f0] text-[#111]">
@@ -67,15 +107,10 @@ export default function HomePage() {
               Gamble Sands · August 20–23, 2026
             </p>
             <h1 className="headline max-w-[14ch] text-white">
-              <span className="hero-line" style={{ "--d": "80ms" } as CSSProperties}>
-                <span>Golf trip.</span>
-              </span>
-              <span className="hero-line" style={{ "--d": "200ms" } as CSSProperties}>
-                <span>Boys trip.</span>
-              </span>
-              <span className="hero-line" style={{ "--d": "320ms" } as CSSProperties}>
-                <span>Since 2018.</span>
-              </span>
+              <span className="sr-only">Golf trip. Boys trip. Since 2018.</span>
+              <HeroLine text="Golf trip." base={60} />
+              <HeroLine text="Boys trip." base={220} />
+              <HeroLine text="Since 2018." base={380} />
             </h1>
             <p
               className="hero-fade mt-6 max-w-md text-base leading-relaxed text-white/80 md:text-lg"
@@ -84,14 +119,25 @@ export default function HomePage() {
               Three David McLay Kidd courses on sandy Columbia Basin soil. Walk to the first tee,
               live scoring on TheGrint, and a Thursday night pairings reveal that sets the tone.
             </p>
-            <div className="hero-fade mt-8 flex flex-wrap gap-3" style={{ "--d": "700ms" } as CSSProperties}>
-              <a href="#players" className="btn-primary">
-                The Field
-              </a>
-              <Link href="/draft" className="btn-ghost">
-                Draft Lab
-              </Link>
+            <div className="hero-fade mt-8 flex flex-wrap items-center gap-3" style={{ "--d": "700ms" } as CSSProperties}>
+              <Magnetic>
+                <a href="#players" className="btn-primary">
+                  The Field
+                </a>
+              </Magnetic>
+              <Magnetic>
+                <Link href="/draft" className="btn-ghost">
+                  Draft Lab
+                </Link>
+              </Magnetic>
             </div>
+
+            <div className="hero-fade mt-8" style={{ "--d": "850ms" } as CSSProperties}>
+              <Countdown />
+            </div>
+
+            <GolfBall id="ball-a" className="float-slow pointer-events-none absolute right-[12%] top-[22%] hidden opacity-70 lg:block" size={40} />
+            <GolfBall id="ball-b" className="float-slower pointer-events-none absolute right-[26%] top-[42%] hidden opacity-40 lg:block" size={24} />
 
             <div
               className="hero-fade absolute bottom-24 right-5 hidden md:bottom-28 md:right-8 md:block"
@@ -135,20 +181,26 @@ export default function HomePage() {
             <h2 className="section-title mt-3">Four rounds. One resort.</h2>
           </Reveal>
 
-          <div className="grid gap-px bg-[#e2ddd3] md:grid-cols-2">
-            {WEEKEND_SCHEDULE.map((item, i) => (
-              <Reveal key={`${item.day}-${item.time}`} delay={(i % 2) * 90}>
-                <div className="group h-full bg-[#f7f5f0] p-6 transition-colors duration-300 hover:bg-white md:p-8">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <span className="label">{item.day}</span>
-                    <span className="font-mono text-xs text-black/45">{item.time}</span>
+          <Reveal className="relative">
+            <span
+              aria-hidden
+              className="timeline-rail absolute inset-y-0 left-1/2 hidden w-px -translate-x-1/2 bg-[#1a3c34]/25 md:block"
+            />
+            <div className="grid gap-px bg-[#e2ddd3] md:grid-cols-2">
+              {WEEKEND_SCHEDULE.map((item, i) => (
+                <Reveal key={`${item.day}-${item.time}`} delay={(i % 2) * 90}>
+                  <div className="group h-full bg-[#f7f5f0] p-6 transition-colors duration-300 hover:bg-white md:p-8">
+                    <div className="flex items-baseline justify-between gap-4">
+                      <span className="label transition-colors duration-300 group-hover:text-[#1a3c34]">{item.day}</span>
+                      <span className="font-mono text-xs text-black/45">{item.time}</span>
+                    </div>
+                    <h3 className="mt-3 text-lg font-medium">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-black/55">{item.note}</p>
                   </div>
-                  <h3 className="mt-3 text-lg font-medium">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-black/55">{item.note}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+                </Reveal>
+              ))}
+            </div>
+          </Reveal>
 
           <Reveal className="mt-12">
             <div className="grid gap-8 md:grid-cols-2">
@@ -189,7 +241,7 @@ export default function HomePage() {
                 <p className="label">Thursday Night</p>
                 <h2 className="section-title mt-3">The Matchmaker</h2>
                 <p className="mt-4 text-sm leading-relaxed text-black/55">
-                  Captain snake draft locks rosters ~one month out. Thursday is pairings only —
+                  Captain draft locks rosters ~one month out. Thursday is pairings only —
                   {CAPTAINS.wix.nickname} vs {CAPTAINS.justin.nickname} set every matchup live.
                 </p>
                 <ul className="mt-6 space-y-2 text-sm text-black/65">
@@ -282,7 +334,7 @@ export default function HomePage() {
                 Model your roster before the captain draft.
               </h2>
               <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70">
-                Mock snakes, win probability, format-by-format edges, and saved what-if scenarios
+                Mock drafts, win probability, format-by-format edges, and saved what-if scenarios
                 with live TheGrint handicaps for all 20 players.
               </p>
               <Link href="/draft" className="btn-primary mt-8 bg-white text-black hover:opacity-90">
@@ -296,6 +348,7 @@ export default function HomePage() {
       </main>
 
       <SiteFooter />
+      <BackToTop />
     </>
   );
 }

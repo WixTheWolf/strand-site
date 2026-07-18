@@ -11,7 +11,7 @@ import {
   winProbability,
   type FormatValues,
 } from "@/lib/draft-engine";
-import { getSnakeOwner, MY_CAPTAIN, OPPONENT_CAPTAIN, TOTAL_DRAFT_PICKS, type DraftPick } from "@/lib/mock-draft";
+import { getPickOwner, MY_CAPTAIN, OPPONENT_CAPTAIN, TOTAL_DRAFT_PICKS, type DraftPick } from "@/lib/mock-draft";
 import { getPlayerPhoto } from "@/lib/player-assets";
 import type { PlayerDraftStats } from "@/lib/types";
 
@@ -111,7 +111,7 @@ export default function DraftAnalytics({
     // How many times does Justin pick before my next turn?
     let justinPicksBetween = 0;
     for (let p = nextPick + 1; p <= TOTAL_DRAFT_PICKS; p += 1) {
-      if (getSnakeOwner(p, iPickFirst) === "mine") break;
+      if (getPickOwner(p, iPickFirst) === "mine") break;
       justinPicksBetween += 1;
     }
 

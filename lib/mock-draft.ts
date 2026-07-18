@@ -40,16 +40,11 @@ export const OPPONENT_CAPTAIN = {
 
 const STORAGE_KEY = "strand-mock-draft-scenarios";
 
-export function getSnakeOwner(pickNumber: number, iPickFirst: boolean): DraftSide {
-  const round = Math.floor((pickNumber - 1) / 2);
-  const snakeAFirst = round % 2 === 0;
+/** Traditional (linear) order — the same captain leads off every round */
+export function getPickOwner(pickNumber: number, iPickFirst: boolean): DraftSide {
   const first = iPickFirst ? "mine" : "justin";
   const second = iPickFirst ? "justin" : "mine";
-
-  if (pickNumber % 2 === 1) {
-    return snakeAFirst ? first : second;
-  }
-  return snakeAFirst ? second : first;
+  return pickNumber % 2 === 1 ? first : second;
 }
 
 export function getNextPickNumber(picks: DraftPick[]): number {
@@ -58,7 +53,7 @@ export function getNextPickNumber(picks: DraftPick[]): number {
 
 export function getCurrentOwner(picks: DraftPick[], iPickFirst: boolean): DraftSide | null {
   if (picks.length >= TOTAL_DRAFT_PICKS) return null;
-  return getSnakeOwner(getNextPickNumber(picks), iPickFirst);
+  return getPickOwner(getNextPickNumber(picks), iPickFirst);
 }
 
 export function getPicksForSide(picks: DraftPick[], side: DraftSide): DraftPick[] {
@@ -166,7 +161,7 @@ export function deleteScenario(scenarios: MockDraftScenario[], id: string) {
 }
 
 export function formatPickLabel(pickNumber: number, iPickFirst: boolean): string {
-  const owner = getSnakeOwner(pickNumber, iPickFirst);
+  const owner = getPickOwner(pickNumber, iPickFirst);
   return owner === "mine" ? `${MY_CAPTAIN.nickname} picks` : `${OPPONENT_CAPTAIN.nickname} picks`;
 }
 

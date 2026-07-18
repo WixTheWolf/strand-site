@@ -39,6 +39,14 @@ export interface GrintHandicap {
   teebox_handicap: string | null;
 }
 
+export interface RecentRound {
+  /** ISO or display date the round was played */
+  date: string;
+  score: number;
+  course?: string;
+  differential?: number | null;
+}
+
 export interface PlayerDraftStats extends StrandPlayer {
   handicap: GrintHandicap | null;
   indexNum: number | null;
@@ -54,6 +62,9 @@ export interface PlayerDraftStats extends StrandPlayer {
   grintUsernameResolved?: string;
   grintProfileUrl?: string | null;
   ghinNumberResolved?: string | null;
+  /** Most recent posted rounds, newest first (up to 5) */
+  recentRounds?: RecentRound[];
+  recentRoundsSource?: "ghin" | "grint" | null;
 }
 
 export interface DraftRecommendation {
