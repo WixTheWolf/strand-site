@@ -117,21 +117,21 @@ export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<Gh
     const data = await response.json();
     const rows: GhinScoreRecord[] = data?.scores ?? data?.recent_scores ?? data?.revision_scores ?? [];
 
-    return rows
-      .map((row) => {
-        const score = parseFloat(String(row.adjusted_gross_score ?? row.adjusted_score ?? row.score ?? ""));
-        const date = row.played_at ?? row.date_played ?? row.posted_at ?? "";
-        if (Number.isNaN(score) || !date) return null;
-        const diff = parseFloat(String(row.differential ?? ""));
-        return {
-          date,
-          score,
-          course: row.course_name ?? row.facility_name,
-          differential: Number.isNaN(diff) ? null : diff,
-        };
-      })
-      .filter((row): row is GhinRoundResult => row !== null)
-      .slice(0, limit);
+    const results: GhinRoundResult[] = [];
+    for (const row of rows) {
+      const score = parseFloat(String(row.adjusted_gross_score ?? row.adjusted_score ?? row.score ?? ""));
+      const date = row.played_at ?? row.date_played ?? row.posted_at ?? "";
+      if (Number.isNaN(score) || !date) continue;
+      const diff = parseFloat(String(row.differential ?? ""));
+      results.push({
+        date,
+        score,
+        course: row.course_name ?? row.facility_name,
+        differential: Number.isNaN(diff) ? null : diff,
+      });
+      if (results.length >= limit) break;
+    }
+    return results;
   } catch {
     return [];
   }

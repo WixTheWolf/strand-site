@@ -122,20 +122,19 @@ export async function fetchGrintScores(userId: string, limit = 5): Promise<Grint
         : (data?.scores ?? data?.data ?? data?.rounds ?? []);
       if (!Array.isArray(rows) || !rows.length) continue;
 
-      const parsed = rows
-        .map((row) => {
-          const score = pickNumber(row, ["score", "gross", "gross_score", "total", "total_score"]);
-          const date = pickString(row, ["date", "date_played", "played_at", "score_date", "created"]);
-          if (score === null || !date) return null;
-          return {
-            date,
-            score,
-            course: pickString(row, ["course", "course_name", "club_name"]),
-            differential: pickNumber(row, ["differential", "diff"]),
-          };
-        })
-        .filter((row): row is GrintRoundResult => row !== null)
-        .slice(0, limit);
+      const parsed: GrintRoundResult[] = [];
+      for (const row of rows) {
+        const score = pickNumber(row, ["score", "gross", "gross_score", "total", "total_score"]);
+        const date = pickString(row, ["date", "date_played", "played_at", "score_date", "created"]);
+        if (score === null || !date) continue;
+        parsed.push({
+          date,
+          score,
+          course: pickString(row, ["course", "course_name", "club_name"]),
+          differential: pickNumber(row, ["differential", "diff"]),
+        });
+        if (parsed.length >= limit) break;
+      }
 
       if (parsed.length) return parsed;
     } catch {
