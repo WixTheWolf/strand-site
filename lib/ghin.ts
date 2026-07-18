@@ -25,140 +25,53 @@ export function ghinConfigured(): boolean {
   return Boolean(ghinEmail() && ghinPassword());
 }
 
+// The api2.ghin.com login endpoint accepts a GHIN NUMBER as the identifier,
+// but rejects the account email (that only works through ghin.com's web
+// OAuth). So authenticate with the number: an explicit GHIN_NUMBER env if set,
+// then the account owner's known number, then whatever's in GHIN_Email (in
+// case a number was entered there). Any valid member login yields a token
+// that can look up every golfer.
+const ACCOUNT_OWNER_GHIN = "11634237"; // WIX
+
+function loginIdentifiers(): string[] {
+  const ids = [
+    process.env.GHIN_NUMBER ?? process.env.GHIN_Number ?? process.env.ghin_number,
+    ACCOUNT_OWNER_GHIN,
+    ghinEmail(),
+  ].filter((id): id is string => Boolean(id && id.trim()));
+  return [...new Set(ids)];
+}
+
 async function ghinLogin(): Promise<string | null> {
   if (!ghinConfigured()) return null;
   if (cachedToken && cachedToken.expiresAt > Date.now()) return cachedToken.token;
 
-  try {
-    const response = await fetch(`${GHIN_API}/golfer_login.json`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user: {
-          email_or_ghin: ghinEmail(),
-          password: ghinPassword(),
-          remember_me: true,
-        },
-        token: "nonblank",
-      }),
-      cache: "no-store",
-    });
-    if (!response.ok) return null;
-    const data = await response.json();
-    const token: string | null = data?.golfer_user?.golfer_user_token ?? null;
-    if (token) cachedToken = { token, expiresAt: Date.now() + 50 * 60 * 1000 };
-    return token;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Diagnostic: attempt a login and report only whether it worked, plus the
- * HTTP status and a coarse note. Never returns the token or any secret.
- */
-export async function ghinLoginProbe(): Promise<{ ok: boolean; status: number | null; note: string }> {
-  if (!ghinConfigured()) return { ok: false, status: null, note: "GHIN_EMAIL / GHIN_PASSWORD not set in this environment" };
-  try {
-    const response = await fetch(`${GHIN_API}/golfer_login.json`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user: {
-          email_or_ghin: ghinEmail(),
-          password: ghinPassword(),
-          remember_me: true,
-        },
-        token: "nonblank",
-      }),
-      cache: "no-store",
-    });
-    let note = `HTTP ${response.status}`;
-    let hasToken = false;
-    try {
-      const data = await response.json();
-      hasToken = Boolean(data?.golfer_user?.golfer_user_token);
-      if (!hasToken && data?.error) note = `HTTP ${response.status} — ${String(data.error).slice(0, 120)}`;
-      else if (!hasToken && data?.errors) note = `HTTP ${response.status} — ${JSON.stringify(data.errors).slice(0, 120)}`;
-    } catch {
-      note = `HTTP ${response.status} — non-JSON response`;
-    }
-    return { ok: response.ok && hasToken, status: response.status, note };
-  } catch (error) {
-    return { ok: false, status: null, note: `request failed: ${error instanceof Error ? error.name : "unknown"}` };
-  }
-}
-
-/**
- * Diagnostic: try several documented GHIN login shapes with the configured
- * credentials (and, as an alternate identifier, a known GHIN number) to find
- * one that authenticates. Reports only status + coarse note per attempt —
- * never the email, password, or token.
- */
-export async function ghinLoginDiagnose(
-  altGhin?: string,
-): Promise<Array<{ variant: string; status: number | null; ok: boolean; note: string }>> {
-  const email = ghinEmail();
   const password = ghinPassword();
-  if (!email || !password) {
-    return [{ variant: "n/a", status: null, ok: false, note: "credentials not set in this environment" }];
-  }
+  if (!password) return null;
 
-  const identifiers: Array<{ label: string; value: string }> = [{ label: "email", value: email }];
-  if (altGhin && altGhin !== email) identifiers.push({ label: "ghin#", value: altGhin });
-
-  const bodies = (id: string) => [
-    {
-      label: "base",
-      body: { user: { email_or_ghin: id, password, remember_me: true }, token: "nonblank" },
-    },
-    {
-      label: "app+source",
-      body: {
-        user: { email_or_ghin: id, password, remember_me: "true" },
-        token: "nonblank",
-        source: "GHINcom",
-      },
-    },
-  ];
-
-  const results: Array<{ variant: string; status: number | null; ok: boolean; note: string }> = [];
-  for (const id of identifiers) {
-    for (const shape of bodies(id.value)) {
-      const variant = `${id.label}/${shape.label}`;
-      try {
-        const response = await fetch(`${GHIN_API}/golfer_login.json`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(shape.body),
-          cache: "no-store",
-          signal: AbortSignal.timeout(9000),
-        });
-        let hasToken = false;
-        let note = `HTTP ${response.status}`;
-        try {
-          const data = await response.json();
-          hasToken = Boolean(data?.golfer_user?.golfer_user_token);
-          if (!hasToken) {
-            const err = data?.error ?? data?.errors ?? data?.digital_profile ?? data;
-            note = `HTTP ${response.status} — ${JSON.stringify(err).slice(0, 140)}`;
-          }
-        } catch {
-          note = `HTTP ${response.status} — non-JSON`;
-        }
-        results.push({ variant, status: response.status, ok: hasToken, note });
-        if (hasToken) return results; // found a working shape — stop
-      } catch (error) {
-        results.push({
-          variant,
-          status: null,
-          ok: false,
-          note: `request failed: ${error instanceof Error ? error.name : "unknown"}`,
-        });
+  for (const identifier of loginIdentifiers()) {
+    try {
+      const response = await fetch(`${GHIN_API}/golfer_login.json`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user: { email_or_ghin: identifier, password, remember_me: true },
+          token: "nonblank",
+        }),
+        cache: "no-store",
+      });
+      if (!response.ok) continue;
+      const data = await response.json();
+      const token: string | null = data?.golfer_user?.golfer_user_token ?? null;
+      if (token) {
+        cachedToken = { token, expiresAt: Date.now() + 50 * 60 * 1000 };
+        return token;
       }
+    } catch {
+      continue;
     }
   }
-  return results;
+  return null;
 }
 
 export interface GhinLookupResult {
