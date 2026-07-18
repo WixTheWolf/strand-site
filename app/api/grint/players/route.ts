@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { buildPlayerStats, getOptimalDraftOrder, getOptimalTeam, rankPlayers, simulateOptimalDraft } from "@/lib/draft-engine";
-import { fetchGhinScores, ghinChainDiagnose } from "@/lib/ghin";
+import { fetchGhinScores } from "@/lib/ghin";
 import { fetchGrintHandicap, fetchGrintScores } from "@/lib/grint";
 import { resolvePlayerGrint } from "@/lib/grint-resolve";
 import { ERIC_THERRIEN, STRAND_PLAYERS } from "@/lib/players";
@@ -24,13 +24,7 @@ async function fetchRecentRounds(
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
-  // Temporary: read GHIN's raw login/search/scores responses via the reliable
-  // players path (the /api/debug routes hit the preview SSO gate).
-  if (new URL(request.url).searchParams.get("diag") === "chain") {
-    return NextResponse.json(await ghinChainDiagnose("11634237", "Matt Wixted"));
-  }
-
+export async function GET() {
   const stats = await Promise.all(
     STRAND_PLAYERS.map(async (player) => {
       const resolved = await resolvePlayerGrint(player);
