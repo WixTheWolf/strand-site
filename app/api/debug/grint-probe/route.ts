@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Temporary server-side probe: dissects TheGrint's public score page
- * (/golf-handicap-tracker/scores/{id}) to find where round history lives
- * in the markup. Runs on Vercel where thegrint.com is reachable; removed
- * once the parser is wired into lib/grint.ts.
+ * Temporary server-side probe: locates the endpoint TheGrint's public
+ * score page calls to load its "Scoring Record" table. mode=page dissects
+ * the HTML shell; mode=js greps a same-site JS bundle for endpoint paths;
+ * mode=try POSTs/GETs a candidate path with a user id. Removed once the
+ * working endpoint is wired into lib/grint.ts.
  */
 
 export const dynamic = "force-dynamic";
@@ -24,61 +25,89 @@ function contexts(text: string, pattern: RegExp, radius: number, max: number): s
   return found;
 }
 
-export async function GET(request: NextRequest) {
-  const id = request.nextUrl.searchParams.get("id") ?? "1812465"; // WIX
-  const url = `${GRINT}/golf-handicap-tracker/scores/${id}`;
-
+async function grab(url: string): Promise<{ status: number; text: string }> {
   const response = await fetch(url, {
     cache: "no-store",
     signal: AbortSignal.timeout(9000),
     headers: { "User-Agent": UA },
   });
-  const html = await response.text();
+  return { status: response.status, text: await response.text() };
+}
 
-  // Embedded JS data blobs (var scores = [...], JSON.parse('...'), etc.)
-  const scriptBlobs = contexts(
-    html,
-    /(?:var|let|const)\s+[a-zA-Z_]*(?:score|round|history)[a-zA-Z_]*\s*=/gi,
-    600,
-    6,
-  );
+export async function GET(request: NextRequest) {
+  const params = request.nextUrl.searchParams;
+  const id = params.get("id") ?? "1812465"; // WIX
+  const mode = params.get("mode") ?? "page";
 
-  // Date-shaped strings with surrounding markup
-  const dateHits = contexts(html, /\d{2}\/\d{2}\/\d{2,4}|\d{4}-\d{2}-\d{2}/g, 220, 20);
+  if (mode === "js") {
+    // Grep a same-site JS bundle for endpoint paths
+    const src = params.get("src") ?? "";
+    if (!src.startsWith(GRINT) && !src.startsWith("/")) {
+      return NextResponse.json({ error: "src must be a thegrint.com URL or path" }, { status: 400 });
+    }
+    const { status, text } = await grab(src.startsWith("/") ? `${GRINT}${src}` : src);
+    return NextResponse.json({
+      src,
+      status,
+      length: text.length,
+      endpointHits: contexts(text, /url\s*[:=]\s*["'`][^"'`]{4,120}["'`]/gi, 80, 40),
+      scoreHits: contexts(text, /["'`][^"'`]*(?:score|scoring|round|record)[^"'`]*["'`]/gi, 100, 40),
+      fetchHits: contexts(text, /(?:fetch|axios|\$\.(?:post|get|ajax))\s*\(/gi, 200, 25),
+    });
+  }
 
-  // Class/id names mentioning score
-  const scoreAttrs = [
-    ...new Set(
-      [...html.matchAll(/(?:class|id)="([^"]*(?:score|round|history)[^"]*)"/gi)].map(
-        (match) => match[1],
-      ),
-    ),
-  ].slice(0, 30);
+  if (mode === "try") {
+    // Hit a candidate endpoint with the id in common parameter spellings
+    const path = params.get("path") ?? "";
+    if (!path.startsWith("/")) {
+      return NextResponse.json({ error: "path must start with /" }, { status: 400 });
+    }
+    const method = params.get("method") ?? "POST";
+    const idField = params.get("field") ?? "user_id";
+    const url =
+      method === "GET" ? `${GRINT}${path.replace(/\{id\}/, id)}` : `${GRINT}${path}`;
+    const response = await fetch(url, {
+      method,
+      cache: "no-store",
+      signal: AbortSignal.timeout(9000),
+      headers: {
+        "User-Agent": UA,
+        ...(method === "POST"
+          ? { "Content-Type": "application/x-www-form-urlencoded" }
+          : {}),
+      },
+      ...(method === "POST" ? { body: new URLSearchParams({ [idField]: id }).toString() } : {}),
+    });
+    const text = await response.text();
+    return NextResponse.json({
+      url,
+      method,
+      status: response.status,
+      contentType: response.headers.get("content-type"),
+      length: text.length,
+      snippet: text.slice(0, 2500),
+    });
+  }
 
-  // Table rows, tags stripped
-  const rows = [...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)]
-    .map((match) => match[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim())
-    .filter(Boolean)
-    .slice(0, 25);
-
-  // AJAX URLs referenced by scripts on the page
-  const ajaxUrls = [
-    ...new Set(
-      [...html.matchAll(/["'](\/[a-z_/]+(?:score|round|history|ajax)[a-z_/]*)["']/gi)].map(
-        (match) => match[1],
-      ),
-    ),
-  ].slice(0, 20);
+  // Default: dissect the score page shell
+  const url = `${GRINT}/golf-handicap-tracker/scores/${id}`;
+  const { status, text: html } = await grab(url);
 
   return NextResponse.json({
     url,
-    status: response.status,
+    status,
     length: html.length,
-    title: html.match(/<title>([^<]*)<\/title>/i)?.[1],
-    scoreAttrs,
-    ajaxUrls,
-    scriptBlobs,
-    rows,
-    dateHits,
+    scriptSrcs: [
+      ...new Set([...html.matchAll(/<script[^>]*src="([^"]+)"/gi)].map((match) => match[1])),
+    ],
+    // Everything around the Scoring Record table, markup intact
+    scoringRecordContext: contexts(html, /Scoring Record/gi, 1500, 2),
+    // Inline-script path strings
+    inlinePaths: [
+      ...new Set(
+        [...html.matchAll(/["'](\/(?:[a-z0-9_-]+\/)+[a-z0-9_-]*)["']/gi)].map((match) => match[1]),
+      ),
+    ].slice(0, 50),
+    idMentions: contexts(html, new RegExp(id, "g"), 250, 8),
   });
 }
