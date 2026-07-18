@@ -190,19 +190,34 @@ export interface GhinRoundResult {
   differential?: number | null;
 }
 
+/** GHIN wraps score arrays a few different ways depending on the endpoint. */
+function extractScoreRows(data: unknown): GhinScoreRecord[] {
+  const d = data as Record<string, unknown>;
+  const candidates: unknown[] = [
+    d?.scores,
+    (d?.revision_scores as Record<string, unknown>)?.scores,
+    (d?.recent_scores as Record<string, unknown>)?.scores,
+    d?.golfer_scores,
+  ];
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate) && candidate.length) return candidate as GhinScoreRecord[];
+  }
+  return [];
+}
+
 /** Last posted rounds for a golfer, newest first — requires GHIN credentials */
 export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<GhinRoundResult[]> {
   const token = await ghinLogin();
   if (!token) return [];
 
   const id = encodeURIComponent(ghinNumber);
-  // GHIN's web/app clients use slightly different query shapes across
-  // releases; try the known-good variants and take the first that answers.
+  // Pull a generous window then sort newest-first ourselves. The flat
+  // /scores.json?golfer_id= shape is cleanest; the nested /golfers/{id}/
+  // shape (scores under revision_scores) is the fallback.
+  const window = Math.max(limit * 4, 20);
   const urls = [
-    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcomWeb&statuses=Validated&per_page=${limit}&page=1`,
-    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcomWeb&per_page=${limit}&page=1`,
-    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcom&per_page=${limit}&page=1`,
-    `${GHIN_API}/golfers/${id}/scores.json?per_page=${limit}&page=1`,
+    `${GHIN_API}/scores.json?golfer_id=${id}&source=GHINcomWeb&per_page=${window}&page=1`,
+    `${GHIN_API}/golfers/${id}/scores.json?source=GHINcomWeb&per_page=${window}&page=1`,
   ];
 
   for (const url of urls) {
@@ -212,10 +227,8 @@ export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<Gh
         next: { revalidate: 300 },
       });
       if (!response.ok) continue;
-      const data = await response.json();
-      const rows: GhinScoreRecord[] =
-        data?.scores ?? data?.recent_scores ?? data?.revision_scores ?? data?.golfer_scores ?? [];
-      if (!Array.isArray(rows) || !rows.length) continue;
+      const rows = extractScoreRows(await response.json());
+      if (!rows.length) continue;
 
       const results: GhinRoundResult[] = [];
       for (const row of rows) {
@@ -229,9 +242,11 @@ export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<Gh
           course: row.course_name ?? row.facility_name,
           differential: Number.isNaN(diff) ? null : diff,
         });
-        if (results.length >= limit) break;
       }
-      if (results.length) return results;
+      if (!results.length) continue;
+      // Newest first, then trim to the requested count
+      results.sort((a, b) => b.date.localeCompare(a.date));
+      return results.slice(0, limit);
     } catch {
       continue;
     }
@@ -239,10 +254,17 @@ export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<Gh
   return [];
 }
 
-/** Look a player up on GHIN by GHIN number first, then by exact name match. */
+/**
+ * Look a player up on GHIN by GHIN number first, then by name. GHIN's name
+ * search requires a country (or state), and returns legal names ("Matthew"
+ * where the roster says "Matt"), so match on last name + a first-name prefix.
+ * When several match, an expected handicap index disambiguates safely.
+ */
 export async function lookupGhinIndex(player: {
   name: string;
   ghinNumber?: string | null;
+  expectedIndex?: number | null;
+  state?: string | null;
 }): Promise<GhinLookupResult | null> {
   const token = await ghinLogin();
   if (!token) return null;
@@ -258,21 +280,34 @@ export async function lookupGhinIndex(player: {
     const lastName = rest.join(" ");
     if (!firstName || !lastName) return null;
 
-    const golfers = await ghinSearch(
-      token,
-      new URLSearchParams({ first_name: firstName, last_name: lastName, status: "Active" }),
-    );
-    const wanted = player.name.trim().toLowerCase();
-    const exact = golfers.filter((golfer) => {
-      const name = (
-        golfer.player_name ?? `${golfer.first_name ?? ""} ${golfer.last_name ?? ""}`
-      )
-        .trim()
-        .toLowerCase();
-      return name === wanted;
+    const params = new URLSearchParams({
+      first_name: firstName,
+      last_name: lastName,
+      status: "Active",
+      country: "USA", // required by GHIN, else it 400s
     });
-    // Only trust an unambiguous match — a common name with multiple actives is skipped
-    if (exact.length === 1) return toResult(exact[0]);
+    if (player.state) params.set("state", player.state);
+
+    const golfers = await ghinSearch(token, params);
+    const fn = firstName.toLowerCase();
+    const ln = lastName.toLowerCase();
+    const candidates = golfers.filter((golfer) => {
+      const gl = (golfer.last_name ?? "").toLowerCase().trim();
+      const gf = (golfer.first_name ?? "").toLowerCase().trim();
+      if (gl !== ln) return false;
+      return gf === fn || gf.startsWith(fn) || fn.startsWith(gf);
+    });
+
+    if (candidates.length === 1) return toResult(candidates[0]);
+
+    // Several same-name golfers — trust the one whose index matches ours
+    if (candidates.length > 1 && player.expectedIndex != null) {
+      const near = candidates.filter((golfer) => {
+        const idx = parseFloat(String(golfer.handicap_index ?? golfer.hi_display ?? ""));
+        return !Number.isNaN(idx) && Math.abs(idx - player.expectedIndex!) <= 1.0;
+      });
+      if (near.length === 1) return toResult(near[0]);
+    }
     return null;
   } catch {
     return null;
