@@ -1,131 +1,84 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Temporary server-side probe: discovers which TheGrint / GHIN endpoints
- * expose posted-score history. Runs on Vercel where thegrint.com is
- * reachable; results are inspected through the protected preview URL and
- * the route is removed once a working endpoint is wired into lib/grint.ts.
+ * Temporary server-side probe: dissects TheGrint's public score page
+ * (/golf-handicap-tracker/scores/{id}) to find where round history lives
+ * in the markup. Runs on Vercel where thegrint.com is reachable; removed
+ * once the parser is wired into lib/grint.ts.
  */
 
 export const dynamic = "force-dynamic";
 
 const GRINT = "https://thegrint.com";
-const GHIN = "https://api2.ghin.com/api/v1";
+const UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
 
-interface ProbeResult {
-  url: string;
-  method: string;
-  status: number | string;
-  contentType?: string;
-  length?: number;
-  snippet?: string;
-  matches?: string[];
-}
-
-async function probe(
-  url: string,
-  init: RequestInit & { label?: string } = {},
-): Promise<ProbeResult> {
-  const method = init.method ?? "GET";
-  try {
-    const response = await fetch(url, {
-      ...init,
-      cache: "no-store",
-      signal: AbortSignal.timeout(9000),
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
-        ...init.headers,
-      },
-    });
-    const text = await response.text();
-    // Score-shaped fragments: dates near 2-3 digit numbers, JSON keys with "score"
-    const matches: string[] = [];
-    const patterns = [
-      /"[a-z_]*score[a-z_]*"\s*:\s*"?[\d.]+"?/gi,
-      /\d{2}\/\d{2}\/\d{2,4}[^<>{}]{0,60}\b\d{2,3}\b/g,
-      /score_(?:date|day|history|feed)/gi,
-      /"differential"\s*:\s*"?[\d.]+"?/gi,
-    ];
-    for (const pattern of patterns) {
-      for (const hit of text.match(pattern)?.slice(0, 6) ?? []) {
-        if (!matches.includes(hit)) matches.push(hit);
-      }
-      if (matches.length >= 12) break;
-    }
-    return {
-      url,
-      method,
-      status: response.status,
-      contentType: response.headers.get("content-type") ?? undefined,
-      length: text.length,
-      snippet: text.slice(0, 700),
-      matches: matches.length ? matches : undefined,
-    };
-  } catch (error) {
-    return { url, method, status: `ERR ${error instanceof Error ? error.name : "unknown"}` };
+function contexts(text: string, pattern: RegExp, radius: number, max: number): string[] {
+  const found: string[] = [];
+  for (const match of text.matchAll(pattern)) {
+    const start = Math.max(0, (match.index ?? 0) - radius);
+    const end = Math.min(text.length, (match.index ?? 0) + (match[0]?.length ?? 0) + radius);
+    found.push(text.slice(start, end).replace(/\s+/g, " "));
+    if (found.length >= max) break;
   }
-}
-
-function formPost(body: Record<string, string>): RequestInit {
-  return {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams(body).toString(),
-  };
+  return found;
 }
 
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id") ?? "1812465"; // WIX
-  const ghinNumber = request.nextUrl.searchParams.get("ghin") ?? "11634237"; // WIX
-  const mode = request.nextUrl.searchParams.get("mode") ?? "grint";
+  const url = `${GRINT}/golf-handicap-tracker/scores/${id}`;
 
-  const targets: Array<Promise<ProbeResult>> = [];
+  const response = await fetch(url, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(9000),
+    headers: { "User-Agent": UA },
+  });
+  const html = await response.text();
 
-  if (mode === "grint" || mode === "all") {
-    // Sibling endpoints of the two known-working ones
-    // (/user/ajax_search_users_json and /user/get_handicap_info/)
-    const ajaxCandidates = [
-      "get_scores_info",
-      "get_stats_info",
-      "get_profile_info",
-      "get_user_info",
-      "get_score_history_info",
-      "get_rounds_info",
-      "get_scores_json",
-      "ajax_get_scores_json",
-      "get_score_feed",
-      "get_last_rounds",
-    ];
-    for (const endpoint of ajaxCandidates) {
-      targets.push(probe(`${GRINT}/user/${endpoint}/`, formPost({ user_id: id })));
-    }
-    // Public profile / score pages (HTML)
-    for (const path of [
-      `/profile/index/${id}`,
-      `/profile/scores/${id}`,
-      `/profile/stats/${id}`,
-      `/scores/index/${id}`,
-      `/scorecard/user/${id}`,
-      `/golf-handicap-tracker/scores/${id}`,
-    ]) {
-      targets.push(probe(`${GRINT}${path}`));
-    }
-  }
+  // Embedded JS data blobs (var scores = [...], JSON.parse('...'), etc.)
+  const scriptBlobs = contexts(
+    html,
+    /(?:var|let|const)\s+[a-zA-Z_]*(?:score|round|history)[a-zA-Z_]*\s*=/gi,
+    600,
+    6,
+  );
 
-  if (mode === "ghin" || mode === "all") {
-    // GHIN widget/public auth paths that may not need member credentials
-    targets.push(
-      probe(`${GHIN}/public/login.json`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: "nonblank" }),
-      }),
-      probe(`${GHIN}/golfers/search.json?golfer_id=${ghinNumber}&per_page=5&page=1`),
-      probe(`${GHIN}/golfers/${ghinNumber}/scores.json?source=GHINcom&per_page=5&page=1`),
-    );
-  }
+  // Date-shaped strings with surrounding markup
+  const dateHits = contexts(html, /\d{2}\/\d{2}\/\d{2,4}|\d{4}-\d{2}-\d{2}/g, 220, 20);
 
-  const results = await Promise.all(targets);
-  return NextResponse.json({ mode, id, results }, { status: 200 });
+  // Class/id names mentioning score
+  const scoreAttrs = [
+    ...new Set(
+      [...html.matchAll(/(?:class|id)="([^"]*(?:score|round|history)[^"]*)"/gi)].map(
+        (match) => match[1],
+      ),
+    ),
+  ].slice(0, 30);
+
+  // Table rows, tags stripped
+  const rows = [...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)]
+    .map((match) => match[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .slice(0, 25);
+
+  // AJAX URLs referenced by scripts on the page
+  const ajaxUrls = [
+    ...new Set(
+      [...html.matchAll(/["'](\/[a-z_/]+(?:score|round|history|ajax)[a-z_/]*)["']/gi)].map(
+        (match) => match[1],
+      ),
+    ),
+  ].slice(0, 20);
+
+  return NextResponse.json({
+    url,
+    status: response.status,
+    length: html.length,
+    title: html.match(/<title>([^<]*)<\/title>/i)?.[1],
+    scoreAttrs,
+    ajaxUrls,
+    scriptBlobs,
+    rows,
+    dateHits,
+  });
 }
