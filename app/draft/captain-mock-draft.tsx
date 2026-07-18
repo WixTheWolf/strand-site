@@ -29,6 +29,7 @@ import {
 import type { PlayerDraftStats } from "@/lib/types";
 import DraftAnalytics from "./draft-analytics";
 import { PlayerSkillGraph } from "./player-skill-graph";
+import RecentForm from "./recent-form";
 
 function formatIndex(player: PlayerDraftStats) {
   if (player.indexNum !== null) return player.indexNum.toFixed(1);
@@ -459,6 +460,8 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
               </div>
             </div>
           )}
+
+          <RecentForm players={players} />
 
           <PlayerSkillGraph players={players} draftedIds={draftedIds} />
         </>

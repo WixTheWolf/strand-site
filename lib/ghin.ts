@@ -83,6 +83,60 @@ async function ghinSearch(token: string, params: URLSearchParams): Promise<GhinG
   return data?.golfers ?? [];
 }
 
+interface GhinScoreRecord {
+  adjusted_gross_score?: number | string;
+  adjusted_score?: number | string;
+  score?: number | string;
+  played_at?: string;
+  date_played?: string;
+  posted_at?: string;
+  course_name?: string;
+  facility_name?: string;
+  differential?: number | string;
+  score_day_order?: number;
+}
+
+export interface GhinRoundResult {
+  date: string;
+  score: number;
+  course?: string;
+  differential?: number | null;
+}
+
+/** Last posted rounds for a golfer, newest first — requires GHIN credentials */
+export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<GhinRoundResult[]> {
+  const token = await ghinLogin();
+  if (!token) return [];
+
+  try {
+    const response = await fetch(
+      `${GHIN_API}/golfers/${encodeURIComponent(ghinNumber)}/scores.json?source=GHINcom&per_page=${limit}&page=1`,
+      { headers: { Authorization: `Bearer ${token}` }, next: { revalidate: 300 } },
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    const rows: GhinScoreRecord[] = data?.scores ?? data?.recent_scores ?? data?.revision_scores ?? [];
+
+    return rows
+      .map((row) => {
+        const score = parseFloat(String(row.adjusted_gross_score ?? row.adjusted_score ?? row.score ?? ""));
+        const date = row.played_at ?? row.date_played ?? row.posted_at ?? "";
+        if (Number.isNaN(score) || !date) return null;
+        const diff = parseFloat(String(row.differential ?? ""));
+        return {
+          date,
+          score,
+          course: row.course_name ?? row.facility_name,
+          differential: Number.isNaN(diff) ? null : diff,
+        };
+      })
+      .filter((row): row is GhinRoundResult => row !== null)
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
 /** Look a player up on GHIN by GHIN number first, then by exact name match. */
 export async function lookupGhinIndex(player: {
   name: string;

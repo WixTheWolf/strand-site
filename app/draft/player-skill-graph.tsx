@@ -266,6 +266,7 @@ export function PlayerSkillGraph({ players, draftedIds }: Props) {
                 <th className="px-3 py-3">Upside</th>
                 <th className="px-3 py-3">Reliability</th>
                 <th className="px-3 py-3">Attest</th>
+                <th className="px-3 py-3">Last 5</th>
                 <th className="px-3 py-3">Heat</th>
                 <th className="px-3 py-3">Draft</th>
                 <th className="px-3 py-3">Source</th>
@@ -304,6 +305,11 @@ export function PlayerSkillGraph({ players, draftedIds }: Props) {
                     <td className="px-3 py-2.5">{p.upsideScore.toFixed(0)}</td>
                     <td className="px-3 py-2.5">{p.reliabilityScore.toFixed(0)}</td>
                     <td className="px-3 py-2.5">{p.attestNum || "—"}</td>
+                    <td className="px-3 py-2.5 font-mono text-xs">
+                      {p.recentRounds?.length
+                        ? p.recentRounds.map((round) => round.score).join(" · ")
+                        : "—"}
+                    </td>
                     <td className="px-3 py-2.5">{p.heatLabel}</td>
                     <td className="px-3 py-2.5">
                       #{p.draftRank} ({p.draftScore.toFixed(0)})

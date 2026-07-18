@@ -1,8 +1,26 @@
 import { NextResponse } from "next/server";
 import { buildPlayerStats, getOptimalDraftOrder, getOptimalTeam, rankPlayers, simulateOptimalDraft } from "@/lib/draft-engine";
-import { fetchGrintHandicap } from "@/lib/grint";
+import { fetchGhinScores } from "@/lib/ghin";
+import { fetchGrintHandicap, fetchGrintScores } from "@/lib/grint";
 import { resolvePlayerGrint } from "@/lib/grint-resolve";
 import { ERIC_THERRIEN, STRAND_PLAYERS } from "@/lib/players";
+import type { PlayerDraftStats, RecentRound } from "@/lib/types";
+
+/** Last five posted rounds — GHIN when credentials are configured, TheGrint otherwise */
+async function fetchRecentRounds(
+  ghinNumber: string | null | undefined,
+  grintId: string | null | undefined,
+): Promise<{ rounds: RecentRound[]; source: PlayerDraftStats["recentRoundsSource"] }> {
+  if (ghinNumber) {
+    const ghinRounds = await fetchGhinScores(ghinNumber, 5);
+    if (ghinRounds.length) return { rounds: ghinRounds, source: "ghin" };
+  }
+  if (grintId) {
+    const grintRounds = await fetchGrintScores(grintId, 5);
+    if (grintRounds.length) return { rounds: grintRounds, source: "grint" };
+  }
+  return { rounds: [], source: null };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +28,7 @@ export async function GET() {
   const stats = await Promise.all(
     STRAND_PLAYERS.map(async (player) => {
       const resolved = await resolvePlayerGrint(player);
-      return buildPlayerStats(player, resolved.handicap, {
+      const stats = buildPlayerStats(player, resolved.handicap, {
         location: resolved.match?.location,
         username: resolved.match?.username ?? player.grintUsername,
         dataSource: resolved.dataSource,
@@ -18,6 +36,11 @@ export async function GET() {
         ghinNumber: resolved.ghinNumber,
         ghinIndex: resolved.ghinIndex,
       });
+      const recent = await fetchRecentRounds(
+        resolved.ghinNumber ?? player.ghinNumber,
+        player.grintId ?? resolved.match?.id,
+      );
+      return { ...stats, recentRounds: recent.rounds, recentRoundsSource: recent.source };
     }),
   );
 
