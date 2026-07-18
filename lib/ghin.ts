@@ -125,6 +125,8 @@ interface GhinScoreRecord {
   facility_name?: string;
   differential?: number | string;
   score_day_order?: number;
+  number_of_holes?: number | string;
+  number_of_played_holes?: number | string;
 }
 
 export interface GhinRoundResult {
@@ -132,6 +134,7 @@ export interface GhinRoundResult {
   score: number;
   course?: string;
   differential?: number | null;
+  nineHole?: boolean;
 }
 
 /** GHIN wraps score arrays a few different ways depending on the endpoint. */
@@ -180,11 +183,13 @@ export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<Gh
         const date = row.played_at ?? row.date_played ?? row.posted_at ?? "";
         if (Number.isNaN(score) || !date) continue;
         const diff = parseFloat(String(row.differential ?? ""));
+        const holes = parseFloat(String(row.number_of_holes ?? row.number_of_played_holes ?? ""));
         results.push({
           date,
           score,
           course: row.course_name ?? row.facility_name,
           differential: Number.isNaN(diff) ? null : diff,
+          nineHole: !Number.isNaN(holes) && holes <= 9,
         });
       }
       if (!results.length) continue;

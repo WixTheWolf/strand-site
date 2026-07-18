@@ -307,7 +307,9 @@ export function PlayerSkillGraph({ players, draftedIds }: Props) {
                     <td className="px-3 py-2.5">{p.attestNum || "—"}</td>
                     <td className="px-3 py-2.5 font-mono text-xs">
                       {p.recentRounds?.length
-                        ? p.recentRounds.map((round) => round.score).join(" · ")
+                        ? p.recentRounds
+                            .map((round) => `${round.score}${round.nineHole ? "*" : ""}`)
+                            .join(" · ")
                         : "—"}
                     </td>
                     <td className="px-3 py-2.5">{p.heatLabel}</td>

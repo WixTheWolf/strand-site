@@ -35,6 +35,10 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
     () => players.filter((player) => !(player.recentRounds?.length ?? 0)),
     [players],
   );
+  const hasNineHole = useMemo(
+    () => withRounds.some((player) => player.recentRounds?.some((round) => round.nineHole)),
+    [withRounds],
+  );
 
   return (
     <section className="rounded-[2rem] border border-[#111]/10 bg-white p-6 shadow-sm">
@@ -82,10 +86,11 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
                       }`}
                       title={`${fullDate(round.date)}${round.course ? ` · ${round.course}` : ""}${
                         round.differential != null ? ` · diff ${round.differential}` : ""
-                      }`}
+                      }${round.nineHole ? " · 9-hole round" : ""}`}
                     >
                       <span className="block font-mono text-sm font-medium leading-none">
                         {round.score}
+                        {round.nineHole && <sup className="text-[#c45c26]">*</sup>}
                       </span>
                       <span className="mt-0.5 block text-[9px] uppercase tracking-[0.08em] text-[#111]/45">
                         {shortDate(round.date)}
@@ -104,8 +109,14 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
         </div>
       )}
 
-      {withRounds.length > 0 && withoutRounds.length > 0 && (
+      {hasNineHole && (
         <p className="mt-4 text-xs text-[#111]/45">
+          <span className="font-mono text-[#c45c26]">*</span> 9-hole round
+        </p>
+      )}
+
+      {withRounds.length > 0 && withoutRounds.length > 0 && (
+        <p className="mt-1 text-xs text-[#111]/45">
           No score history found for: {withoutRounds.map((player) => player.nickname).join(", ")}
         </p>
       )}

@@ -45,6 +45,8 @@ export interface RecentRound {
   score: number;
   course?: string;
   differential?: number | null;
+  /** True when the posted round was 9 holes (shown with an asterisk) */
+  nineHole?: boolean;
 }
 
 export interface PlayerDraftStats extends StrandPlayer {
