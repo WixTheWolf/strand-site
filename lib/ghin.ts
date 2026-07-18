@@ -89,6 +89,78 @@ export async function ghinLoginProbe(): Promise<{ ok: boolean; status: number | 
   }
 }
 
+/**
+ * Diagnostic: try several documented GHIN login shapes with the configured
+ * credentials (and, as an alternate identifier, a known GHIN number) to find
+ * one that authenticates. Reports only status + coarse note per attempt —
+ * never the email, password, or token.
+ */
+export async function ghinLoginDiagnose(
+  altGhin?: string,
+): Promise<Array<{ variant: string; status: number | null; ok: boolean; note: string }>> {
+  const email = ghinEmail();
+  const password = ghinPassword();
+  if (!email || !password) {
+    return [{ variant: "n/a", status: null, ok: false, note: "credentials not set in this environment" }];
+  }
+
+  const identifiers: Array<{ label: string; value: string }> = [{ label: "email", value: email }];
+  if (altGhin && altGhin !== email) identifiers.push({ label: "ghin#", value: altGhin });
+
+  const bodies = (id: string) => [
+    {
+      label: "base",
+      body: { user: { email_or_ghin: id, password, remember_me: true }, token: "nonblank" },
+    },
+    {
+      label: "app+source",
+      body: {
+        user: { email_or_ghin: id, password, remember_me: "true" },
+        token: "nonblank",
+        source: "GHINcom",
+      },
+    },
+  ];
+
+  const results: Array<{ variant: string; status: number | null; ok: boolean; note: string }> = [];
+  for (const id of identifiers) {
+    for (const shape of bodies(id.value)) {
+      const variant = `${id.label}/${shape.label}`;
+      try {
+        const response = await fetch(`${GHIN_API}/golfer_login.json`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(shape.body),
+          cache: "no-store",
+          signal: AbortSignal.timeout(9000),
+        });
+        let hasToken = false;
+        let note = `HTTP ${response.status}`;
+        try {
+          const data = await response.json();
+          hasToken = Boolean(data?.golfer_user?.golfer_user_token);
+          if (!hasToken) {
+            const err = data?.error ?? data?.errors ?? data?.digital_profile ?? data;
+            note = `HTTP ${response.status} — ${JSON.stringify(err).slice(0, 140)}`;
+          }
+        } catch {
+          note = `HTTP ${response.status} — non-JSON`;
+        }
+        results.push({ variant, status: response.status, ok: hasToken, note });
+        if (hasToken) return results; // found a working shape — stop
+      } catch (error) {
+        results.push({
+          variant,
+          status: null,
+          ok: false,
+          note: `request failed: ${error instanceof Error ? error.name : "unknown"}`,
+        });
+      }
+    }
+  }
+  return results;
+}
+
 export interface GhinLookupResult {
   handicapIndex: string;
   ghinNumber: string;

@@ -1,31 +1,24 @@
 import { NextResponse } from "next/server";
-import { ghinConfigured, ghinEmail, ghinPassword, ghinLoginProbe } from "@/lib/ghin";
+import { ghinConfigured, ghinEmail, ghinPassword, ghinLoginDiagnose } from "@/lib/ghin";
 
 /**
- * Secret-safe diagnostic for the GHIN integration. Reports only booleans,
- * lengths, and GHIN's own HTTP status / error text — never the email,
- * password, or token. Lets us tell an env-scope miss from a credential or
- * endpoint rejection. Readable on the public production URL.
+ * Secret-safe diagnostic for the GHIN integration. Tries several documented
+ * login shapes (email vs GHIN number, with/without the app `source` field)
+ * and reports which authenticates, plus GHIN's status/error text. Never
+ * returns the email, password, or token. Temporary; removed once live GHIN
+ * authenticates.
  */
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const probe = await ghinLoginProbe();
+  const attempts = await ghinLoginDiagnose("11634237"); // WIX's GHIN number as alt identifier
+  const winner = attempts.find((attempt) => attempt.ok);
   return NextResponse.json({
     configured: ghinConfigured(),
-    // which name variant actually resolved (helps spot a casing/scope miss)
-    sawEnv: {
-      GHIN_EMAIL: Boolean(process.env.GHIN_EMAIL),
-      GHIN_Email: Boolean(process.env.GHIN_Email),
-      ghin_email: Boolean(process.env.ghin_email),
-      GHIN_PASSWORD: Boolean(process.env.GHIN_PASSWORD),
-      GHIN_Password: Boolean(process.env.GHIN_Password),
-      ghin_password: Boolean(process.env.ghin_password),
-    },
     emailLength: ghinEmail()?.length ?? 0,
     passwordLength: ghinPassword()?.length ?? 0,
-    loginSucceeded: probe.ok,
-    httpStatus: probe.status,
-    note: probe.note,
+    loginSucceeded: Boolean(winner),
+    workingVariant: winner?.variant ?? null,
+    attempts,
   });
 }
