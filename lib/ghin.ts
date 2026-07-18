@@ -43,6 +43,42 @@ async function ghinLogin(): Promise<string | null> {
   }
 }
 
+/**
+ * Diagnostic: attempt a login and report only whether it worked, plus the
+ * HTTP status and a coarse note. Never returns the token or any secret.
+ */
+export async function ghinLoginProbe(): Promise<{ ok: boolean; status: number | null; note: string }> {
+  if (!ghinConfigured()) return { ok: false, status: null, note: "GHIN_EMAIL / GHIN_PASSWORD not set in this environment" };
+  try {
+    const response = await fetch(`${GHIN_API}/golfer_login.json`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user: {
+          email_or_ghin: process.env.GHIN_EMAIL,
+          password: process.env.GHIN_PASSWORD,
+          remember_me: true,
+        },
+        token: "nonblank",
+      }),
+      cache: "no-store",
+    });
+    let note = `HTTP ${response.status}`;
+    let hasToken = false;
+    try {
+      const data = await response.json();
+      hasToken = Boolean(data?.golfer_user?.golfer_user_token);
+      if (!hasToken && data?.error) note = `HTTP ${response.status} — ${String(data.error).slice(0, 120)}`;
+      else if (!hasToken && data?.errors) note = `HTTP ${response.status} — ${JSON.stringify(data.errors).slice(0, 120)}`;
+    } catch {
+      note = `HTTP ${response.status} — non-JSON response`;
+    }
+    return { ok: response.ok && hasToken, status: response.status, note };
+  } catch (error) {
+    return { ok: false, status: null, note: `request failed: ${error instanceof Error ? error.name : "unknown"}` };
+  }
+}
+
 export interface GhinLookupResult {
   handicapIndex: string;
   ghinNumber: string;
