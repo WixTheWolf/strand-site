@@ -102,8 +102,13 @@ export interface FormatValues {
 
 /** Per-format match-play value breakdown for one player */
 export function computeFormatValues(player: PlayerDraftStats): FormatValues {
-  const index = playingIndex(player.indexNum ?? player.estimatedIndex ?? 24);
-  const grossSkill = Math.max(0, 40 - index);
+  // Gross skill reflects the real index; strokes received are capped at the
+  // Strand ceiling, and every stroke forfeited to the cap is a net penalty
+  // weighted by how much net scoring matters in each format.
+  const rawIndex = player.indexNum ?? player.estimatedIndex ?? 24;
+  const index = playingIndex(rawIndex);
+  const forfeit = rawIndex - index;
+  const grossSkill = Math.max(0, 40 - rawIndex);
   const netLeverage = strokeLeverage(index);
 
   let formBonus = 0;
@@ -117,18 +122,19 @@ export function computeFormatValues(player: PlayerDraftStats): FormatValues {
   const strategy = strategicBonus(player);
 
   return {
-    fourball: grossSkill * 1.2 + strategy + (index <= 9 ? (9 - index) * 0.8 : 0),
-    scramble: grossSkill * 0.85 + strategy * 1.15 + reliability,
+    fourball: grossSkill * 1.2 + strategy + (index <= 9 ? (9 - index) * 0.8 : 0) - forfeit * 0.5,
+    // Scramble team HC only counts the high index at 15%
+    scramble: grossSkill * 0.85 + strategy * 1.15 + reliability - forfeit * 0.15,
     // Singles: full course handicap difference between opponents (stroke leverage matters)
-    singles: grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy,
+    singles: grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy - forfeit * 1.25,
     // Shamble uses same 35% low + 15% high team weighting as scramble
-    shamble: grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5,
+    shamble: grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5 - forfeit * 0.7,
   };
 }
 
 /** Cross-format match-play value — weights singles net leverage higher */
 export function computeMatchPlayValue(player: PlayerDraftStats): number {
-  const index = playingIndex(player.indexNum ?? player.estimatedIndex ?? 24);
+  const index = player.indexNum ?? player.estimatedIndex ?? 24;
   const formats = computeFormatValues(player);
   const eliteAnchor = index <= 8 ? 6 + (8 - index) * 0.5 : 0;
 
@@ -360,8 +366,9 @@ function computeDraftScore(
   heat: HeatStatus,
   formDelta: number | null,
 ): number {
-  const effectiveIndex = playingIndex(indexNum ?? player.estimatedIndex ?? 24);
-  const handicapScore = Math.max(0, 36 - effectiveIndex);
+  // Real index for skill; strokes forfeited to the 25 ceiling come off the top
+  const effectiveIndex = indexNum ?? player.estimatedIndex ?? 24;
+  const handicapScore = Math.max(0, 36 - effectiveIndex) - (effectiveIndex - playingIndex(effectiveIndex));
 
   let formScore = 0;
   if (heat === "heating" && formDelta) formScore = Math.min(8, formDelta * 3);

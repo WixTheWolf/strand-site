@@ -34,16 +34,18 @@ const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n
 
 /** Composite draft value — verified index dominates; recent scores adjust. */
 function rate(p: PlayerDraftStats): Rated {
-  // Strand ceiling: anyone over 25 plays as a 25
+  // Strand ceiling: anyone over 25 plays as a 25 — they keep their real
+  // scoring but forfeit the strokes above the cap, a straight net penalty
   const rawIndex = p.indexNum ?? p.estimatedIndex ?? 22;
   const index = playingIndex(rawIndex);
+  const capForfeit = rawIndex - index;
   const rounds = p.recentRounds ?? [];
   const scores = eighteenScores(rounds);
   const avg18 = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
   const best18 = scores.length ? Math.min(...scores) : null;
   const spread18 = scores.length >= 2 ? Math.max(...scores) - Math.min(...scores) : null;
 
-  const skill = 30 - index;
+  const skill = 30 - rawIndex;
   const form = clamp(p.formDelta ?? 0, -4, 6); // playing below index = hot
   const ceiling = avg18 !== null && best18 !== null ? clamp(avg18 - best18, 0, 12) : 0;
   const consistency = spread18 !== null ? clamp(12 - spread18, 0, 12) : 0;
@@ -56,10 +58,12 @@ function rate(p: PlayerDraftStats): Rated {
     ceiling * 0.25 +
     consistency * 0.15 +
     (netLeverage ? 2 : 0) +
-    (noData ? -1.2 : 0);
+    (noData ? -1.2 : 0) -
+    capForfeit * 0.9;
 
   const tags: Rated["tags"] = [];
-  if (rawIndex > HANDICAP_CAP) tags.push({ icon: "🧢", label: `plays as ${HANDICAP_CAP}`, tone: "warn" });
+  if (rawIndex > HANDICAP_CAP)
+    tags.push({ icon: "🧢", label: `plays as ${HANDICAP_CAP} (−${capForfeit.toFixed(1)} net)`, tone: "warn" });
   if ((p.formDelta ?? 0) >= 2) tags.push({ icon: "🔥", label: `${(p.formDelta ?? 0).toFixed(1)} below idx`, tone: "hot" });
   else if ((p.formDelta ?? 0) <= -2) tags.push({ icon: "❄️", label: "cooling", tone: "cold" });
   if (consistency >= 9) tags.push({ icon: "🎯", label: "consistent", tone: "steady" });
