@@ -112,10 +112,10 @@ export default function DraftBoard() {
     );
   }
 
-  const views: { key: View; label: string }[] = [
-    { key: "advisor", label: "🎯 Draft advisor (live)" },
-    { key: "captain", label: "Captain mock draft" },
-    { key: "sandbox", label: "Free sandbox" },
+  const views: { key: View; label: string; hint: string }[] = [
+    { key: "advisor", label: "🎯 Live Advisor", hint: "Draft-day board" },
+    { key: "captain", label: "📋 Mock Draft", hint: "Practice vs J-BONE" },
+    { key: "sandbox", label: "🧪 Sandbox", hint: "Free-build teams" },
   ];
 
   return (
@@ -137,18 +137,21 @@ export default function DraftBoard() {
         </button>
       </div>
 
-      <div className="mb-8 flex flex-wrap gap-2">
-        {views.map((item) => (
-          <button
-            key={item.key}
-            onClick={() => setView(item.key)}
-            className={`rounded-2xl px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] ${
-              view === item.key ? "bg-[#111] text-white" : "border border-black/15 bg-white"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
+      <div className="sticky top-16 z-30 -mx-5 mb-8 border-y border-black/5 bg-[#f7f5f0]/90 px-5 py-3 backdrop-blur-md md:-mx-8 md:px-8">
+        <div className="flex flex-wrap gap-2">
+          {views.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => setView(item.key)}
+              title={item.hint}
+              className={`rounded-2xl px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] transition-colors ${
+                view === item.key ? "bg-[#111] text-white" : "border border-black/15 bg-white hover:border-black/40"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mb-6 grid gap-4 md:grid-cols-4">
