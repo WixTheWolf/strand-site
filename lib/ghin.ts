@@ -23,11 +23,6 @@ export function ghinPassword(): string | undefined {
   return (process.env.GHIN_PASSWORD ?? process.env.GHIN_Password ?? process.env.ghin_password)?.trim();
 }
 
-/** Raw (untrimmed) stored password, for diagnosing paste errors only. */
-export function ghinPasswordRaw(): string | undefined {
-  return process.env.GHIN_PASSWORD ?? process.env.GHIN_Password ?? process.env.ghin_password;
-}
-
 export function ghinConfigured(): boolean {
   return Boolean(ghinEmail() && ghinPassword());
 }
@@ -49,10 +44,12 @@ function loginIdentifiers(): string[] {
   return [...new Set(ids)];
 }
 
-async function ghinLogin(): Promise<string | null> {
-  if (!ghinConfigured()) return null;
-  if (cachedToken && cachedToken.expiresAt > Date.now()) return cachedToken.token;
+// Share a single in-flight login across concurrent callers. The players
+// route resolves 20 golfers in parallel; without this they'd each fire
+// their own login and GHIN throttles the burst, failing them all.
+let loginPromise: Promise<string | null> | null = null;
 
+async function doLogin(): Promise<string | null> {
   const password = ghinPassword();
   if (!password) return null;
 
@@ -79,6 +76,18 @@ async function ghinLogin(): Promise<string | null> {
     }
   }
   return null;
+}
+
+async function ghinLogin(): Promise<string | null> {
+  if (!ghinConfigured()) return null;
+  if (cachedToken && cachedToken.expiresAt > Date.now()) return cachedToken.token;
+  // Coalesce concurrent logins into one request
+  if (!loginPromise) {
+    loginPromise = doLogin().finally(() => {
+      loginPromise = null;
+    });
+  }
+  return loginPromise;
 }
 
 export interface GhinLookupResult {
