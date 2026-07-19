@@ -229,10 +229,12 @@ export async function lookupGhinIndex(player: {
   name: string;
   ghinNumber?: string | null;
   expectedIndex?: number | null;
-  state?: string | null;
+  expectedClub?: string | null;
 }): Promise<GhinLookupResult | null> {
   const token = await ghinLogin();
   if (!token) return null;
+
+  const alpha = (value: string | undefined) => (value ?? "").toLowerCase().replace(/[^a-z]/g, "");
 
   try {
     if (player.ghinNumber) {
@@ -245,33 +247,54 @@ export async function lookupGhinIndex(player: {
     const lastName = rest.join(" ");
     if (!firstName || !lastName) return null;
 
-    const params = new URLSearchParams({
-      first_name: firstName,
-      last_name: lastName,
-      status: "Active",
-      country: "USA", // required by GHIN, else it 400s
-    });
-    if (player.state) params.set("state", player.state);
+    // Country (not residence state) — a player's GHIN home association may be
+    // in a different state than where they live, so state would over-filter.
+    const golfers = await ghinSearch(
+      token,
+      new URLSearchParams({
+        first_name: firstName,
+        last_name: lastName,
+        status: "Active",
+        country: "USA",
+      }),
+    );
 
-    const golfers = await ghinSearch(token, params);
-    const fn = firstName.toLowerCase();
-    const ln = lastName.toLowerCase();
+    const fn = alpha(firstName);
+    const ln = alpha(lastName);
     const candidates = golfers.filter((golfer) => {
-      const gl = (golfer.last_name ?? "").toLowerCase().trim();
-      const gf = (golfer.first_name ?? "").toLowerCase().trim();
-      if (gl !== ln) return false;
+      const gl = alpha(golfer.last_name);
+      const gf = alpha(golfer.first_name);
+      if (gl !== ln) return false; // apostrophes/hyphens already stripped
       return gf === fn || gf.startsWith(fn) || fn.startsWith(gf);
     });
 
     if (candidates.length === 1) return toResult(candidates[0]);
+    if (!candidates.length) return null;
 
-    // Several same-name golfers — trust the one whose index matches ours
-    if (candidates.length > 1 && player.expectedIndex != null) {
-      const near = candidates.filter((golfer) => {
-        const idx = parseFloat(String(golfer.handicap_index ?? golfer.hi_display ?? ""));
-        return !Number.isNaN(idx) && Math.abs(idx - player.expectedIndex!) <= 1.0;
+    // Disambiguate same-name golfers by club, then by verified index.
+    const clubKey = alpha(player.expectedClub ?? undefined);
+    if (clubKey) {
+      const byClub = candidates.filter((golfer) => {
+        const c = alpha(golfer.club_name);
+        return c && (c.includes(clubKey) || clubKey.includes(c));
       });
-      if (near.length === 1) return toResult(near[0]);
+      if (byClub.length === 1) return toResult(byClub[0]);
+    }
+
+    if (player.expectedIndex != null) {
+      const scored = candidates
+        .map((golfer) => ({
+          golfer,
+          diff: Math.abs(
+            parseFloat(String(golfer.handicap_index ?? golfer.hi_display ?? "NaN")) - player.expectedIndex!,
+          ),
+        }))
+        .filter((entry) => !Number.isNaN(entry.diff))
+        .sort((a, b) => a.diff - b.diff);
+      // Accept the closest index when it's a clear, close match
+      if (scored.length && scored[0].diff <= 0.5 && (scored.length === 1 || scored[1].diff - scored[0].diff >= 0.5)) {
+        return toResult(scored[0].golfer);
+      }
     }
     return null;
   } catch {
