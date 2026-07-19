@@ -12,12 +12,19 @@ const GHIN_API = "https://api2.ghin.com/api/v1";
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
 // Env-var names are case-sensitive; accept the common casings so a
-// GHIN_Email / ghin_email entry in the dashboard still resolves.
+// GHIN_Email / ghin_email entry in the dashboard still resolves. Trim the
+// values so a stray space/newline pasted into the Vercel field can't break
+// the login.
 export function ghinEmail(): string | undefined {
-  return process.env.GHIN_EMAIL ?? process.env.GHIN_Email ?? process.env.ghin_email;
+  return (process.env.GHIN_EMAIL ?? process.env.GHIN_Email ?? process.env.ghin_email)?.trim();
 }
 
 export function ghinPassword(): string | undefined {
+  return (process.env.GHIN_PASSWORD ?? process.env.GHIN_Password ?? process.env.ghin_password)?.trim();
+}
+
+/** Raw (untrimmed) stored password, for diagnosing paste errors only. */
+export function ghinPasswordRaw(): string | undefined {
   return process.env.GHIN_PASSWORD ?? process.env.GHIN_Password ?? process.env.ghin_password;
 }
 
