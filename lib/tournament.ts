@@ -162,6 +162,7 @@ export const LOGISTICS_NOTES = [
 
 export const HANDICAP_RULES = [
   "All four rounds use USGA / WHS handicap indexes via TheGrint / GHIN.",
+  "Handicap ceiling of 25 — anyone with a higher index plays as a 25.",
   "Course handicap calculated from slope and rating at each tee box.",
   "Match play: strokes allocated hole-by-hole based on stroke index.",
   "Foursomes: team handicap per draw (confirm at The Matchmaker).",
@@ -188,6 +189,14 @@ export const MATCH_PLAY_RULES = [
 
 /** Canonical Strand 2026 rules — single source of truth for site + draft model */
 export const STRAND_RULES = [...HANDICAP_RULES, ...MATCH_PLAY_RULES];
+
+/** League handicap ceiling — anyone with a higher index plays as a 25 */
+export const HANDICAP_CAP = 25;
+
+/** Index as it plays under the Strand ceiling */
+export function playingIndex(index: number): number {
+  return Math.min(index, HANDICAP_CAP);
+}
 
 /** Scramble / shamble team handicap formula (WHS-style) */
 export const SCRAMBLE_LOW_WEIGHT = 0.35;
