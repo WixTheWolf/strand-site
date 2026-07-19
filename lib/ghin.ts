@@ -123,7 +123,7 @@ async function ghinSearch(token: string, params: URLSearchParams): Promise<GhinG
   params.set("page", "1");
   const response = await fetch(`${GHIN_API}/golfers/search.json?${params}`, {
     headers: { Authorization: `Bearer ${token}` },
-    next: { revalidate: 300 },
+    next: { revalidate: 1800 },
   });
   if (!response.ok) return [];
   const data = await response.json();
@@ -187,7 +187,7 @@ export async function fetchGhinScores(ghinNumber: string, limit = 5): Promise<Gh
     try {
       const response = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
-        next: { revalidate: 300 },
+        next: { revalidate: 1800 },
       });
       if (!response.ok) continue;
       const rows = extractScoreRows(await response.json());

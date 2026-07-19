@@ -6,6 +6,7 @@ import { summarizeTeam } from "@/lib/draft-engine";
 import { STRAND_RULES } from "@/lib/tournament";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 import CaptainMockDraft from "./captain-mock-draft";
+import DraftAdvisor from "./draft-advisor";
 
 interface DraftPayload {
   updatedAt: string;
@@ -20,7 +21,7 @@ interface DraftPayload {
   };
 }
 
-type View = "captain" | "sandbox";
+type View = "advisor" | "captain" | "sandbox";
 
 const heatStyles = {
   heating: "bg-orange-100 text-orange-800 border-orange-200",
@@ -39,7 +40,7 @@ export default function DraftBoard() {
   const [data, setData] = useState<DraftPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<View>("captain");
+  const [view, setView] = useState<View>("advisor");
   const [teamA, setTeamA] = useState<string[]>([]);
   const [teamB, setTeamB] = useState<string[]>([]);
   const [activeTeam, setActiveTeam] = useState<"A" | "B">("A");
@@ -113,6 +114,7 @@ export default function DraftBoard() {
   }
 
   const views: { key: View; label: string }[] = [
+    { key: "advisor", label: "🎯 Draft advisor (live)" },
     { key: "captain", label: "Captain mock draft" },
     { key: "sandbox", label: "Free sandbox" },
   ];
@@ -184,6 +186,8 @@ export default function DraftBoard() {
           <div className="mt-1 text-sm text-white/70">~1 month before trip · {DRAFT_PICKS_PER_CAPTAIN} picks each</div>
         </div>
       </div>
+
+      {view === "advisor" && <DraftAdvisor players={data.players} />}
 
       {view === "captain" && <CaptainMockDraft players={data.players} />}
 
