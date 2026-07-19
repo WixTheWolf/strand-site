@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { isCaptain } from "@/lib/players";
+import { HANDICAP_CAP, playingIndex } from "@/lib/tournament";
 import type { PlayerDraftStats, RecentRound } from "@/lib/types";
 
 const WIX_ID = "matt-wixted";
@@ -33,7 +34,9 @@ const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n
 
 /** Composite draft value — verified index dominates; recent scores adjust. */
 function rate(p: PlayerDraftStats): Rated {
-  const index = p.indexNum ?? p.estimatedIndex ?? 22;
+  // Strand ceiling: anyone over 25 plays as a 25
+  const rawIndex = p.indexNum ?? p.estimatedIndex ?? 22;
+  const index = playingIndex(rawIndex);
   const rounds = p.recentRounds ?? [];
   const scores = eighteenScores(rounds);
   const avg18 = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
@@ -56,6 +59,7 @@ function rate(p: PlayerDraftStats): Rated {
     (noData ? -1.2 : 0);
 
   const tags: Rated["tags"] = [];
+  if (rawIndex > HANDICAP_CAP) tags.push({ icon: "🧢", label: `plays as ${HANDICAP_CAP}`, tone: "warn" });
   if ((p.formDelta ?? 0) >= 2) tags.push({ icon: "🔥", label: `${(p.formDelta ?? 0).toFixed(1)} below idx`, tone: "hot" });
   else if ((p.formDelta ?? 0) <= -2) tags.push({ icon: "❄️", label: "cooling", tone: "cold" });
   if (consistency >= 9) tags.push({ icon: "🎯", label: "consistent", tone: "steady" });
@@ -76,7 +80,11 @@ const toneClass: Record<Tone, string> = {
 };
 
 function fmtIndex(p: PlayerDraftStats) {
-  return p.indexNum !== null ? p.indexNum.toFixed(1) : p.estimatedIndex ? `~${p.estimatedIndex}` : "—";
+  if (p.indexNum !== null) {
+    // Show the real index but make the ceiling explicit
+    return p.indexNum > HANDICAP_CAP ? `${p.indexNum.toFixed(1)}→${HANDICAP_CAP}` : p.indexNum.toFixed(1);
+  }
+  return p.estimatedIndex ? `~${Math.min(p.estimatedIndex, HANDICAP_CAP)}` : "—";
 }
 
 function shortDate(raw: string): string {
@@ -394,7 +402,7 @@ export default function DraftAdvisor({ players }: { players: PlayerDraftStats[] 
           const picked = players.filter((p) => assigned[p.id] === side.key && !isCaptain(p.id)).map(rate);
           const avgIdx =
             picked.length > 0
-              ? picked.reduce((s, r) => s + (r.p.indexNum ?? r.p.estimatedIndex ?? 0), 0) / picked.length
+              ? picked.reduce((s, r) => s + playingIndex(r.p.indexNum ?? r.p.estimatedIndex ?? 0), 0) / picked.length
               : null;
           return (
             <div

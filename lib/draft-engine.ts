@@ -8,6 +8,7 @@ import {
 } from "./players";
 import { parseHandicapNumber } from "./grint";
 import {
+  playingIndex,
   scrambleTeamHandicap,
 } from "./tournament";
 import type {
@@ -101,7 +102,7 @@ export interface FormatValues {
 
 /** Per-format match-play value breakdown for one player */
 export function computeFormatValues(player: PlayerDraftStats): FormatValues {
-  const index = player.indexNum ?? player.estimatedIndex ?? 24;
+  const index = playingIndex(player.indexNum ?? player.estimatedIndex ?? 24);
   const grossSkill = Math.max(0, 40 - index);
   const netLeverage = strokeLeverage(index);
 
@@ -127,7 +128,7 @@ export function computeFormatValues(player: PlayerDraftStats): FormatValues {
 
 /** Cross-format match-play value — weights singles net leverage higher */
 export function computeMatchPlayValue(player: PlayerDraftStats): number {
-  const index = player.indexNum ?? player.estimatedIndex ?? 24;
+  const index = playingIndex(player.indexNum ?? player.estimatedIndex ?? 24);
   const formats = computeFormatValues(player);
   const eliteAnchor = index <= 8 ? 6 + (8 - index) * 0.5 : 0;
 
@@ -176,7 +177,7 @@ function scramblePairBonus(indexA: number, indexB: number): number {
 }
 
 function teamSynergyBonus(roster: PlayerDraftStats[]): number {
-  const indexes = roster.map((p) => p.indexNum ?? 24).sort((a, b) => a - b);
+  const indexes = roster.map((p) => playingIndex(p.indexNum ?? 24)).sort((a, b) => a - b);
   if (indexes.length < 2) return 0;
 
   const low = indexes.filter((i) => i <= 12).length;
@@ -359,7 +360,7 @@ function computeDraftScore(
   heat: HeatStatus,
   formDelta: number | null,
 ): number {
-  const effectiveIndex = indexNum ?? player.estimatedIndex ?? 24;
+  const effectiveIndex = playingIndex(indexNum ?? player.estimatedIndex ?? 24);
   const handicapScore = Math.max(0, 36 - effectiveIndex);
 
   let formScore = 0;
@@ -532,7 +533,10 @@ export function getOptimalTeam(
 }
 
 export function summarizeTeam(team: PlayerDraftStats[]) {
-  const indexes = team.map((p) => p.indexNum ?? p.estimatedIndex).filter((v): v is number => v !== null && v !== undefined);
+  const indexes = team
+    .map((p) => p.indexNum ?? p.estimatedIndex)
+    .filter((v): v is number => v !== null && v !== undefined)
+    .map(playingIndex);
   const avgIndex = indexes.length
     ? indexes.reduce((sum, value) => sum + value, 0) / indexes.length
     : null;
