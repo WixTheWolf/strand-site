@@ -60,7 +60,7 @@ export const GHIN_ROUNDS_SNAPSHOT: Record<string, RecentRound[]> = {
     {"date": "2026-04", "score": 108, "differential": 33.8},
     {"date": "2025-08", "score": 108, "differential": 31.1},
     {"date": "2025-07", "score": 110, "differential": 36.3},
-    {"date": "2025-07", "score": 56, "differential": 19.2, "nineHole": true},
+    {"date": "2025-07", "score": 56, "differential": 34.0, "nineHole": true},
     {"date": "2025-06", "score": 104, "differential": 27.5},
   ],
   "jason-olson": [
