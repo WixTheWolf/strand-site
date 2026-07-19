@@ -50,13 +50,12 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
   const profileUrl = getGrintProfileUrlForPlayer(player);
 
   // GHIN is the official source — look it up first (no-op without credentials).
-  // Pass the verified index and state so name lookups can disambiguate.
-  const stateMatch = player.location?.match(/,\s*([A-Z]{2})\b/);
+  // Pass the verified index and home club so name lookups can disambiguate.
   const ghin = await lookupGhinIndex({
     name: player.name,
     ghinNumber: player.ghinNumber,
     expectedIndex: player.manualIndex ?? null,
-    state: stateMatch?.[1] ?? null,
+    expectedClub: player.ghinClub ?? null,
   });
   const ghinIndex = ghin?.handicapIndex ?? null;
   const ghinNumber = ghin?.ghinNumber ?? player.ghinNumber ?? null;
