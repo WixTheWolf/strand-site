@@ -113,7 +113,7 @@ export async function fetchGrintScores(userId: string, limit = 5): Promise<Grint
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body,
-        next: { revalidate: 300 },
+        next: { revalidate: 1800 },
       });
       if (!response.ok) continue;
       const data = await response.json();
@@ -152,7 +152,7 @@ export async function fetchGrintHandicap(userId: string): Promise<GrintHandicap>
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
     // Keep indexes fresh — 5 minutes, not 30
-    next: { revalidate: 300 },
+    next: { revalidate: 1800 },
   });
 
   if (!response.ok) {
