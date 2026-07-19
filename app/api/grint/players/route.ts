@@ -2,12 +2,18 @@ import { NextResponse } from "next/server";
 import { buildPlayerStats, getOptimalDraftOrder, getOptimalTeam, rankPlayers, simulateOptimalDraft } from "@/lib/draft-engine";
 import { fetchGhinScores } from "@/lib/ghin";
 import { fetchGrintHandicap, fetchGrintScores } from "@/lib/grint";
+import { GHIN_ROUNDS_SNAPSHOT } from "@/lib/ghin-snapshot";
 import { resolvePlayerGrint } from "@/lib/grint-resolve";
 import { ERIC_THERRIEN, STRAND_PLAYERS } from "@/lib/players";
 import type { PlayerDraftStats, RecentRound } from "@/lib/types";
 
-/** Last five posted rounds — GHIN when credentials are configured, TheGrint otherwise */
+/**
+ * Last five posted rounds — live GHIN first, then TheGrint, then a captured
+ * snapshot so recent form stays visible even when GHIN rate-limits the live
+ * lookups (critical for draft day).
+ */
 async function fetchRecentRounds(
+  playerId: string,
   ghinNumber: string | null | undefined,
   grintId: string | null | undefined,
 ): Promise<{ rounds: RecentRound[]; source: PlayerDraftStats["recentRoundsSource"] }> {
@@ -19,6 +25,8 @@ async function fetchRecentRounds(
     const grintRounds = await fetchGrintScores(grintId, 5);
     if (grintRounds.length) return { rounds: grintRounds, source: "grint" };
   }
+  const snapshot = GHIN_ROUNDS_SNAPSHOT[playerId];
+  if (snapshot?.length) return { rounds: snapshot, source: "ghin" };
   return { rounds: [], source: null };
 }
 
@@ -52,6 +60,7 @@ export async function GET() {
       ghinIndex: resolved.ghinIndex,
     });
     const recent = await fetchRecentRounds(
+      player.id,
       resolved.ghinNumber ?? player.ghinNumber,
       player.grintId ?? resolved.match?.id,
     );
