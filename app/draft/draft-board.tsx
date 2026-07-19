@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DRAFT_PICKS_PER_CAPTAIN, isCaptain, TEAM_SIZE } from "@/lib/players";
 import { summarizeTeam } from "@/lib/draft-engine";
-import { STRAND_RULES } from "@/lib/tournament";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 import CaptainMockDraft from "./captain-mock-draft";
 import DraftAdvisor from "./draft-advisor";
@@ -152,20 +151,7 @@ export default function DraftBoard() {
         ))}
       </div>
 
-      <div className="mb-8 rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm">
-        <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Strand 2026 rules</div>
-        <p className="mt-2 max-w-3xl text-sm text-[#111]/70">
-          Draft model uses foursomes, shamble (35% low + 15% high), singles with full course handicap
-          difference, and scramble pairings — 3-point match play throughout.
-        </p>
-        <ul className="mt-4 grid gap-2 text-sm text-[#111]/75 md:grid-cols-2">
-          {STRAND_RULES.map((rule) => (
-            <li key={rule}>• {rule}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mb-8 grid gap-4 md:grid-cols-4">
+      <div className="mb-6 grid gap-4 md:grid-cols-4">
         <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Live TheGrint</div>
           <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "live").length}/20 linked</div>
