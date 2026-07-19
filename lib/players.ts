@@ -214,7 +214,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintUsername: "Kaner87",
     grintSearchTerms: ["nskane87@gmail.com", "Kaner87", "Nick Kane"],
     location: "Hermosa Beach, CA",
-    tags: ["grinder", "southern"],
+    // Garmin Golf stats (2026-07-19): index 22.6 "staying consistent",
+    // last-10 avg +27 (18-hole), +15 (9-hole), best +17 — no round-by-round
+    // history available, so no last-5 chips.
+    tags: ["grinder", "southern", "garmin: +27 avg last 10"],
   },
   {
     id: "nick-sprowls",
