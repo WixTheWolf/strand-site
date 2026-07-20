@@ -490,9 +490,14 @@ export function getOptimalDraftOrder(stats: PlayerDraftStats[]): DraftRecommenda
   }));
 }
 
-/** Traditional order: team A owns every odd overall pick, team B every even one */
-export function getTeamPickSlots(teamName: "A" | "B", rounds = DRAFT_PICKS_PER_CAPTAIN): number[] {
-  return Array.from({ length: rounds }, (_, round) => round * 2 + (teamName === "A" ? 1 : 2));
+/** Traditional order: whoever picks first owns every odd overall pick, the other side every even one */
+export function getTeamPickSlots(
+  teamName: "A" | "B",
+  rounds = DRAFT_PICKS_PER_CAPTAIN,
+  wixPicksFirst = true,
+): number[] {
+  const onOdd = teamName === "A" ? wixPicksFirst : !wixPicksFirst;
+  return Array.from({ length: rounds }, (_, round) => round * 2 + (onOdd ? 1 : 2));
 }
 
 export interface OptimalTeamPick {
@@ -506,14 +511,15 @@ export function getOptimalTeamWithPicks(
   recommendations: DraftRecommendation[],
   teamName: "A" | "B" = "A",
   simulation?: SimulatedDraftResult,
+  wixPicksFirst = true,
 ): OptimalTeamPick[] {
-  const sim = simulation ?? simulateOptimalDraft(stats, teamName === "A");
+  const sim = simulation ?? simulateOptimalDraft(stats, wixPicksFirst);
   const picks = teamName === "A" ? sim.wixPicks : sim.justinPicks;
   const captain = stats.find((player) =>
     player.id === (teamName === "A" ? CAPTAIN_IDS[0] : CAPTAIN_IDS[1]),
   )!;
   const rationaleMap = new Map(recommendations.map((rec) => [rec.playerId, rec.rationale]));
-  const pickSlots = getTeamPickSlots(teamName);
+  const pickSlots = getTeamPickSlots(teamName, DRAFT_PICKS_PER_CAPTAIN, wixPicksFirst);
 
   const captainPick: OptimalTeamPick = {
     overallPick: 0,

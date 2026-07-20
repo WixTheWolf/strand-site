@@ -112,7 +112,8 @@ export function suggestJustinPick(
   return best;
 }
 
-export function createScenario(name: string, iPickFirst = true): MockDraftScenario {
+// Justin won the flip — new scenarios start from draft-night reality (J-BONE picks first)
+export function createScenario(name: string, iPickFirst = false): MockDraftScenario {
   const now = new Date().toISOString();
   return {
     id: `scenario-${Date.now()}`,
@@ -171,8 +172,8 @@ export const SCENARIO_TEMPLATES = [
   { name: "Justin takes Fred #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "fred-geisinger") },
   { name: "Justin takes Mager #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "andrew-mager") },
   { name: "Justin takes D'Arcy #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "ryan-darcy") },
-  { name: "I pick first — best case", preset: (s: MockDraftScenario) => ({ ...s, iPickFirst: true, picks: [] }) },
-  { name: "Justin picks first — worst case", preset: (s: MockDraftScenario) => ({ ...s, iPickFirst: false, picks: [] }) },
+  { name: "Draft night — Justin picks first", preset: (s: MockDraftScenario) => ({ ...s, iPickFirst: false, picks: [] }) },
+  { name: "I pick first — hypothetical", preset: (s: MockDraftScenario) => ({ ...s, iPickFirst: true, picks: [] }) },
 ];
 
 function presetJustinFirstPick(scenario: MockDraftScenario, playerId: string): MockDraftScenario {

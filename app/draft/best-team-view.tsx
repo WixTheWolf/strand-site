@@ -146,6 +146,8 @@ export default function BestTeamView() {
   const [data, setData] = useState<DraftPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Draft-night reality: Justin won the flip, so J-BONE leads off by default
+  const [firstPick, setFirstPick] = useState<"wix" | "jbone">("jbone");
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("draftRank");
   const [sortAsc, setSortAsc] = useState(true);
@@ -169,19 +171,21 @@ export default function BestTeamView() {
     loadData();
   }, [loadData]);
 
+  const wixFirst = firstPick === "wix";
+
   const simulation = useMemo(
-    () => (data ? simulateOptimalDraft(data.players, true) : null),
-    [data],
+    () => (data ? simulateOptimalDraft(data.players, wixFirst) : null),
+    [data, wixFirst],
   );
 
   const wixTeam = useMemo(
-    () => (data && simulation ? getOptimalTeamWithPicks(data.players, data.recommendations, "A", simulation) : []),
-    [data, simulation],
+    () => (data && simulation ? getOptimalTeamWithPicks(data.players, data.recommendations, "A", simulation, wixFirst) : []),
+    [data, simulation, wixFirst],
   );
 
   const justinTeam = useMemo(
-    () => (data && simulation ? getOptimalTeamWithPicks(data.players, data.recommendations, "B", simulation) : []),
-    [data, simulation],
+    () => (data && simulation ? getOptimalTeamWithPicks(data.players, data.recommendations, "B", simulation, wixFirst) : []),
+    [data, simulation, wixFirst],
   );
 
   const wixSummary = useMemo(() => summarizeTeam(wixTeam.map((p) => p.player)), [wixTeam]);
@@ -269,12 +273,30 @@ export default function BestTeamView() {
             Updated {new Date(data.updatedAt).toLocaleString()} • {data.source}
           </p>
         </div>
-        <button
-          onClick={loadData}
-          className="rounded-2xl border border-[#111]/15 bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em]"
-        >
-          Refresh data
-        </button>
+        <div className="flex items-end gap-4">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[11px] uppercase tracking-[0.16em] text-[#111]/45">First pick</span>
+            <div className="flex gap-1.5">
+              {(["jbone", "wix"] as const).map((who) => (
+                <button
+                  key={who}
+                  onClick={() => setFirstPick(who)}
+                  className={`rounded-xl px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                    firstPick === who ? "bg-[#111] text-white" : "border border-[#111]/15 bg-white"
+                  }`}
+                >
+                  {who === "jbone" ? "J-BONE" : "WIX"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={loadData}
+            className="rounded-2xl border border-[#111]/15 bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em]"
+          >
+            Refresh data
+          </button>
+        </div>
       </div>
 
       <div className="mb-8 rounded-[2rem] border border-[#111]/10 bg-[#f7f5f0] p-6">
@@ -308,7 +330,8 @@ export default function BestTeamView() {
       <section className="mb-12">
         <h2 className="text-xl font-medium">Your roster — {MY_CAPTAIN.nickname} + 9 picks</h2>
         <p className="mt-1 text-sm text-[#111]/65">
-          Traditional order if {MY_CAPTAIN.nickname} picks first: picks #1, 3, 5, 7, 9, 11, 13, 15, 17 (captain locked)
+          Traditional order, {MY_CAPTAIN.nickname} picking {wixFirst ? "first" : "second"}: picks{" "}
+          {wixFirst ? "#1, 3, 5, 7, 9, 11, 13, 15, 17" : "#2, 4, 6, 8, 10, 12, 14, 16, 18"} (captain locked)
         </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {wixTeam.map((pick) => (
@@ -319,7 +342,9 @@ export default function BestTeamView() {
 
       <section className="mb-12">
         <h2 className="text-xl font-medium">{OPPONENT_CAPTAIN.nickname}&apos;s counter-roster</h2>
-        <p className="mt-1 text-sm text-[#111]/65">What Justin gets if he drafts optimally picking second.</p>
+        <p className="mt-1 text-sm text-[#111]/65">
+          What Justin gets if he drafts optimally picking {wixFirst ? "second" : "first"}.
+        </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {justinTeam.map((pick) => (
             <div key={pick.player.id} className="rounded-2xl border border-[#111]/10 bg-white p-4 shadow-sm">

@@ -52,8 +52,8 @@ export function ScrollProgress() {
 
 const TEE_OFF = new Date("2026-08-20T17:00:00-07:00").getTime();
 
-function diffParts(now: number) {
-  const total = Math.max(0, TEE_OFF - now);
+function diffParts(now: number, target: number) {
+  const total = Math.max(0, target - now);
   return {
     days: Math.floor(total / 86_400_000),
     hours: Math.floor((total / 3_600_000) % 24),
@@ -63,7 +63,21 @@ function diffParts(now: number) {
   };
 }
 
-export function Countdown({ className = "" }: { className?: string }) {
+export function Countdown({
+  className = "",
+  target = TEE_OFF,
+  doneText = "It's go time — QuickSands at 5:00 PM",
+  caption = ["Until the", "first tee"],
+  ariaLabel = "Countdown to the QuickSands warm-up",
+  tone = "dark",
+}: {
+  className?: string;
+  target?: number;
+  doneText?: string;
+  caption?: [string, string];
+  ariaLabel?: string;
+  tone?: "dark" | "light";
+}) {
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
@@ -74,7 +88,12 @@ export function Countdown({ className = "" }: { className?: string }) {
     return () => clearInterval(id);
   }, []);
 
-  const parts = now === null ? null : diffParts(now);
+  const cellClass = tone === "dark" ? "border-white/15 bg-black/25 backdrop-blur-sm" : "border-black/10 bg-white";
+  const numClass = tone === "dark" ? "text-white" : "text-[#111]";
+  const unitClass = tone === "dark" ? "text-white/50" : "text-black/45";
+  const captionClass = tone === "dark" ? "text-white/60" : "text-black/55";
+
+  const parts = now === null ? null : diffParts(now, target);
   const cells: { label: string; value: string }[] = [
     { label: "Days", value: parts ? String(parts.days) : "—" },
     { label: "Hrs", value: parts ? String(parts.hours).padStart(2, "0") : "—" },
@@ -85,27 +104,27 @@ export function Countdown({ className = "" }: { className?: string }) {
   if (parts?.done) {
     return (
       <div className={`text-sm font-medium uppercase tracking-[0.2em] ${className}`}>
-        It&apos;s go time — QuickSands at 5:00 PM
+        {doneText}
       </div>
     );
   }
 
   return (
-    <div className={`flex items-stretch gap-2 ${className}`} role="timer" aria-label="Countdown to the QuickSands warm-up">
+    <div className={`flex items-stretch gap-2 ${className}`} role="timer" aria-label={ariaLabel}>
       {cells.map((cell) => (
         <div
           key={cell.label}
-          className="min-w-[64px] rounded-lg border border-white/15 bg-black/25 px-3 py-2 text-center backdrop-blur-sm"
+          className={`min-w-[64px] rounded-lg border px-3 py-2 text-center ${cellClass}`}
         >
-          <div className="font-mono text-2xl font-medium tabular-nums leading-none text-white" suppressHydrationWarning>
+          <div className={`font-mono text-2xl font-medium tabular-nums leading-none ${numClass}`} suppressHydrationWarning>
             {cell.value}
           </div>
-          <div className="mt-1.5 text-[9px] uppercase tracking-[0.24em] text-white/50">{cell.label}</div>
+          <div className={`mt-1.5 text-[9px] uppercase tracking-[0.24em] ${unitClass}`}>{cell.label}</div>
         </div>
       ))}
       <div className="ml-1 hidden flex-col justify-center sm:flex">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-white/60">Until the</span>
-        <span className="text-[10px] uppercase tracking-[0.2em] text-white/60">first tee</span>
+        <span className={`text-[10px] uppercase tracking-[0.2em] ${captionClass}`}>{caption[0]}</span>
+        <span className={`text-[10px] uppercase tracking-[0.2em] ${captionClass}`}>{caption[1]}</span>
       </div>
     </div>
   );
