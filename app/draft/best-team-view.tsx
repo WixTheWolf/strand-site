@@ -21,7 +21,8 @@ type SortKey =
   | "lowestNum"
   | "draftScore"
   | "attestNum"
-  | "heat";
+  | "heat"
+  | "strand";
 
 const heatStyles = {
   heating: "bg-orange-100 text-orange-800 border-orange-200",
@@ -95,11 +96,12 @@ function TeamRosterCard({
         {player.blurb}
       </p>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
         <DataCell label="Draft score" value={formatNum(player.draftScore, 1)} />
         <DataCell label="Lowest" value={formatNum(player.lowestNum)} />
         <DataCell label="Attest %" value={formatNum(player.attestNum, 0)} />
         <DataCell label="Form" value={player.heatLabel} />
+        <DataCell label="Strand W–L" value={recordLabel(player)} />
       </div>
 
       <div className={`mt-4 rounded-xl px-3 py-2 text-xs ${dark ? "bg-black/20 text-white/80" : "bg-[#f7f5f0] text-[#111]/75"}`}>
@@ -214,6 +216,12 @@ export default function BestTeamView() {
       );
     }
     return [...list].sort((a, b) => {
+      if (sortKey === "strand") {
+        // Wins dominate, appearances break ties; rookies sort last
+        const score = (p: PlayerDraftStats) =>
+          p.strandRecord ? p.strandRecord.wins * 100 + p.strandRecord.appearances : -1;
+        return sortAsc ? score(a) - score(b) : score(b) - score(a);
+      }
       const av = a[sortKey];
       const bv = b[sortKey];
       if (typeof av === "string" && typeof bv === "string") {
@@ -385,6 +393,7 @@ export default function BestTeamView() {
                   ["draftScore", "Score"],
                   ["attestNum", "Attest"],
                   ["heat", "Heat"],
+                  ["strand", "Record"],
                 ].map(([key, label]) => (
                   <th key={key} className="px-3 py-3">
                     <button type="button" onClick={() => toggleSort(key as SortKey)} className="hover:text-[#111]">
@@ -424,6 +433,14 @@ export default function BestTeamView() {
                           {player.heat}
                         </span>
                       </td>
+                      <td className="px-3 py-3">
+                        <div className="font-medium">{recordLabel(player)}</div>
+                        {player.strandRecord && player.strandRecord.appearances > 0 && (
+                          <div className="text-xs text-[#111]/45">
+                            {player.strandRecord.appearances} trips · {player.strandRecord.winPct}%
+                          </div>
+                        )}
+                      </td>
                       <td className="px-3 py-3 text-xs font-semibold uppercase tracking-[0.12em]">{team}</td>
                       <td className="px-3 py-3">
                         <span className={`rounded-full px-2 py-0.5 text-[10px] uppercase ${sourceStyles[player.dataSource]}`}>
@@ -459,7 +476,7 @@ export default function BestTeamView() {
                     </tr>
                     {expanded && (
                       <tr className="border-b bg-[#f7f5f0]/60">
-                        <td colSpan={15} className="px-4 py-4">
+                        <td colSpan={16} className="px-4 py-4">
                           <div className="grid gap-4 lg:grid-cols-3">
                             <div>
                               <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Profile</div>
@@ -518,4 +535,10 @@ export default function BestTeamView() {
 
 function playerLabel(player: PlayerDraftStats) {
   return `${player.nickname} (${player.name.split(" ").pop()})`;
+}
+
+function recordLabel(player: PlayerDraftStats) {
+  const rec = player.strandRecord;
+  if (!rec || rec.appearances === 0) return "Rookie";
+  return `${rec.wins}–${rec.losses}`;
 }

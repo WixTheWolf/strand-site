@@ -7,6 +7,7 @@ import {
   TOTAL_DRAFT_PICKS,
 } from "./players";
 import { parseHandicapNumber } from "./grint";
+import { buildPlayerRecords } from "./history";
 import {
   playingIndex,
   scrambleTeamHandicap,
@@ -57,9 +58,24 @@ function getHeat(indexNum: number | null, lowestNum: number | null, attestNum: n
   return { heat: "steady", heatLabel: "Steady form", formDelta: 0 };
 }
 
+/** Career Strand records from the archive, keyed by player id */
+const STRAND_RECORDS = new Map(
+  buildPlayerRecords(STRAND_PLAYERS).map((rec) => [rec.playerId, rec]),
+);
+
+/**
+ * Measured pedigree from the archive replaces the old champion/veteran/experience
+ * vibe tags: each title is worth 1.5, each trip 0.5, capped so record can't
+ * outweigh handicap.
+ */
+function pedigreeBonus(playerId: string): number {
+  const rec = STRAND_RECORDS.get(playerId);
+  if (!rec) return 0;
+  return Math.min(8, rec.wins * 1.5 + rec.appearances * 0.5);
+}
+
 function strategicBonus(player: StrandPlayer): number {
-  let bonus = 0;
-  if (player.tags.includes("champion")) bonus += 4;
+  let bonus = pedigreeBonus(player.id);
   if (player.tags.includes("captain")) bonus += 3;
   if (player.tags.includes("low-handicap")) bonus += 3;
   if (player.tags.includes("competitor")) bonus += 2.5;
@@ -71,8 +87,6 @@ function strategicBonus(player: StrandPlayer): number {
   if (player.tags.includes("rookie") && projectedIndex && projectedIndex < 12) {
     bonus += 2;
   }
-  if (player.tags.includes("veteran")) bonus += 2;
-  if (player.tags.includes("experience")) bonus += 1.5;
   if (player.tags.includes("net-leverage")) bonus += 2;
   return bonus;
 }
@@ -396,7 +410,11 @@ export function buildRationale(player: PlayerDraftStats): string {
     parts.push(player.heatLabel.toLowerCase());
   }
 
-  if (player.tags.includes("champion")) parts.push("Strand winner");
+  const rec = player.strandRecord;
+  if (rec && rec.wins >= 2) parts.push(`${rec.wins}× Strand champ (${rec.wins}–${rec.losses})`);
+  else if (rec && rec.wins === 1) parts.push(`Strand champ (${rec.wins}–${rec.losses})`);
+  else if (rec && rec.appearances > 0) parts.push(`still hunting a title (0–${rec.losses})`);
+  else parts.push("Strand rookie");
   if (player.tags.includes("captain")) parts.push("proven captain");
   if (player.tags.includes("competitor")) parts.push("elite competitor");
   if (player.tags.includes("veteran")) parts.push("Strand veteran");
@@ -448,6 +466,8 @@ export function buildPlayerStats(
     dataSource: "live",
   } as PlayerDraftStats);
 
+  const record = STRAND_RECORDS.get(player.id);
+
   return {
     ...player,
     handicap,
@@ -459,6 +479,14 @@ export function buildPlayerStats(
     draftScore,
     draftRank: 0,
     formDelta,
+    strandRecord: record
+      ? {
+          wins: record.wins,
+          losses: record.losses,
+          appearances: record.appearances,
+          winPct: record.winPct,
+        }
+      : undefined,
     dataSource: ghinLiveIndex !== null
       ? "ghin"
       : player.manualIndex !== undefined

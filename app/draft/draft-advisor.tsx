@@ -46,6 +46,9 @@ function rate(p: PlayerDraftStats): Rated {
   const spread18 = scores.length >= 2 ? Math.max(...scores) - Math.min(...scores) : null;
 
   const skill = 30 - rawIndex;
+  // Career Strand record: titles and trips are measured signal, softly weighted
+  const rec = p.strandRecord;
+  const pedigree = rec ? Math.min(4, rec.wins * 0.8 + rec.appearances * 0.25) : 0;
   const form = clamp(p.formDelta ?? 0, -4, 6); // playing below index = hot
   const ceiling = avg18 !== null && best18 !== null ? clamp(avg18 - best18, 0, 12) : 0;
   const consistency = spread18 !== null ? clamp(12 - spread18, 0, 12) : 0;
@@ -54,6 +57,7 @@ function rate(p: PlayerDraftStats): Rated {
 
   const value =
     skill +
+    pedigree +
     form * 0.8 +
     ceiling * 0.25 +
     consistency * 0.15 +
@@ -62,6 +66,11 @@ function rate(p: PlayerDraftStats): Rated {
     capForfeit * 0.9;
 
   const tags: Rated["tags"] = [];
+  if (rec && rec.wins > 0)
+    tags.push({ icon: "🏆", label: `${rec.wins}–${rec.losses} strand`, tone: rec.wins >= 2 ? "hot" : "steady" });
+  else if (rec && rec.appearances > 0)
+    tags.push({ icon: "🎒", label: `0–${rec.losses} strand`, tone: "cold" });
+  else tags.push({ icon: "🆕", label: "strand rookie", tone: "warn" });
   if (rawIndex > HANDICAP_CAP)
     tags.push({ icon: "🧢", label: `plays as ${HANDICAP_CAP} (−${capForfeit.toFixed(1)} net)`, tone: "warn" });
   if ((p.formDelta ?? 0) >= 2) tags.push({ icon: "🔥", label: `${(p.formDelta ?? 0).toFixed(1)} below idx`, tone: "hot" });

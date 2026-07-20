@@ -67,6 +67,8 @@ export interface PlayerDraftStats extends StrandPlayer {
   /** Most recent posted rounds, newest first (up to 5) */
   recentRounds?: RecentRound[];
   recentRoundsSource?: "ghin" | "grint" | null;
+  /** Career Strand record from the archive (2018–2025) */
+  strandRecord?: { wins: number; losses: number; appearances: number; winPct: number | null };
 }
 
 export interface DraftRecommendation {
