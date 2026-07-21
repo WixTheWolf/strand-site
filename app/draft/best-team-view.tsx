@@ -128,6 +128,14 @@ function TeamRosterCard({
         ))}
       </div>
 
+      {player.reportedScoring && (
+        <div className={`mt-4 grid grid-cols-3 gap-2 rounded-xl p-3 text-xs ${dark ? "bg-black/20 text-white/80" : "bg-sky-50 text-sky-950/75"}`}>
+          <DataCell label="Garmin sample" value={`${player.reportedScoring.sampleSize} rounds`} />
+          <DataCell label="9-hole avg" value={player.reportedScoring.averageToPar9 === undefined ? "—" : `+${player.reportedScoring.averageToPar9}`} />
+          <DataCell label="18-hole avg" value={player.reportedScoring.averageToPar18 === undefined ? "—" : `+${player.reportedScoring.averageToPar18}`} />
+        </div>
+      )}
+
       {h && (
         <details className={`mt-4 text-xs ${dark ? "text-white/70" : "text-[#111]/65"}`}>
           <summary className="cursor-pointer uppercase tracking-[0.16em]">Model source fields</summary>
@@ -439,7 +447,9 @@ export default function BestTeamView() {
                           {player.dataSource}
                         </span>
                       </td>
-                      <td className="px-3 py-3 font-mono text-xs">{player.recentRounds?.length ?? 0}</td>
+                      <td className="px-3 py-3 font-mono text-xs">
+                        {(player.recentRounds?.length ?? 0) || (player.reportedScoring ? `${player.reportedScoring.sampleSize} avg` : 0)}
+                      </td>
                       <td className="px-3 py-3 font-mono text-xs">{player.recentRounds?.[0]?.date ?? "—"}</td>
                       <td className="px-3 py-3 text-xs">{player.ghinClub ?? "—"}</td>
                       <td className="px-3 py-3">
@@ -480,7 +490,14 @@ export default function BestTeamView() {
                               <div className="mt-2 space-y-1 text-sm">
                                 <div>Source: {player.dataSource}</div>
                                 <div>Score feed: {player.recentRoundsSource ?? "none"}</div>
-                                <div>Rounds modeled: {player.recentRounds?.length ?? 0}</div>
+                                <div>Scorecards modeled: {player.recentRounds?.length ?? 0}</div>
+                                {player.reportedScoring && (
+                                  <>
+                                    <div>Garmin aggregate: {player.reportedScoring.sampleSize} rounds</div>
+                                    <div>Average to par: +{player.reportedScoring.averageToPar9 ?? "—"} / 9 · +{player.reportedScoring.averageToPar18 ?? "—"} / 18</div>
+                                    <div>Aggregate captured: {player.reportedScoring.capturedAt}</div>
+                                  </>
+                                )}
                                 <div>Club: {player.ghinClub ?? "—"}</div>
                                 {player.handicap ? (
                                   <>

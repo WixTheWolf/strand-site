@@ -32,7 +32,11 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
     [players],
   );
   const withoutRounds = useMemo(
-    () => players.filter((player) => !(player.recentRounds?.length ?? 0)),
+    () => players.filter((player) => !(player.recentRounds?.length ?? 0) && !player.reportedScoring),
+    [players],
+  );
+  const withAggregates = useMemo(
+    () => players.filter((player) => !(player.recentRounds?.length ?? 0) && player.reportedScoring),
     [players],
   );
   const hasNineHole = useMemo(
@@ -47,7 +51,7 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
         <h2 className="mt-1 text-xl font-medium">Last five rounds</h2>
         <p className="mt-2 max-w-2xl text-sm text-[#111]/70">
           Most recent posted scores per player, newest first — pulled from GHIN when linked,
-          TheGrint otherwise. Trend compares the latest round to the average of the ones before it.
+          TheGrint otherwise. Garmin aggregates are labeled separately when individual scorecards are unavailable.
         </p>
       </header>
 
@@ -106,6 +110,30 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
         <div className="rounded-2xl border border-dashed border-[#111]/15 bg-[#f7f5f0] p-6 text-sm text-[#111]/55">
           No posted rounds available yet. Score history comes from GHIN once credentials are
           configured (Vercel env: GHIN_EMAIL / GHIN_PASSWORD), with TheGrint as fallback.
+        </div>
+      )}
+
+      {withAggregates.length > 0 && (
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {withAggregates.map((player) => {
+            const aggregate = player.reportedScoring!;
+            return (
+              <div key={player.id} className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <div>
+                    <span className="text-sm font-medium">{player.nickname}</span>
+                    <span className="ml-2 font-mono text-xs text-sky-950/50">{player.indexNum?.toFixed(1) ?? "—"} idx</span>
+                  </div>
+                  <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-sky-800/60">Garmin aggregate</span>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <span className="rounded-lg bg-white px-3 py-2 font-mono text-sm font-semibold">+{aggregate.averageToPar9 ?? "—"} / 9</span>
+                  <span className="rounded-lg bg-white px-3 py-2 font-mono text-sm font-semibold">+{aggregate.averageToPar18 ?? "—"} / 18</span>
+                  <span className="rounded-lg bg-white px-3 py-2 text-xs text-sky-950/55">last {aggregate.sampleSize}</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 

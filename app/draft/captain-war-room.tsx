@@ -167,6 +167,20 @@ function InsightCard({
 function RecentLedger({ metric }: { metric: PlayerSaberMetrics }) {
   const recent = (metric.player.recentRounds ?? []).slice(0, 10);
   if (!recent.length) {
+    const aggregate = metric.player.reportedScoring;
+    if (aggregate) {
+      return (
+        <div className="mt-4 rounded-xl border border-sky-200 bg-sky-50 p-4">
+          <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-sky-800/60">Garmin Connect aggregate</div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            <DataPoint label="Sample" value={`${aggregate.sampleSize} rounds`} note="Individual cards unavailable" />
+            <DataPoint label="9-hole average" value={aggregate.averageToPar9 === undefined ? "—" : `+${aggregate.averageToPar9}`} note="Score relative to par" />
+            <DataPoint label="18-hole average" value={aggregate.averageToPar18 === undefined ? "—" : `+${aggregate.averageToPar18}`} note="Score relative to par" />
+          </div>
+          <p className="mt-3 text-[10px] leading-4 text-sky-950/55">Used as a bounded confidence signal only. Course, tee, dates and round-level variance are unavailable, so the model does not manufacture differentials.</p>
+        </div>
+      );
+    }
     return (
       <div className="mt-4 rounded-xl border border-dashed border-black/10 bg-white/60 p-4 text-xs text-black/50">
         No scorecards available. {metric.player.reportedRounds2026
@@ -237,7 +251,11 @@ function PlayerIntel({ metric }: { metric: PlayerSaberMetrics }) {
       <div>
         <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Data file</div>
         <div className="grid grid-cols-2 gap-2">
-          <DataPoint label="Rounds modeled" value={`${p.roundCount}`} note={`${p.fullRoundCount} full`} />
+          <DataPoint
+            label="Scoring sample"
+            value={metric.aggregateSampleSize ? `${p.roundCount} + ${metric.aggregateSampleSize} avg` : `${p.roundCount}`}
+            note={metric.aggregateSampleSize ? "scorecards + aggregate" : `${p.fullRoundCount} full`}
+          />
           <DataPoint label="Shot-stat rounds" value={`${p.statRoundCount}`} />
           <DataPoint label="Used in index" value={`${p.usedInIndexCount}`} />
           <DataPoint label="Last post" value={p.latestRoundDate ?? "—"} note={`${metric.player.recentRoundsSource ?? "no round feed"} · ${metric.confidenceLabel.toLowerCase()} confidence`} />
@@ -350,8 +368,9 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
   );
   const visibleScenarios = showAll ? scenarios : scenarios.slice(0, 8);
   const avgConfidence = average(board.map((metric) => metric.confidence));
-  const roundCoverage = board.filter((metric) => metric.sampleSize > 0).length;
+  const roundCoverage = board.filter((metric) => metric.sampleSize > 0 || metric.aggregateSampleSize > 0).length;
   const roundsModeled = board.reduce((sum, metric) => sum + metric.performance.roundCount, 0);
+  const aggregateRounds = board.reduce((sum, metric) => sum + metric.aggregateSampleSize, 0);
   const detailedRounds = board.reduce((sum, metric) => sum + metric.performance.detailedRoundCount, 0);
   const puttingRounds = board.reduce(
     (sum, metric) => sum + (metric.player.recentRounds ?? []).filter((round) => round.shotStats?.putts != null).length,
@@ -714,11 +733,11 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-2xl bg-[#f7f5f0] p-4">
               <div className="font-mono text-2xl font-semibold">{roundCoverage}/20</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Players with rounds</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Players with scoring evidence</div>
             </div>
             <div className="rounded-2xl bg-[#f7f5f0] p-4">
               <div className="font-mono text-2xl font-semibold">{roundsModeled}</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Rounds modeled</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Scorecards modeled</div>
             </div>
             <div className="rounded-2xl bg-[#f7f5f0] p-4">
               <div className="font-mono text-2xl font-semibold">{detailedRounds}</div>
@@ -739,7 +758,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
       </div>
 
       <div className="rounded-[1.6rem] border border-dashed border-black/15 bg-white/55 p-5 text-xs leading-5 text-black/50">
-        <b className="text-black/70">Strand Sabr v3.0:</b> {roundsModeled} attributable rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Form, ceiling and volatility use the latest 20 differentials; older rounds remain context only. Captain scouting is bounded, source-labeled and confidence-shrunk. Missing fields stay neutral.
+        <b className="text-black/70">Strand Sabr v3.1:</b> {roundsModeled} attributable scorecards plus {aggregateRounds} Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Form, ceiling and volatility use the latest 20 differentials; aggregate-only data affects confidence but never creates synthetic differentials. Captain scouting is bounded, source-labeled and confidence-shrunk. Missing fields stay neutral.
       </div>
     </section>
   );

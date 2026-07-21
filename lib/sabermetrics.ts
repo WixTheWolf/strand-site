@@ -43,6 +43,7 @@ export interface PlayerSaberMetrics {
   draftGrade: number;
   sampleSize: number;
   fullRoundSampleSize: number;
+  aggregateSampleSize: number;
   evidence: string[];
   performance: PlayerPerformanceProfile;
 }
@@ -175,10 +176,17 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
         : performance.daysSinceLastRound > 90
           ? 6
           : 0;
+  // Aggregate Garmin summaries confirm scoring activity but do not contain the
+  // course, tee, date or round-by-round variance needed for form/differential
+  // modeling. They receive a bounded confidence lift only—never fabricated
+  // differentials or a directional skill adjustment.
+  const aggregateSampleSize = player.reportedScoring?.sampleSize ?? 0;
+  const aggregateConfidence = Math.min(8, aggregateSampleSize * 0.8);
   const confidence = clamp(
     sourceConfidence(player) * 0.72 +
       performance.dataDepth * 0.48 +
       Math.min(7, (record?.appearances ?? 0) * 1.25) +
+      aggregateConfidence +
       (player.ghinRevisionDate ? 4 : 0) -
       stalenessPenalty,
     12,
@@ -272,6 +280,15 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   if (player.reportedRounds2026 && performance.roundCount === 0) {
     evidence.push(`${player.reportedRounds2026} reported 2026 rounds — scores unavailable`);
   }
+  if (player.reportedScoring) {
+    const scoring = player.reportedScoring;
+    const averages = [
+      scoring.averageToPar18 !== undefined ? `+${scoring.averageToPar18} / 18` : null,
+      scoring.averageToPar9 !== undefined ? `+${scoring.averageToPar9} / 9` : null,
+    ].filter(Boolean).join(" · ");
+    evidence.push(`Garmin last ${scoring.sampleSize}: ${averages}`);
+    evidence.push("aggregate only — course context unavailable");
+  }
 
   return {
     player,
@@ -297,6 +314,7 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
     draftGrade: 50,
     sampleSize: diffs.all.length,
     fullRoundSampleSize: diffs.full.length,
+    aggregateSampleSize,
     evidence,
     performance,
   };

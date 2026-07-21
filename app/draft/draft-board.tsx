@@ -16,7 +16,9 @@ interface DraftPayload {
   optimalTeams: { A: PlayerDraftStats[]; B: PlayerDraftStats[] };
   summary: {
     withRounds: number;
+    withScoringEvidence: number;
     roundsLoaded: number;
+    aggregateRoundsReported: number;
     withCourseRatings: number;
     snapshotRoundPlayers: number;
   };
@@ -91,7 +93,7 @@ export default function DraftBoard() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="rounded-3xl border border-black/10 bg-white px-8 py-10 text-center shadow-sm">
-          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Strand Sabr v3.0</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Strand Sabr v3.1</div>
           <div className="mt-3 text-lg font-medium">Loading the captain model...</div>
         </div>
       </div>
@@ -126,8 +128,8 @@ export default function DraftBoard() {
           <p className="label">Draft Lab</p>
           <h1 className="section-title mt-3">Captain prep for Gamble Sands</h1>
           <p className="mt-3 max-w-3xl text-sm text-black/55">
-            Draft against Justin Uribe (J-BONE) with a 327-round, confidence-weighted model built for the four
-            Strand formats. Lock the real picks as they happen; the board recalculates WIX&apos;s best response instantly.
+            Draft against Justin Uribe (J-BONE) with 327 attributable scorecards plus Garmin aggregate evidence,
+            confidence-weighted for the four Strand formats. Lock the real picks as they happen; the board recalculates WIX&apos;s best response instantly.
           </p>
         </div>
         <button
@@ -159,12 +161,12 @@ export default function DraftBoard() {
         <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Evidence base</div>
           <div className="mt-2 font-mono text-2xl font-semibold">{data.summary.roundsLoaded}</div>
-          <div className="mt-1 text-xs text-black/45">attributable rounds modeled</div>
+          <div className="mt-1 text-xs text-black/45">scorecards + {data.summary.aggregateRoundsReported} aggregate rounds</div>
         </div>
         <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Player coverage</div>
-          <div className="mt-2 font-mono text-2xl font-semibold">{data.summary.withRounds}/20</div>
-          <div className="mt-1 text-xs text-black/45">players with score history</div>
+          <div className="mt-2 font-mono text-2xl font-semibold">{data.summary.withScoringEvidence}/20</div>
+          <div className="mt-1 text-xs text-black/45">players with scoring evidence</div>
         </div>
         <div className="rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Course-adjusted depth</div>

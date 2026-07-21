@@ -150,9 +150,16 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     name: "Nick Kane",
     nickname: "KANE",
     initials: "NK",
-    blurb: "",
+    blurb: "Garmin Connect last-10 summary: averages +15 over par for 9 holes and +27 for 18. Aggregate scoring only; course, tee, date and round-level variance are unavailable.",
     grintId: null,
-    tags: [],
+    tags: ["garmin-aggregate"],
+    reportedScoring: {
+      source: "garmin",
+      sampleSize: 10,
+      averageToPar9: 15,
+      averageToPar18: 27,
+      capturedAt: "2026-07-21",
+    },
   },
   {
     id: "nick-sprowls",

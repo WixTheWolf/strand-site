@@ -26,6 +26,14 @@ export interface StrandPlayer {
   manualLowest?: number;
   /** Captain-reported activity when scorecards are unavailable */
   reportedRounds2026?: number;
+  /** Aggregate scoring evidence when individual scorecards/course context are unavailable */
+  reportedScoring?: {
+    source: "garmin";
+    sampleSize: number;
+    averageToPar9?: number;
+    averageToPar18?: number;
+    capturedAt: string;
+  };
   estimatedIndex?: number;
   photoUrl?: string;
   out?: boolean;

@@ -132,10 +132,18 @@ export async function GET() {
     player.recentRoundsSource === "ghin" || player.recentRoundsSource === "grint",
   ).length;
   const snapshotRoundPlayers = stats.filter((player) => player.recentRoundsSource === "snapshot").length;
+  const aggregateRoundPlayers = stats.filter((player) => player.reportedScoring?.sampleSize).length;
+  const aggregateRoundsReported = stats.reduce(
+    (sum, player) => sum + (player.reportedScoring?.sampleSize ?? 0),
+    0,
+  );
+  const withScoringEvidence = stats.filter(
+    (player) => (player.recentRounds?.length ?? 0) > 0 || (player.reportedScoring?.sampleSize ?? 0) > 0,
+  ).length;
 
   return NextResponse.json({
     updatedAt: new Date().toISOString(),
-    source: `TheGrint / GHIN — ${linked}/20 live, ${ghin}/20 GHIN-verified, ${snapshotHandicaps}/20 consented handicap snapshots, ${roundsLoaded} rounds`,
+    source: `TheGrint / GHIN / Garmin — ${linked}/20 live, ${ghin}/20 GHIN-verified, ${snapshotHandicaps}/20 consented handicap snapshots, ${roundsLoaded} scorecards + ${aggregateRoundsReported} aggregate rounds`,
     summary: {
       live: linked,
       ghin,
@@ -152,6 +160,9 @@ export async function GET() {
       withShotStats,
       liveRoundPlayers,
       snapshotRoundPlayers,
+      aggregateRoundPlayers,
+      aggregateRoundsReported,
+      withScoringEvidence,
     },
     // Account IDs and contact/profile metadata are identifiers, not
     // performance metrics. Keep them server-side even when live lookups
