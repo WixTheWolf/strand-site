@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { STRAND_COURSES, STRAND_DINING } from "@/lib/courses";
 import Reveal from "./reveal";
 
@@ -15,10 +16,13 @@ export default function CoursesSection() {
             David McLay Kidd&apos;s desert links on sandy Columbia Basin soil — firm fescue fairways,
             walk-to-the-tee resort living, and three courses on property.
           </p>
+          <Link href="/courses" className="mt-5 inline-flex border-b border-black pb-1 text-xs font-semibold uppercase tracking-[0.15em]">
+            Open the 50-hole command center
+          </Link>
         </Reveal>
 
         {/* Featured course — full width */}
-        <div className="group relative mb-px aspect-[16/9] overflow-hidden bg-[#111] md:aspect-[21/9]">
+        <Link href="/courses" className="group relative mb-px block aspect-[16/9] overflow-hidden bg-[#111] md:aspect-[21/9]">
           <Image
             src={featured.image}
             alt={`${featured.name} fairway above the Columbia River`}
@@ -35,12 +39,12 @@ export default function CoursesSection() {
               {featured.playedIn}
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Remaining courses — grid */}
         <div className="grid gap-px bg-[#e2ddd3] md:grid-cols-2">
           {rest.map((course) => (
-            <article key={course.id} className="group relative aspect-[4/3] overflow-hidden bg-[#111]">
+            <Link href="/courses" key={course.id} className="group relative aspect-[4/3] overflow-hidden bg-[#111]">
               <Image
                 src={course.image}
                 alt={`${course.name} at Gamble Sands`}
@@ -56,7 +60,7 @@ export default function CoursesSection() {
                 <h3 className="mt-1 text-lg font-medium text-white">{course.name}</h3>
                 <p className="mt-1 text-xs text-white/55">{course.playedIn}</p>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
 

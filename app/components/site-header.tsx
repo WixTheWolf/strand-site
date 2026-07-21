@@ -7,6 +7,7 @@ const NAV = [
   { label: "Trip", href: "#trip" },
   { label: "Schedule", href: "#schedule" },
   { label: "Players", href: "#players" },
+  { label: "Course Intel", href: "/courses" },
   { label: "The Pass", href: "#travel" },
   { label: "Draft", href: "/draft" },
   { label: "Archive", href: "#history" },

@@ -766,7 +766,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
       </div>
 
       <div className="rounded-[1.6rem] border border-dashed border-black/15 bg-white/55 p-5 text-xs leading-5 text-black/50">
-        <b className="text-black/70">Strand Sabr v3.2:</b> all {eventHandicapCoverage} event handicaps are locked to the supplied 2026 roster sheet; GHIN, TheGrint and Garmin remain performance provenance. The model uses {roundsModeled} attributable scorecards plus {aggregateRounds} Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Form, ceiling and volatility use the latest 20 differentials; aggregate-only data affects confidence but never creates synthetic differentials. Missing fields stay neutral.
+        <b className="text-black/70">Strand Sabr v3.3:</b> all {eventHandicapCoverage} event handicaps are locked to the supplied 2026 roster sheet; GHIN, TheGrint and Garmin remain performance provenance. The model uses {roundsModeled} attributable scorecards plus {aggregateRounds} Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Form, ceiling and volatility use the latest 20 differentials; course fit now reflects Gamble Sands&apos; ground-game choices and Scarecrow&apos;s angle-dependent smaller targets. Aggregate-only data affects confidence but never creates synthetic differentials. Missing fields stay neutral.
       </div>
     </section>
   );

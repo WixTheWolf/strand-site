@@ -126,6 +126,11 @@ export default function HomePage() {
                 </a>
               </Magnetic>
               <Magnetic>
+                <Link href="/courses" className="btn-ghost">
+                  Course Intel
+                </Link>
+              </Magnetic>
+              <Magnetic>
                 <Link href="/draft" className="btn-ghost">
                   Draft Lab
                 </Link>

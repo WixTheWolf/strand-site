@@ -218,21 +218,23 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   const driverBonus = player.tags.includes("driver-reliable") ? 2.4 : 0;
   const lowSamplePenalty = player.tags.includes("low-sample") ? 3.2 : 0;
 
-  // Gamble rewards ceiling and ball striking on wide, firm corridors. Scarecrow
-  // hosts singles late in the trip, so mistake avoidance, current form, and
-  // activity readiness matter more. Shot-level inputs remain neutral when absent.
+  // Gamble's wide, firm corridors reward ceiling and ball striking, but the
+  // architect's preferred ground routes make touch and rollout control real
+  // course-fit signals. Scarecrow's smaller targets and angle-dependent fairways
+  // add ball striking to its late-trip singles emphasis on form and mistake
+  // avoidance. Shot-level inputs remain neutral when absent.
   const endurance = clamp(
     consistency * 0.4 + performance.activityReadiness * 0.3 + confidence * 0.16 + skill * 0.14,
     20,
     95,
   );
   const gambleFit = clamp(
-    skill * 0.27 + ceiling * 0.25 + ballStriking * 0.18 + scoringControl * 0.12 + consistency * 0.1 + confidence * 0.08,
+    skill * 0.24 + ceiling * 0.22 + ballStriking * 0.17 + scoringControl * 0.13 + putting * 0.1 + consistency * 0.08 + confidence * 0.06,
     15,
     96,
   );
   const scarecrowFit = clamp(
-    consistency * 0.24 + netForm * 0.24 + scoringControl * 0.17 + endurance * 0.15 + putting * 0.08 + skill * 0.07 + confidence * 0.05,
+    consistency * 0.21 + netForm * 0.21 + scoringControl * 0.18 + ballStriking * 0.12 + putting * 0.1 + endurance * 0.08 + skill * 0.06 + confidence * 0.04,
     15,
     96,
   );
