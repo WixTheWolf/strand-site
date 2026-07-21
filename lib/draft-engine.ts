@@ -501,7 +501,7 @@ export function buildPlayerStats(
           ? "ghin"
           : "manual"
         : liveIndex !== null
-          ? "live"
+          ? grintMeta?.dataSource === "snapshot" ? "snapshot" : "live"
           : grintMeta?.dataSource
             ?? (player.estimatedIndex ? "estimated" : "missing"),
     grintLocation: grintMeta?.location,

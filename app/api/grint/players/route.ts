@@ -4,15 +4,17 @@ import { fetchGhinScores } from "@/lib/ghin";
 import { fetchGrintHandicap, fetchGrintScores } from "@/lib/grint";
 import { resolvePlayerGrint } from "@/lib/grint-resolve";
 import { withPrivateDataLink } from "@/lib/player-data-links";
+import { PLAYER_DATA_SNAPSHOT, PLAYER_DATA_SNAPSHOT_CAPTURED_AT } from "@/lib/player-data-snapshot";
 import { ERIC_THERRIEN, STRAND_PLAYERS } from "@/lib/players";
 import type { PlayerDraftStats, RecentRound } from "@/lib/types";
 
 /**
- * Up to 60 posted rounds — live GHIN first, then TheGrint. Historical rounds
- * are never checked into source; they only flow from an authorized live
- * account connection.
+ * Up to 60 posted rounds — authorized live GHIN first, then TheGrint, then the
+ * consented performance-only snapshot. Direct account identifiers never enter
+ * the client payload or snapshot.
  */
 async function fetchRecentRounds(
+  playerId: string,
   ghinNumber: string | null | undefined,
   grintId: string | null | undefined,
 ): Promise<{ rounds: RecentRound[]; source: PlayerDraftStats["recentRoundsSource"] }> {
@@ -24,6 +26,8 @@ async function fetchRecentRounds(
     const grintRounds = await fetchGrintScores(grintId, 60);
     if (grintRounds.length) return { rounds: grintRounds, source: "grint" };
   }
+  const snapshot = PLAYER_DATA_SNAPSHOT[playerId]?.rounds;
+  if (snapshot?.length) return { rounds: snapshot, source: "snapshot" };
   return { rounds: [], source: null };
 }
 
@@ -67,10 +71,12 @@ export async function GET() {
   const stats = await mapLimit(STRAND_PLAYERS, 4, async (player) => {
     const lookupPlayer = withPrivateDataLink(player);
     const resolved = await resolvePlayerGrint(lookupPlayer);
-    const stats = buildPlayerStats(player, resolved.handicap, {
+    const snapshot = PLAYER_DATA_SNAPSHOT[player.id];
+    const handicap = resolved.handicap ?? snapshot?.handicap ?? null;
+    const stats = buildPlayerStats(player, handicap, {
       location: resolved.match?.location,
       username: resolved.match?.username ?? player.grintUsername,
-      dataSource: resolved.dataSource,
+      dataSource: resolved.handicap ? resolved.dataSource : snapshot?.handicap ? "snapshot" : resolved.dataSource,
       grintProfileUrl: resolved.grintProfileUrl,
       ghinNumber: resolved.ghinNumber,
       ghinIndex: resolved.ghinIndex,
@@ -82,6 +88,7 @@ export async function GET() {
       ghinStatus: resolved.ghinStatus,
     });
     const recent = await fetchRecentRounds(
+      player.id,
       resolved.ghinNumber ?? lookupPlayer.ghinNumber,
       lookupPlayer.grintId ?? resolved.match?.id,
     );
@@ -106,9 +113,13 @@ export async function GET() {
 
   const linked = stats.filter((player) => player.dataSource === "live").length;
   const ghin = stats.filter((player) => player.dataSource === "ghin").length;
+  const snapshot = stats.filter((player) => player.dataSource === "snapshot").length;
   const manual = stats.filter((player) => player.dataSource === "manual").length;
   const missing = stats.filter((player) => player.dataSource === "missing").length;
-  const withGrintProfile = stats.filter((player) => player.grintProfileUrl).length;
+  const snapshotHandicaps = stats.filter((player) => PLAYER_DATA_SNAPSHOT[player.id]?.handicap).length;
+  const withGrintProfile = stats.filter((player) =>
+    player.grintProfileUrl || PLAYER_DATA_SNAPSHOT[player.id]?.handicap,
+  ).length;
   const roundsLoaded = stats.reduce((sum, player) => sum + (player.recentRounds?.length ?? 0), 0);
   const withRounds = stats.filter((player) => (player.recentRounds?.length ?? 0) > 0).length;
   const withCourseRatings = stats.filter((player) =>
@@ -124,13 +135,16 @@ export async function GET() {
 
   return NextResponse.json({
     updatedAt: new Date().toISOString(),
-    source: `TheGrint / GHIN — ${linked}/20 live, ${ghin}/20 GHIN-verified${manual ? `, ${manual} manual` : ""}${missing ? `, ${missing} pending` : ""}`,
+    source: `TheGrint / GHIN — ${linked}/20 live, ${ghin}/20 GHIN-verified, ${snapshotHandicaps}/20 consented handicap snapshots, ${roundsLoaded} rounds`,
     summary: {
       live: linked,
       ghin,
+      snapshot,
       manual,
       missing,
       withGrintProfile,
+      snapshotHandicaps,
+      snapshotCapturedAt: PLAYER_DATA_SNAPSHOT_CAPTURED_AT,
       withGhin: stats.filter((p) => p.ghinNumberResolved).length,
       withRounds,
       roundsLoaded,

@@ -588,7 +588,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
       </div>
 
       <div className="rounded-[1.6rem] border border-dashed border-black/15 bg-white/55 p-5 text-xs leading-5 text-black/50">
-        <b className="text-black/70">Model v2.0:</b> up to 60 GHIN rounds per player can feed rating, slope, PCC, home/away and competition type, index usage, exceptional-score flags, GIR, fairways, putting and hole-level scoring. TheGrint contributes its current public handicap record; its private friend activity and Pro analytics are intentionally excluded unless the account owner authorizes authenticated access.
+        <b className="text-black/70">Model v2.1:</b> the consented roster snapshot now contributes 95 GHIN rounds and 19 TheGrint handicap records. Authorized live GHIN data can add rating, slope, PCC, home/away and competition type, index usage, exceptional-score flags, GIR, fairways, putting and hole-level scoring; unavailable fields remain neutral.
       </div>
     </section>
   );

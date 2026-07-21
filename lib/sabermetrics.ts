@@ -132,6 +132,8 @@ function sourceConfidence(player: PlayerDraftStats): number {
       return 45;
     case "live":
       return 42;
+    case "snapshot":
+      return 36;
     case "manual":
       return 34;
     case "estimated":

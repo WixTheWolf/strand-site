@@ -66,7 +66,7 @@ function computeRiskScore(player: PlayerDraftStats): number {
   if (player.tags.includes("steady") || player.tags.includes("rock-solid")) score -= 2;
   if (player.tags.includes("veteran") || player.tags.includes("experience")) score -= 1;
   if (player.tags.includes("champion") || player.tags.includes("captain")) score -= 1;
-  if (player.dataSource === "live" || player.dataSource === "ghin") score -= 1;
+  if (player.dataSource === "live" || player.dataSource === "ghin" || player.dataSource === "snapshot") score -= 1;
   if (player.tags.includes("calm") || player.tags.includes("reliable")) score -= 1;
 
   return score;
@@ -111,7 +111,7 @@ export function enrichPlayerAnalytics(player: PlayerDraftStats): PlayerAnalytics
   const reliabilityScore = Math.min(
     100,
     player.attestNum * 0.7 +
-      (player.dataSource === "live" || player.dataSource === "ghin" ? 20 : 0) +
+      (player.dataSource === "live" || player.dataSource === "ghin" || player.dataSource === "snapshot" ? 20 : 0) +
       (player.heat === "steady" ? 15 : 0) +
       (player.heat === "unknown" ? -10 : 0),
   );
@@ -169,4 +169,3 @@ export function suggestSafePairing(
     })
     .sort((a, b) => b.synergy - a.synergy)[0]?.safe ?? null;
 }
-

@@ -95,7 +95,7 @@ export interface PlayerDraftStats extends StrandPlayer {
   draftScore: number;
   draftRank: number;
   formDelta: number | null;
-  dataSource: "live" | "ghin" | "manual" | "estimated" | "missing";
+  dataSource: "live" | "ghin" | "snapshot" | "manual" | "estimated" | "missing";
   grintLocation?: string;
   grintUsernameResolved?: string;
   grintProfileUrl?: string | null;
