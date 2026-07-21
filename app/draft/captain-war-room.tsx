@@ -265,7 +265,11 @@ function PlayerIntel({ metric }: { metric: PlayerSaberMetrics }) {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Recent scoring ledger</div>
-            <div className="mt-1 text-xs text-black/45">Newest 10 rounds · full history remains in the model</div>
+            <div className="mt-1 text-xs text-black/45">
+              {metric.player.reportedScoring && !(metric.player.recentRounds?.length)
+                ? "Aggregate summary only · individual scorecards unavailable"
+                : "Newest 10 rounds · full history remains in the model"}
+            </div>
           </div>
           {metric.player.blurb && <div className="max-w-2xl text-xs leading-5 text-black/55">Scout: {metric.player.blurb}</div>}
         </div>
