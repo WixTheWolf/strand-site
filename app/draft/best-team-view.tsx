@@ -130,7 +130,7 @@ function TeamRosterCard({
 
       {h && (
         <details className={`mt-4 text-xs ${dark ? "text-white/70" : "text-[#111]/65"}`}>
-          <summary className="cursor-pointer uppercase tracking-[0.16em]">Raw GHIN fields</summary>
+          <summary className="cursor-pointer uppercase tracking-[0.16em]">Model source fields</summary>
           <div className="mt-2 grid gap-1 sm:grid-cols-2">
             <div>Index: {formatRaw(h.index)}</div>
             <div>Lowest: {formatRaw(h.lowest)}</div>
@@ -275,7 +275,7 @@ export default function BestTeamView() {
           <p className="mt-3 max-w-3xl text-sm text-black/55">
             {MY_CAPTAIN.nickname} is pre-assigned as captain. This traditional-draft model picks your other{" "}
             {DRAFT_PICKS_PER_CAPTAIN} players vs {OPPONENT_CAPTAIN.nickname} using match-play analytics
-            across four-ball, scramble, singles, and shamble — including high-handicap net leverage.
+            across foursomes, shamble, singles, and scramble — including high-handicap net leverage.
           </p>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[#111]/45">
             Updated {new Date(data.updatedAt).toLocaleString()} • {data.source}
