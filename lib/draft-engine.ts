@@ -433,6 +433,12 @@ export function buildPlayerStats(
     grintProfileUrl?: string | null;
     ghinNumber?: string | null;
     ghinIndex?: string | null;
+    ghinLowIndex?: string | null;
+    ghinLowIndexDate?: string | null;
+    ghinRevisionDate?: string | null;
+    ghinSoftCap?: boolean | null;
+    ghinHardCap?: boolean | null;
+    ghinStatus?: string | null;
   },
 ): PlayerDraftStats {
   // GHIN is the official source per Strand rules. Priority:
@@ -448,8 +454,9 @@ export function buildPlayerStats(
   const liveIndex = ghinLiveIndex ?? grintIndex;
   const indexNum =
     ghinLiveIndex ?? player.manualIndex ?? grintIndex ?? player.estimatedIndex ?? null;
+  const ghinLowIndex = parseHandicapNumber(grintMeta?.ghinLowIndex);
   const lowestNum =
-    (handicap ? parseHandicapNumber(handicap.lowest) : null) ?? player.manualLowest ?? null;
+    ghinLowIndex ?? (handicap ? parseHandicapNumber(handicap.lowest) : null) ?? player.manualLowest ?? null;
   const attestNum = handicap ? parseFloat(handicap.attest || "0") : 0;
   const { heat, heatLabel, formDelta } = getHeat(indexNum, lowestNum, attestNum);
   const draftScore = computeMatchPlayValue({
@@ -501,6 +508,12 @@ export function buildPlayerStats(
     grintUsernameResolved: grintMeta?.username,
     grintProfileUrl: grintMeta?.grintProfileUrl ?? null,
     ghinNumberResolved: grintMeta?.ghinNumber ?? player.ghinNumber ?? null,
+    ghinLowIndex,
+    ghinLowIndexDate: grintMeta?.ghinLowIndexDate ?? null,
+    ghinRevisionDate: grintMeta?.ghinRevisionDate ?? null,
+    ghinSoftCap: grintMeta?.ghinSoftCap ?? null,
+    ghinHardCap: grintMeta?.ghinHardCap ?? null,
+    ghinStatus: grintMeta?.ghinStatus ?? null,
   };
 }
 

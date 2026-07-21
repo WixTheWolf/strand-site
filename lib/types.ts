@@ -39,6 +39,28 @@ export interface GrintHandicap {
   teebox_handicap: string | null;
 }
 
+export interface RoundShotStats {
+  birdiesOrBetterPct?: number | null;
+  parsPct?: number | null;
+  bogeysPct?: number | null;
+  doubleBogeysPct?: number | null;
+  tripleBogeysOrWorsePct?: number | null;
+  fairwayHitsPct?: number | null;
+  girPct?: number | null;
+  onePuttOrBetterPct?: number | null;
+  twoPuttPct?: number | null;
+  threePuttOrWorsePct?: number | null;
+  putts?: number | null;
+  upAndDowns?: number | null;
+  par3Average?: number | null;
+  par4Average?: number | null;
+  par5Average?: number | null;
+  approachMissLeftPct?: number | null;
+  approachMissRightPct?: number | null;
+  approachMissShortPct?: number | null;
+  approachMissLongPct?: number | null;
+}
+
 export interface RecentRound {
   /** ISO or display date the round was played */
   date: string;
@@ -47,6 +69,20 @@ export interface RecentRound {
   differential?: number | null;
   /** True when the posted round was 9 holes (shown with an asterisk) */
   nineHole?: boolean;
+  adjustedGrossScore?: number | null;
+  courseRating?: number | null;
+  slopeRating?: number | null;
+  pcc?: number | null;
+  unadjustedDifferential?: number | null;
+  netScoreDifferential?: number | null;
+  holesPlayed?: number | null;
+  postedDate?: string | null;
+  scoreType?: string | null;
+  scoreStatus?: string | null;
+  usedInIndex?: boolean | null;
+  exceptional?: boolean | null;
+  edited?: boolean | null;
+  shotStats?: RoundShotStats | null;
 }
 
 export interface PlayerDraftStats extends StrandPlayer {
@@ -64,9 +100,15 @@ export interface PlayerDraftStats extends StrandPlayer {
   grintUsernameResolved?: string;
   grintProfileUrl?: string | null;
   ghinNumberResolved?: string | null;
-  /** Most recent posted rounds, newest first (up to 20 live; snapshot may be smaller) */
+  ghinLowIndex?: number | null;
+  ghinLowIndexDate?: string | null;
+  ghinRevisionDate?: string | null;
+  ghinSoftCap?: boolean | null;
+  ghinHardCap?: boolean | null;
+  ghinStatus?: string | null;
+  /** Most recent posted rounds, newest first (up to 60 live; snapshot may be smaller) */
   recentRounds?: RecentRound[];
-  recentRoundsSource?: "ghin" | "grint" | null;
+  recentRoundsSource?: "ghin" | "grint" | "snapshot" | null;
   /** Career Strand record from the archive (2018–2025) */
   strandRecord?: { wins: number; losses: number; appearances: number; winPct: number | null };
 }

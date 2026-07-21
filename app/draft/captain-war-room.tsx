@@ -119,6 +119,69 @@ function EvidenceList({ metric }: { metric: PlayerSaberMetrics }) {
   );
 }
 
+function metricValue(value: number | null, suffix = "", digits = 1) {
+  return value === null ? "—" : `${value.toFixed(digits)}${suffix}`;
+}
+
+function DataPoint({ label, value, note }: { label: string; value: string; note?: string }) {
+  return (
+    <div className="rounded-xl border border-black/[0.07] bg-white p-3">
+      <div className="text-[9px] font-semibold uppercase tracking-[0.14em] text-black/35">{label}</div>
+      <div className="mt-1 font-mono text-sm font-semibold text-black/80">{value}</div>
+      {note && <div className="mt-1 text-[10px] leading-4 text-black/40">{note}</div>}
+    </div>
+  );
+}
+
+function PlayerIntel({ metric }: { metric: PlayerSaberMetrics }) {
+  const p = metric.performance;
+  const doubleAvoidance = p.doubleBogeyPct !== null || p.tripleBogeyPct !== null
+    ? 100 - (p.doubleBogeyPct ?? 0) - (p.tripleBogeyPct ?? 0)
+    : null;
+  const trend = p.trend === null ? "—" : `${p.trend >= 0 ? "+" : ""}${p.trend.toFixed(1)}`;
+
+  return (
+    <div className="grid gap-4 border-t border-black/[0.07] bg-[#f8f6f1] p-4 md:grid-cols-2 xl:grid-cols-4">
+      <div>
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Form & range</div>
+        <div className="grid grid-cols-2 gap-2">
+          <DataPoint label="Last 5 diff" value={metricValue(p.recent5)} />
+          <DataPoint label="Last 10 diff" value={metricValue(p.recent10)} />
+          <DataPoint label="Trend vs prior 5" value={trend} note="Positive is improving" />
+          <DataPoint label="Ceiling / floor" value={`${metricValue(p.ceiling)} / ${metricValue(p.floor)}`} />
+        </div>
+      </div>
+      <div>
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Travel & pressure</div>
+        <div className="grid grid-cols-2 gap-2">
+          <DataPoint label="Away diff" value={metricValue(p.awayDifferential)} note={`${p.awayRounds} rounds`} />
+          <DataPoint label="Competition diff" value={metricValue(p.competitiveDifferential)} note={`${p.competitiveRounds} rounds`} />
+          <DataPoint label="Avg rating / slope" value={`${metricValue(p.averageCourseRating)} / ${metricValue(p.averageSlope, "", 0)}`} />
+          <DataPoint label="Activity" value={`${p.activity30} / ${p.activity90}`} note="Rounds in 30 / 90 days" />
+        </div>
+      </div>
+      <div>
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Shot profile</div>
+        <div className="grid grid-cols-2 gap-2">
+          <DataPoint label="GIR / fairways" value={`${metricValue(p.girPct, "%", 0)} / ${metricValue(p.fairwayPct, "%", 0)}`} />
+          <DataPoint label="Putts / 18" value={metricValue(p.puttsPer18)} />
+          <DataPoint label="Birdie+" value={metricValue(p.birdieOrBetterPct, "%", 0)} />
+          <DataPoint label="Avoids doubles+" value={metricValue(doubleAvoidance, "%", 0)} />
+        </div>
+      </div>
+      <div>
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Data file</div>
+        <div className="grid grid-cols-2 gap-2">
+          <DataPoint label="Rounds modeled" value={`${p.roundCount}`} note={`${p.fullRoundCount} full`} />
+          <DataPoint label="Shot-stat rounds" value={`${p.statRoundCount}`} />
+          <DataPoint label="Used in index" value={`${p.usedInIndexCount}`} />
+          <DataPoint label="Last post" value={p.latestRoundDate ?? "—"} note={`${metric.player.recentRoundsSource ?? "no round feed"} · ${metric.confidenceLabel.toLowerCase()} confidence`} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FormatCard({
   format,
   mine,
@@ -158,6 +221,7 @@ function FormatCard({
 export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[] }) {
   const [assignments, setAssignments] = useState<DraftAssignment[]>([]);
   const [showAll, setShowAll] = useState(false);
+  const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
   const board = useMemo(() => buildSaberBoard(players), [players]);
   const metricMap = useMemo(
     () => new Map(board.map((metric) => [metric.player.id, metric])),
@@ -192,7 +256,9 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
   const visibleScenarios = showAll ? scenarios : scenarios.slice(0, 8);
   const avgConfidence = average(board.map((metric) => metric.confidence));
   const roundCoverage = board.filter((metric) => metric.sampleSize > 0).length;
-  const fullRoundSamples = board.reduce((sum, metric) => sum + metric.fullRoundSampleSize, 0);
+  const roundsModeled = board.reduce((sum, metric) => sum + metric.performance.roundCount, 0);
+  const detailedRounds = board.reduce((sum, metric) => sum + metric.performance.detailedRoundCount, 0);
+  const shotStatPlayers = board.filter((metric) => metric.performance.statRoundCount > 0).length;
   const lockedMine = assignments.filter((assignment) => assignment.side === "mine");
   const lockedOpponent = assignments.filter((assignment) => assignment.side === "opponent");
 
@@ -217,12 +283,16 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
                 <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-emerald-100">
                   {simulation.simulations.toLocaleString()} event simulations
                 </span>
+                <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
+                  {roundsModeled} rounds modeled
+                </span>
               </div>
               <h2 className="mt-6 max-w-2xl text-3xl font-semibold tracking-[-0.035em] md:text-5xl">
                 Draft the team that creates the most points.
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-white/65 md:text-base">
-                Every recommendation is rebuilt from current index, recent differentials, variance,
+                Every recommendation now blends index and low-index history, multi-window form,
+                course difficulty, travel and competition splits, mistake avoidance, shot stats,
                 format fit, partner lift and the board J-BONE is likely to leave behind.
               </p>
 
@@ -369,83 +439,81 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
           </span>
         </div>
 
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[940px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-black/10 text-[10px] uppercase tracking-[0.14em] text-black/40">
-                <th className="pb-3 pr-3 font-medium">Rank / player</th>
-                <th className="px-3 pb-3 text-right font-medium">Index</th>
-                <th className="px-3 pb-3 text-right font-medium">Net edge</th>
-                <th className="px-3 pb-3 text-right font-medium">SVA</th>
-                <th className="px-3 pb-3 font-medium">Singles</th>
-                <th className="px-3 pb-3 font-medium">Pair formats</th>
-                <th className="px-3 pb-3 font-medium">Data trust</th>
-                <th className="pl-3 pb-3 text-right font-medium">Pick impact</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visibleScenarios.map((scenario, index) => {
-                const metric = scenario.metric;
-                const pairAverage = average([
-                  metric.format.foursomes,
-                  metric.format.shamble,
-                  metric.format.scramble,
-                ]);
-                return (
-                  <tr key={metric.player.id} className="border-b border-black/[0.07] align-top last:border-0">
-                    <td className="py-4 pr-3">
-                      <div className="flex items-start gap-3">
-                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold ${index === 0 ? "bg-[#102f28] text-white" : "bg-black/[0.05] text-black/45"}`}>
-                          {index + 1}
-                        </span>
-                        <div>
-                          <div className="font-semibold">{metric.player.nickname}</div>
-                          <div className="mt-0.5 text-xs text-black/45">{metric.player.name}</div>
-                          <EvidenceList metric={metric} />
-                        </div>
+        <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-black/[0.08]">
+          <div className="hidden grid-cols-[minmax(240px,1.6fr)_70px_90px_110px_105px_150px] gap-3 border-b border-black/[0.08] bg-[#f8f6f1] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.14em] text-black/35 lg:grid">
+            <span>Player / evidence</span>
+            <span className="text-right">Index</span>
+            <span className="text-right">Net edge</span>
+            <span className="text-right">Pick impact</span>
+            <span className="text-right">Data trust</span>
+            <span />
+          </div>
+          {visibleScenarios.map((scenario, index) => {
+            const metric = scenario.metric;
+            const isExpanded = expandedPlayer === metric.player.id;
+            return (
+              <article key={metric.player.id} className="border-b border-black/[0.07] last:border-0">
+                <div className="grid gap-4 p-4 lg:grid-cols-[minmax(240px,1.6fr)_70px_90px_110px_105px_150px] lg:items-center">
+                  <div className="flex items-start gap-3">
+                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold ${index === 0 ? "bg-[#102f28] text-white" : "bg-black/[0.05] text-black/45"}`}>
+                      {index + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="font-semibold">{metric.player.nickname}</span>
+                        <span className="text-xs text-black/40">{metric.player.name}</span>
+                        {index === 0 && (
+                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-emerald-800">
+                            Best move
+                          </span>
+                        )}
                       </div>
-                    </td>
-                    <td className="px-3 py-4 text-right font-mono font-semibold">{formatIndex(metric.player)}</td>
-                    <td className={`px-3 py-4 text-right font-mono font-semibold ${metric.netEdge >= 0.25 ? "text-emerald-700" : metric.netEdge <= -0.5 ? "text-orange-700" : "text-black/60"}`}>
-                      {formatEdge(metric.netEdge)}
-                    </td>
-                    <td className={`px-3 py-4 text-right font-mono font-semibold ${metric.strandValueAdded >= 0 ? "text-emerald-700" : "text-orange-700"}`}>
-                      {formatEdge(metric.strandValueAdded)}
-                    </td>
-                    <td className="px-3 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className="w-7 font-mono text-xs">{metric.format.singles.toFixed(0)}</span>
-                        <div className="w-20"><MetricBar value={metric.format.singles} /></div>
+                      <EvidenceList metric={metric} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2 lg:contents">
+                    <div className="lg:text-right">
+                      <div className="text-[9px] uppercase tracking-[0.12em] text-black/35 lg:hidden">Index</div>
+                      <div className="mt-1 font-mono text-sm font-semibold lg:mt-0">{formatIndex(metric.player)}</div>
+                    </div>
+                    <div className="lg:text-right">
+                      <div className="text-[9px] uppercase tracking-[0.12em] text-black/35 lg:hidden">Net edge</div>
+                      <div className={`mt-1 font-mono text-sm font-semibold lg:mt-0 ${metric.netEdge >= 0.25 ? "text-emerald-700" : metric.netEdge <= -0.5 ? "text-orange-700" : "text-black/60"}`}>
+                        {formatEdge(metric.netEdge)}
                       </div>
-                    </td>
-                    <td className="px-3 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className="w-7 font-mono text-xs">{pairAverage.toFixed(0)}</span>
-                        <div className="w-20"><MetricBar value={pairAverage} tone="sand" /></div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-4">
-                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${confidenceTone(metric.confidence)}`}>
-                        {metric.confidenceLabel} · {metric.confidence.toFixed(0)}
-                      </span>
-                      <div className="mt-1 text-[10px] text-black/40">{metric.fullRoundSampleSize} full rounds</div>
-                    </td>
-                    <td className="py-4 pl-3 text-right">
-                      <div className={`font-mono text-sm font-semibold ${scenario.impactVsMedian > 0.005 ? "text-emerald-700" : "text-black/60"}`}>
+                    </div>
+                    <div className="lg:text-right">
+                      <div className="text-[9px] uppercase tracking-[0.12em] text-black/35 lg:hidden">Pick impact</div>
+                      <div className={`mt-1 font-mono text-sm font-semibold lg:mt-0 ${scenario.impactVsMedian > 0.005 ? "text-emerald-700" : "text-black/60"}`}>
                         {scenario.impactVsMedian >= 0 ? "+" : ""}{(scenario.impactVsMedian * 100).toFixed(1)} pp
                       </div>
-                      <button
-                        onClick={() => lockPick(metric.player.id)}
-                        className="mt-2 rounded-xl bg-[#102f28] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white"
-                      >
-                        {owner === "mine" ? "Draft" : "Taken"}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </div>
+                    <div className="lg:text-right">
+                      <div className="text-[9px] uppercase tracking-[0.12em] text-black/35 lg:hidden">Trust</div>
+                      <span className={`mt-1 inline-flex rounded-full border px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.1em] lg:mt-0 ${confidenceTone(metric.confidence)}`}>
+                        {metric.confidenceLabel} · {metric.confidence.toFixed(0)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 lg:justify-end">
+                    <button
+                      onClick={() => setExpandedPlayer(isExpanded ? null : metric.player.id)}
+                      className="rounded-xl border border-black/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.11em] text-black/60"
+                    >
+                      {isExpanded ? "Hide data" : "Full data"}
+                    </button>
+                    <button
+                      onClick={() => lockPick(metric.player.id)}
+                      className="rounded-xl bg-[#102f28] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.11em] text-white"
+                    >
+                      {owner === "mine" ? "Draft" : "Taken"}
+                    </button>
+                  </div>
+                </div>
+                {isExpanded && <PlayerIntel metric={metric} />}
+              </article>
+            );
+          })}
         </div>
         {scenarios.length > 8 && (
           <button
@@ -498,28 +566,29 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
               <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Players with rounds</div>
             </div>
             <div className="rounded-2xl bg-[#f7f5f0] p-4">
-              <div className="font-mono text-2xl font-semibold">{fullRoundSamples}</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Full-round samples</div>
+              <div className="font-mono text-2xl font-semibold">{roundsModeled}</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Rounds modeled</div>
             </div>
             <div className="rounded-2xl bg-[#f7f5f0] p-4">
-              <div className="font-mono text-2xl font-semibold">{avgConfidence.toFixed(0)}</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Average confidence</div>
+              <div className="font-mono text-2xl font-semibold">{detailedRounds}</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Rich GHIN rounds</div>
             </div>
             <div className="rounded-2xl bg-[#f7f5f0] p-4">
-              <div className="font-mono text-2xl font-semibold">75</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Event points</div>
+              <div className="font-mono text-2xl font-semibold">{shotStatPlayers}/20</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Players with shot stats</div>
             </div>
           </div>
           <div className="mt-5 space-y-3 text-xs leading-5 text-black/55">
             <p><b className="text-black/75">SVA</b> is projected Strand Value Added versus the average available golfer across all four weighted formats.</p>
-            <p><b className="text-black/75">Net Edge</b> compares current playing index with the best recent 40% of posted differentials, then shrinks small samples toward zero.</p>
+            <p><b className="text-black/75">Net Edge</b> combines the best recent 40% of posted differentials, last-five trend, travel/competition evidence and confidence shrinkage.</p>
+            <p><b className="text-black/75">Data trust {avgConfidence.toFixed(0)}/100.</b> Missing GIR, fairway or putting data stays neutral and never counts as poor performance.</p>
             <p><b className="text-black/75">Do not overread history.</b> Team championships receive only a small, Bayesian-shrunk weight because partners and opponents are missing from the archive.</p>
           </div>
         </section>
       </div>
 
       <div className="rounded-[1.6rem] border border-dashed border-black/15 bg-white/55 p-5 text-xs leading-5 text-black/50">
-        <b className="text-black/70">Model v1.0:</b> the simulator creates front-nine, back-nine and overall match outcomes from each format matchup. Course-fit ratings are currently evidence-based proxies; true shot-level Gamble Sands and Scarecrow data will replace them as scorecards are captured.
+        <b className="text-black/70">Model v2.0:</b> up to 60 GHIN rounds per player can feed rating, slope, PCC, home/away and competition type, index usage, exceptional-score flags, GIR, fairways, putting and hole-level scoring. TheGrint contributes its current public handicap record; its private friend activity and Pro analytics are intentionally excluded unless the account owner authorizes authenticated access.
       </div>
     </section>
   );

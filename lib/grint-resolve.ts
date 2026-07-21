@@ -11,6 +11,23 @@ export interface ResolvedGrintPlayer {
   ghinNumber: string | null;
   /** Official USGA index straight from GHIN, when GHIN credentials are configured */
   ghinIndex: string | null;
+  ghinLowIndex: string | null;
+  ghinLowIndexDate: string | null;
+  ghinRevisionDate: string | null;
+  ghinSoftCap: boolean | null;
+  ghinHardCap: boolean | null;
+  ghinStatus: string | null;
+}
+
+function ghinProfile(ghin: Awaited<ReturnType<typeof lookupGhinIndex>>) {
+  return {
+    ghinLowIndex: ghin?.lowHandicapIndex ?? null,
+    ghinLowIndexDate: ghin?.lowHandicapDate ?? null,
+    ghinRevisionDate: ghin?.revisionDate ?? null,
+    ghinSoftCap: ghin?.softCap ?? null,
+    ghinHardCap: ghin?.hardCap ?? null,
+    ghinStatus: ghin?.status ?? null,
+  };
 }
 
 function normalizeTerm(term: string): string {
@@ -76,6 +93,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         grintProfileUrl: profileUrl,
         ghinNumber,
         ghinIndex,
+        ...ghinProfile(ghin),
       };
     } catch {
       // fall through
@@ -124,6 +142,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         grintProfileUrl: getGrintProfileUrlForPlayer({ grintId: bestHit.id, grintUsername: bestHit.username }),
         ghinNumber,
         ghinIndex,
+        ...ghinProfile(ghin),
       };
     } catch {
       return {
@@ -138,6 +157,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
         grintProfileUrl: getGrintProfileUrlForPlayer({ grintId: bestHit.id, grintUsername: bestHit.username }),
         ghinNumber,
         ghinIndex,
+        ...ghinProfile(ghin),
       };
     }
   }
@@ -151,6 +171,7 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
       grintProfileUrl: profileUrl,
       ghinNumber,
       ghinIndex,
+      ...ghinProfile(ghin),
     };
   }
 
@@ -162,5 +183,6 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
     grintProfileUrl: getGrintProfileUrlForPlayer(player),
     ghinNumber,
     ghinIndex,
+    ...ghinProfile(ghin),
   };
 }

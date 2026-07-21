@@ -1,4 +1,5 @@
 import { CAPTAIN_IDS, isCaptain, TOTAL_DRAFT_PICKS } from "./players";
+import { buildPerformanceProfile, type PlayerPerformanceProfile } from "./player-performance";
 import { playingIndex } from "./tournament";
 import type { PlayerDraftStats, RecentRound } from "./types";
 
@@ -43,6 +44,7 @@ export interface PlayerSaberMetrics {
   sampleSize: number;
   fullRoundSampleSize: number;
   evidence: string[];
+  performance: PlayerPerformanceProfile;
 }
 
 export interface PairProjection {
@@ -110,18 +112,6 @@ function standardDeviation(values: number[]): number {
   return Math.sqrt(average(values.map((value) => (value - mean) ** 2)));
 }
 
-function weightedRecentMean(values: number[]): number | null {
-  if (!values.length) return null;
-  let weighted = 0;
-  let weights = 0;
-  values.forEach((value, index) => {
-    const weight = 0.82 ** index;
-    weighted += value * weight;
-    weights += weight;
-  });
-  return weighted / weights;
-}
-
 function usableDifferentials(rounds: RecentRound[] | undefined): {
   all: number[];
   full: number[];
@@ -167,69 +157,77 @@ function smoothedPedigree(player: PlayerDraftStats): number {
 function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   const rawIndex = player.indexNum ?? player.estimatedIndex ?? 22;
   const index = playingIndex(rawIndex);
+  const performance = buildPerformanceProfile(player);
   const diffs = usableDifferentials(player.recentRounds);
-  const primaryDiffs = diffs.full.length ? diffs.full : diffs.all;
-  const recentMean = weightedRecentMean(primaryDiffs);
-  const potentialCount = primaryDiffs.length
-    ? Math.max(1, Math.ceil(primaryDiffs.length * 0.4))
-    : 0;
-  const recentPotential = potentialCount
-    ? average([...primaryDiffs].sort((a, b) => a - b).slice(0, potentialCount))
-    : null;
+  const primaryDiffs = diffs.full.length >= 3 ? diffs.full : diffs.all;
+  const recentMean = performance.weightedForm;
+  const recentPotential = performance.formIndex;
   const rawNetEdge = recentPotential === null ? 0 : index - recentPotential;
   const record = player.strandRecord;
   const confidence = clamp(
-    sourceConfidence(player) +
-      Math.min(34, primaryDiffs.length * 6.8) +
-      (diffs.full.length >= 4 ? 8 : diffs.full.length * 2) +
-      Math.min(8, (record?.appearances ?? 0) * 1.5),
+    sourceConfidence(player) * 0.72 +
+      performance.dataDepth * 0.48 +
+      Math.min(7, (record?.appearances ?? 0) * 1.25) +
+      (player.ghinRevisionDate ? 4 : 0),
     12,
-    95,
+    96,
   );
-  const sampleShrinkage = primaryDiffs.length / (primaryDiffs.length + 5);
-  const netEdge = rawNetEdge * sampleShrinkage * (confidence / 100);
-  const volatility = standardDeviation(primaryDiffs);
+  const sampleShrinkage = primaryDiffs.length / (primaryDiffs.length + 6);
+  const trendSignal = clamp(performance.trend ?? 0, -3.5, 3.5) * 0.22;
+  const pressureSignal = performance.pressure === null
+    ? 0
+    : clamp((performance.pressure - 50) / 24, -1.4, 1.4) * 0.16;
+  const netEdge = (rawNetEdge + trendSignal + pressureSignal) * sampleShrinkage * (confidence / 100);
+  const volatility = performance.volatility ?? standardDeviation(primaryDiffs);
   const consistency = clamp(96 - volatility * 8.2, 22, 94);
-  const bestDiff = primaryDiffs.length ? Math.min(...primaryDiffs) : index;
+  const bestDiff = performance.ceiling ?? (primaryDiffs.length ? Math.min(...primaryDiffs) : index);
   const ceiling = clamp(50 + (index - bestDiff) * 6.2, 24, 96);
   const skill = clamp(100 - rawIndex * 3.05, 18, 98);
   const netForm = clamp(50 + netEdge * 13, 15, 92);
   const pedigree = smoothedPedigree(player);
   const projectedDifferential = index - netEdge;
+  const ballStriking = performance.ballStriking ?? 50;
+  const scoringControl = performance.scoringControl ?? 50;
+  const putting = performance.putting ?? 50;
+  const pressure = performance.pressure ?? 50;
 
-  // Course fits are evidence-based proxies until shot-level history exists.
-  // Gamble rewards ceiling on its wide, firm corridors; Scarecrow gets more
-  // consistency/endurance weight because it hosts singles on the second 36-hole day.
-  const endurance = clamp(consistency * 0.55 + confidence * 0.25 + skill * 0.2, 20, 95);
+  // Gamble rewards ceiling and ball striking on wide, firm corridors. Scarecrow
+  // hosts singles late in the trip, so mistake avoidance, current form, and
+  // activity readiness matter more. Shot-level inputs remain neutral when absent.
+  const endurance = clamp(
+    consistency * 0.4 + performance.activityReadiness * 0.3 + confidence * 0.16 + skill * 0.14,
+    20,
+    95,
+  );
   const gambleFit = clamp(
-    skill * 0.34 + ceiling * 0.3 + consistency * 0.22 + confidence * 0.14,
+    skill * 0.27 + ceiling * 0.25 + ballStriking * 0.18 + scoringControl * 0.12 + consistency * 0.1 + confidence * 0.08,
     15,
     96,
   );
   const scarecrowFit = clamp(
-    consistency * 0.31 + netForm * 0.28 + endurance * 0.2 + skill * 0.12 + confidence * 0.09,
+    consistency * 0.24 + netForm * 0.24 + scoringControl * 0.17 + endurance * 0.15 + putting * 0.08 + skill * 0.07 + confidence * 0.05,
     15,
     96,
   );
 
   const format: Record<StrandFormat, number> = {
     foursomes: clamp(
-      skill * 0.32 + consistency * 0.3 + gambleFit * 0.18 + confidence * 0.12 + pedigree * 0.08,
+      skill * 0.23 + consistency * 0.24 + scoringControl * 0.14 + ballStriking * 0.13 + gambleFit * 0.1 + confidence * 0.08 + pressure * 0.04 + pedigree * 0.04,
       10,
       98,
     ),
     shamble: clamp(
-      netForm * 0.24 + consistency * 0.19 + ceiling * 0.18 + scarecrowFit * 0.17 + skill * 0.12 + confidence * 0.1,
+      netForm * 0.2 + ceiling * 0.17 + scoringControl * 0.15 + ballStriking * 0.12 + consistency * 0.12 + scarecrowFit * 0.1 + skill * 0.07 + confidence * 0.07,
       10,
       98,
     ),
     singles: clamp(
-      netForm * 0.37 + consistency * 0.24 + scarecrowFit * 0.17 + confidence * 0.13 + pedigree * 0.09,
+      netForm * 0.28 + consistency * 0.19 + scoringControl * 0.14 + scarecrowFit * 0.12 + pressure * 0.09 + putting * 0.06 + endurance * 0.05 + confidence * 0.04 + pedigree * 0.03,
       10,
       98,
     ),
     scramble: clamp(
-      skill * 0.29 + ceiling * 0.28 + gambleFit * 0.19 + consistency * 0.12 + confidence * 0.12,
+      skill * 0.22 + ceiling * 0.22 + ballStriking * 0.17 + scoringControl * 0.13 + gambleFit * 0.1 + putting * 0.06 + consistency * 0.05 + confidence * 0.05,
       10,
       98,
     ),
@@ -246,7 +244,12 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   else evidence.push("form tracks current index");
   if (consistency >= 74) evidence.push("low recent variance");
   if (ceiling >= 72) evidence.push("format-changing ceiling");
+  if (performance.trend !== null && performance.trend >= 1.25) evidence.push(`${performance.trend.toFixed(1)}-stroke upward trend`);
+  if (performance.pressure !== null && performance.pressure >= 62) evidence.push("travels/competes above baseline");
+  if (performance.girPct !== null && performance.girPct >= 45) evidence.push(`${performance.girPct.toFixed(0)}% GIR`);
+  if (performance.scoringControl !== null && performance.scoringControl >= 68) evidence.push("strong double-bogey avoidance");
   if (confidence < 50) evidence.push("thin data — recommendation is fragile");
+  if (performance.daysSinceLastRound !== null && performance.daysSinceLastRound > 75) evidence.push("stale scoring record");
   if (rawIndex > index) evidence.push(`${(rawIndex - index).toFixed(1)} strokes lost to the 25 cap`);
 
   return {
@@ -274,6 +277,7 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
     sampleSize: diffs.all.length,
     fullRoundSampleSize: diffs.full.length,
     evidence,
+    performance,
   };
 }
 

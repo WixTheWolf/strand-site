@@ -2,31 +2,28 @@ import { NextResponse } from "next/server";
 import { buildPlayerStats, getOptimalDraftOrder, getOptimalTeam, rankPlayers, simulateOptimalDraft } from "@/lib/draft-engine";
 import { fetchGhinScores } from "@/lib/ghin";
 import { fetchGrintHandicap, fetchGrintScores } from "@/lib/grint";
-import { GHIN_ROUNDS_SNAPSHOT } from "@/lib/ghin-snapshot";
 import { resolvePlayerGrint } from "@/lib/grint-resolve";
+import { withPrivateDataLink } from "@/lib/player-data-links";
 import { ERIC_THERRIEN, STRAND_PLAYERS } from "@/lib/players";
 import type { PlayerDraftStats, RecentRound } from "@/lib/types";
 
 /**
- * Up to 20 posted rounds — live GHIN first, then TheGrint, then a captured
- * snapshot so recent form stays visible even when GHIN rate-limits the live
- * lookups (critical for draft day).
+ * Up to 60 posted rounds — live GHIN first, then TheGrint. Historical rounds
+ * are never checked into source; they only flow from an authorized live
+ * account connection.
  */
 async function fetchRecentRounds(
-  playerId: string,
   ghinNumber: string | null | undefined,
   grintId: string | null | undefined,
 ): Promise<{ rounds: RecentRound[]; source: PlayerDraftStats["recentRoundsSource"] }> {
   if (ghinNumber) {
-    const ghinRounds = await fetchGhinScores(ghinNumber, 20);
+    const ghinRounds = await fetchGhinScores(ghinNumber, 60);
     if (ghinRounds.length) return { rounds: ghinRounds, source: "ghin" };
   }
   if (grintId) {
-    const grintRounds = await fetchGrintScores(grintId, 20);
+    const grintRounds = await fetchGrintScores(grintId, 60);
     if (grintRounds.length) return { rounds: grintRounds, source: "grint" };
   }
-  const snapshot = GHIN_ROUNDS_SNAPSHOT[playerId];
-  if (snapshot?.length) return { rounds: snapshot, source: "ghin" };
   return { rounds: [], source: null };
 }
 
@@ -50,7 +47,8 @@ export async function GET() {
   // Resolve players a few at a time — GHIN throttles a 20-way burst of
   // login/search/score requests, which was intermittently blanking the data.
   const stats = await mapLimit(STRAND_PLAYERS, 4, async (player) => {
-    const resolved = await resolvePlayerGrint(player);
+    const lookupPlayer = withPrivateDataLink(player);
+    const resolved = await resolvePlayerGrint(lookupPlayer);
     const stats = buildPlayerStats(player, resolved.handicap, {
       location: resolved.match?.location,
       username: resolved.match?.username ?? player.grintUsername,
@@ -58,11 +56,16 @@ export async function GET() {
       grintProfileUrl: resolved.grintProfileUrl,
       ghinNumber: resolved.ghinNumber,
       ghinIndex: resolved.ghinIndex,
+      ghinLowIndex: resolved.ghinLowIndex,
+      ghinLowIndexDate: resolved.ghinLowIndexDate,
+      ghinRevisionDate: resolved.ghinRevisionDate,
+      ghinSoftCap: resolved.ghinSoftCap,
+      ghinHardCap: resolved.ghinHardCap,
+      ghinStatus: resolved.ghinStatus,
     });
     const recent = await fetchRecentRounds(
-      player.id,
-      resolved.ghinNumber ?? player.ghinNumber,
-      player.grintId ?? resolved.match?.id,
+      resolved.ghinNumber ?? lookupPlayer.ghinNumber,
+      lookupPlayer.grintId ?? resolved.match?.id,
     );
     return { ...stats, recentRounds: recent.rounds, recentRoundsSource: recent.source };
   });
@@ -75,8 +78,9 @@ export async function GET() {
 
   let blazeHandicap = null;
   try {
-    if (ERIC_THERRIEN.grintId) {
-      blazeHandicap = await fetchGrintHandicap(ERIC_THERRIEN.grintId);
+    const blazeLookup = withPrivateDataLink(ERIC_THERRIEN);
+    if (blazeLookup.grintId) {
+      blazeHandicap = await fetchGrintHandicap(blazeLookup.grintId);
     }
   } catch {
     blazeHandicap = null;
@@ -87,6 +91,18 @@ export async function GET() {
   const manual = stats.filter((player) => player.dataSource === "manual").length;
   const missing = stats.filter((player) => player.dataSource === "missing").length;
   const withGrintProfile = stats.filter((player) => player.grintProfileUrl).length;
+  const roundsLoaded = stats.reduce((sum, player) => sum + (player.recentRounds?.length ?? 0), 0);
+  const withRounds = stats.filter((player) => (player.recentRounds?.length ?? 0) > 0).length;
+  const withCourseRatings = stats.filter((player) =>
+    player.recentRounds?.some((round) => round.courseRating != null && round.slopeRating != null),
+  ).length;
+  const withShotStats = stats.filter((player) =>
+    player.recentRounds?.some((round) => round.shotStats != null),
+  ).length;
+  const liveRoundPlayers = stats.filter((player) =>
+    player.recentRoundsSource === "ghin" || player.recentRoundsSource === "grint",
+  ).length;
+  const snapshotRoundPlayers = stats.filter((player) => player.recentRoundsSource === "snapshot").length;
 
   return NextResponse.json({
     updatedAt: new Date().toISOString(),
@@ -98,8 +114,30 @@ export async function GET() {
       missing,
       withGrintProfile,
       withGhin: stats.filter((p) => p.ghinNumberResolved).length,
+      withRounds,
+      roundsLoaded,
+      withCourseRatings,
+      withShotStats,
+      liveRoundPlayers,
+      snapshotRoundPlayers,
     },
-    players: ranked,
+    // Account IDs and contact/profile metadata are identifiers, not
+    // performance metrics. Keep them server-side even when live lookups
+    // resolve successfully.
+    players: ranked.map((player) => ({
+      ...player,
+      email: undefined,
+      grintId: null,
+      grintUsername: undefined,
+      grintSearchTerms: undefined,
+      grintLocation: undefined,
+      grintUsernameResolved: undefined,
+      grintProfileUrl: null,
+      location: undefined,
+      origin: undefined,
+      ghinNumber: null,
+      ghinNumberResolved: null,
+    })),
     recommendations,
     optimalTeams: { A: teamA, B: teamB },
     rosterNote: {
