@@ -97,9 +97,9 @@ function strokeLeverage(index: number): number {
 }
 
 const FORMAT_WEIGHTS = {
-  fourball: 0.25,
+  fourball: 0.2,
   scramble: 0.2,
-  singles: 0.35,
+  singles: 0.4,
   shamble: 0.2,
 } as const;
 
@@ -145,9 +145,9 @@ export function computeFormatValues(player: PlayerDraftStats): FormatValues {
     fourball: grossSkill * 1.2 + strategy + driverBonus * 0.6 + (index <= 9 ? (9 - index) * 0.8 : 0) - forfeit * 0.5 - samplePenalty,
     // Scramble team HC only counts the high index at 15%
     scramble: grossSkill * 0.85 + strategy * 1.15 + reliability + driverBonus - forfeit * 0.15 - samplePenalty * 0.6,
-    // Singles: full course handicap difference between opponents (stroke leverage matters)
+    // Singles: 80% allowances, played off the low player (stroke leverage matters)
     singles: grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy + driverBonus * 0.2 - forfeit * 1.25 - samplePenalty * 1.2,
-    // Shamble uses same 35% low + 15% high team weighting as scramble
+    // Shamble gives each player 75%; the best net ball counts after the selected drive
     shamble: grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5 + driverBonus - forfeit * 0.7 - samplePenalty * 0.6,
   };
 }
@@ -222,7 +222,7 @@ function teamSynergyBonus(roster: PlayerDraftStats[]): number {
 
   bonus += Math.min(4, roster.filter((p) => p.heat === "heating").length * 2);
 
-  // Scramble / shamble: best pairs are low + high (35% / 15% team HC)
+  // Scramble rewards low/high 35%/15% leverage; shamble rewards complementary best-ball paths.
   let scramblePairScore = 0;
   const lows = indexes.filter((i) => i <= 14);
   const highs = indexes.filter((i) => i > 14);

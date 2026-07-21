@@ -83,7 +83,7 @@ export default function StrandV6FullSite() {
   const competitionCards = [
     {
       title: "Format",
-      body: "QuickSands warm-up Thursday. Round 1 Foursomes. Round 2 Shamble. Round 3 Singles. Round 4 Two-Man Scramble.",
+      body: "QuickSands warm-up Thursday. Round 1 Fourball. Round 2 Shamble. Round 3 Singles. Round 4 Two-Man Scramble.",
     },
     {
       title: "Side Games",

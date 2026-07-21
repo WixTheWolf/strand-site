@@ -19,7 +19,7 @@ import type { PlayerDraftStats } from "@/lib/types";
 const TEAM_COLORS = { mine: "#2e8b64", justin: "#d2691e" } as const;
 
 const FORMAT_ROWS: { key: keyof FormatValues; label: string; course: string }[] = [
-  { key: "fourball", label: "R1 · Foursomes", course: "Gamble Sands" },
+  { key: "fourball", label: "R1 · Fourball", course: "Gamble Sands" },
   { key: "shamble", label: "R2 · Shamble", course: "Scarecrow" },
   { key: "singles", label: "R3 · Singles", course: "Scarecrow" },
   { key: "scramble", label: "R4 · Scramble", course: "Gamble Sands" },

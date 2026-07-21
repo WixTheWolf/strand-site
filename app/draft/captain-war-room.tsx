@@ -708,10 +708,10 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
           <div className="text-[10px] uppercase tracking-[0.22em] text-black/40">The Matchmaker · projected Team WIX</div>
           <h2 className="mt-1 text-2xl font-semibold tracking-[-0.025em]">Best partner combinations by format</h2>
           <p className="mt-2 text-sm leading-6 text-black/55">
-            These use the projected final roster. Alternate shot rewards reliable floors; shamble and scramble reward useful skill and handicap contrast.
+            These use the projected final roster. Fourball rewards a dependable floor plus birdie ceiling; shamble and scramble reward useful skill and handicap contrast.
           </p>
           <div className="mt-6 grid gap-4 lg:grid-cols-3">
-            {(["foursomes", "shamble", "scramble"] as const).map((format) => {
+            {(["fourball", "shamble", "scramble"] as const).map((format) => {
               const pairs = optimizePairs(projectedMine, format);
               return (
                 <div key={format} className="rounded-[1.5rem] border border-black/10 bg-white/75 p-4">
@@ -766,7 +766,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
       </div>
 
       <div className="rounded-[1.6rem] border border-dashed border-black/15 bg-white/55 p-5 text-xs leading-5 text-black/50">
-        <b className="text-black/70">Strand Sabr v3.3:</b> all {eventHandicapCoverage} event handicaps are locked to the supplied 2026 roster sheet; GHIN, TheGrint and Garmin remain performance provenance. The model uses {roundsModeled} attributable scorecards plus {aggregateRounds} Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Form, ceiling and volatility use the latest 20 differentials; course fit now reflects Gamble Sands&apos; ground-game choices and Scarecrow&apos;s angle-dependent smaller targets. Aggregate-only data affects confidence but never creates synthetic differentials. Missing fields stay neutral.
+        <b className="text-black/70">Strand Sabr v3.4:</b> all {eventHandicapCoverage} event handicaps are locked to the supplied 2026 roster sheet; GHIN, TheGrint and Garmin remain performance provenance. The model uses {roundsModeled} attributable scorecards plus {aggregateRounds} Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Tournament weights now mirror the 75-point schedule: Fourball 20%, Shamble 20%, Singles 40% and Scramble 20%. Course fit reflects Gamble Sands&apos; ground-game choices and Scarecrow&apos;s angle-dependent smaller targets. Aggregate-only data affects confidence but never creates synthetic differentials. Missing fields stay neutral.
       </div>
     </section>
   );

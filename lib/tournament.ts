@@ -34,7 +34,7 @@ export const TEAM_DRAFT_RULES = [...CAPTAIN_DRAFT_RULES, ...MATCHMAKER_RULES];
 /** Canonical match formats — strandinvitational.life/competition */
 export const STRAND_FORMAT = [
   "Quicksands Warm-Up — TBD",
-  "Round 1 — Foursomes",
+  "Round 1 — Fourball",
   "Round 2 — Shamble",
   "Round 3 — Singles",
   "Round 4 — Two Man Scramble",
@@ -46,9 +46,9 @@ export const ROUND_FORMATS = [
     round: 1,
     day: "Friday • August 21",
     course: "Gamble Sands",
-    format: "Foursomes",
+    format: "Fourball",
     teeTime: "8:20 AM",
-    note: "Alternate-shot foursomes match play. Lunch at 1:00 PM.",
+    note: "Two-man best ball at 80% handicap. Lunch at 1:00 PM.",
   },
   {
     round: 2,
@@ -56,7 +56,7 @@ export const ROUND_FORMATS = [
     course: "Scarecrow",
     format: "Shamble",
     teeTime: "2:45 PM",
-    note: "Two-man shamble. Dinner at 8:00 PM.",
+    note: "Two-man shamble at 75% handicap. Dinner at 8:00 PM.",
   },
   {
     round: 3,
@@ -99,8 +99,8 @@ export const WEEKEND_SCHEDULE = [
   {
     day: "Friday • August 21",
     time: "8:20 AM",
-    title: "Round 1 — Foursomes @ Gamble Sands",
-    note: "Team match play opens on the original 18.",
+    title: "Round 1 — Fourball @ Gamble Sands",
+    note: "Two-man best ball opens the 75-point team match.",
   },
   {
     day: "Friday • August 21",
@@ -165,9 +165,10 @@ export const HANDICAP_RULES = [
   "Handicap ceiling of 25 — anyone with a higher index plays as a 25.",
   "Course handicap calculated from slope and rating at each tee box.",
   "Match play: strokes allocated hole-by-hole based on stroke index.",
-  "Foursomes: team handicap per draw (confirm at The Matchmaker).",
-  "Scramble / shamble: team handicap 35% low + 15% high.",
-  "Singles: full course handicap difference between opponents.",
+  "Fourball: each player receives 80% of course handicap, then all players play off the lowest allowance in the match.",
+  "Shamble: each player receives 75% of course handicap, then all players play off the lowest allowance in the match.",
+  "Singles: each player receives 80% of course handicap, with the low allowance playing from zero.",
+  "2v2 Scramble: 35% of the low course handicap plus 15% of the high course handicap; the low team allowance plays from zero.",
 ];
 
 /** On-course rules — strandinvitational.life/competition */
@@ -198,7 +199,7 @@ export function playingIndex(index: number): number {
   return Math.min(index, HANDICAP_CAP);
 }
 
-/** Scramble / shamble team handicap formula (WHS-style) */
+/** 2v2 scramble team handicap formula */
 export const SCRAMBLE_LOW_WEIGHT = 0.35;
 export const SCRAMBLE_HIGH_WEIGHT = 0.15;
 

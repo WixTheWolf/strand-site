@@ -7,6 +7,7 @@ const NAV = [
   { label: "Trip", href: "#trip" },
   { label: "Schedule", href: "#schedule" },
   { label: "Players", href: "#players" },
+  { label: "Live", href: "/live" },
   { label: "Course Intel", href: "/courses" },
   { label: "The Pass", href: "#travel" },
   { label: "Draft", href: "/draft" },
@@ -77,7 +78,7 @@ export default function SiteHeader() {
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-6 md:flex">
           {NAV.map((item) => {
             const isActive = active === item.href;
             const cls = `nav-link label transition-colors duration-500 ${

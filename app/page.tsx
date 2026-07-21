@@ -117,11 +117,16 @@ export default function HomePage() {
               style={{ "--d": "550ms" } as CSSProperties}
             >
               Three David McLay Kidd courses on sandy Columbia Basin soil. Walk to the first tee,
-              live scoring on TheGrint, and a Thursday night pairings reveal that sets the tone.
+              a purpose-built live scoreboard, and a Thursday night pairings reveal that sets the tone.
             </p>
             <div className="hero-fade mt-8 flex flex-wrap items-center gap-3" style={{ "--d": "700ms" } as CSSProperties}>
               <Magnetic>
-                <a href="#players" className="btn-primary">
+                <Link href="/live" className="btn-primary">
+                  Live Scoring
+                </Link>
+              </Magnetic>
+              <Magnetic>
+                <a href="#players" className="btn-ghost">
                   The Field
                 </a>
               </Magnetic>

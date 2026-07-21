@@ -3,14 +3,14 @@ import { buildPerformanceProfile, type PlayerPerformanceProfile } from "./player
 import { playingIndex } from "./tournament";
 import type { PlayerDraftStats, RecentRound } from "./types";
 
-export type StrandFormat = "foursomes" | "shamble" | "singles" | "scramble";
+export type StrandFormat = "fourball" | "shamble" | "singles" | "scramble";
 export type DraftSide = "mine" | "opponent";
 
 export const FORMAT_META: Record<
   StrandFormat,
   { label: string; round: string; course: string; weight: number }
 > = {
-  foursomes: { label: "Foursomes", round: "R1", course: "Gamble Sands", weight: 0.2 },
+  fourball: { label: "Fourball", round: "R1", course: "Gamble Sands", weight: 0.2 },
   shamble: { label: "Shamble", round: "R2", course: "Scarecrow", weight: 0.2 },
   singles: { label: "Singles", round: "R3", course: "Scarecrow", weight: 0.4 },
   scramble: { label: "2-Man Scramble", round: "R4", course: "Gamble Sands", weight: 0.2 },
@@ -240,7 +240,7 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   );
 
   const format: Record<StrandFormat, number> = {
-    foursomes: clamp(
+    fourball: clamp(
       skill * 0.23 + consistency * 0.24 + scoringControl * 0.14 + ballStriking * 0.13 + gambleFit * 0.1 + confidence * 0.08 + pressure * 0.04 + pedigree * 0.04 + driverBonus * 0.3 - lowSamplePenalty,
       10,
       98,
@@ -344,8 +344,8 @@ function pairNote(
   spread: number,
   consistency: number,
 ): string {
-  if (format === "foursomes") {
-    return consistency >= 72 ? "Reliable alternate-shot floor" : "Ceiling pairing with variance";
+  if (format === "fourball") {
+    return consistency >= 72 ? "Reliable best-ball floor" : "Birdie ceiling with cover";
   }
   if (spread >= 8 && spread <= 18) return "Useful low/high handicap spread";
   if (format === "scramble") return "Gross-skill and birdie-ceiling blend";
@@ -362,8 +362,8 @@ export function projectPair(
   const pairConsistency = (a.consistency + b.consistency) / 2;
   let lift = 0;
 
-  if (format === "foursomes") {
-    lift = (pairConsistency - 58) * 0.11 + (Math.min(a.confidence, b.confidence) - 55) * 0.035;
+  if (format === "fourball") {
+    lift = (pairConsistency - 58) * 0.08 + (Math.max(a.ceiling, b.ceiling) - 55) * 0.05 + (Math.min(a.confidence, b.confidence) - 55) * 0.025;
     if (a.volatility > 7 && b.volatility > 7) lift -= 3;
   } else if (format === "shamble") {
     const spreadFit = spread >= 7 && spread <= 18 ? 3.2 : spread >= 4 ? 1.2 : -0.8;
@@ -574,7 +574,7 @@ export function simulateTournament(
 function teamPower(team: PlayerSaberMetrics[]): number {
   if (!team.length) return 0;
   const playerValue = team.reduce((sum, metric) => sum + metric.tournamentScore, 0);
-  const pairLift = (["foursomes", "shamble", "scramble"] as const).reduce(
+  const pairLift = (["fourball", "shamble", "scramble"] as const).reduce(
     (sum, format) =>
       sum + optimizePairs(team, format).reduce((pairSum, pair) => pairSum + pair.lift, 0),
     0,

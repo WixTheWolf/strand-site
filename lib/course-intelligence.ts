@@ -71,7 +71,7 @@ export const GAMBLE_SANDS_INTEL: ChampionshipCourseIntel = {
   image: "/courses/gamble-sands.jpg",
   par: 72,
   defaultTee: "Sands",
-  tournamentRounds: "R1 Foursomes · R4 Two-Man Scramble",
+  tournamentRounds: "R1 Fourball · R4 Two-Man Scramble",
   design:
     "The original is enormous, firm and fast. Wide corridors create choices rather than automatic safety: the aggressive line usually crosses diagonal sand for a shorter, cleaner angle; the conservative line leaves more club and a more complicated green entry.",
   winningFormula: [

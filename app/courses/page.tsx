@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function CoursesPage() {
   return (
     <div className="min-h-screen bg-[#f7f5f0] text-[#111]">
-      <DraftHeader title="Course Intel" extraLink={{ href: "/draft", label: "Draft Lab" }} />
+      <DraftHeader title="Course Intel" extraLink={{ href: "/live", label: "Live Scoring" }} />
       <CourseCommandCenter />
       <SiteFooter />
     </div>

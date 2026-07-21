@@ -85,7 +85,7 @@ export function PlayerSkillGraph({ players, draftedIds }: Props) {
           <h2 className="mt-1 text-xl font-medium">Skill & risk graph</h2>
           <p className="mt-2 max-w-2xl text-sm text-[#111]/70">
             X-axis = course handicap index (lower is stronger). Y-axis = Strand match-play value across
-            foursomes, shamble, singles, and scramble. Dot size reflects upside; color is draft risk tier.
+            fourball, shamble, singles, and scramble. Dot size reflects upside; color is draft risk tier.
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-xs font-medium uppercase tracking-[0.12em]">
@@ -447,7 +447,7 @@ function PlayerDetailCard({
       {p.pickRisk === "high-risk" && safePair && (
         <div className="mt-3 rounded-xl border border-[#2d6a4f]/25 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
           <strong>Recommended safe pair:</strong> {safePair.name} ({safePair.nickname}) at{" "}
-          {formatIndex(safePair)} — scramble 35/15 synergy + steady foursomes floor.
+          {formatIndex(safePair)} — scramble 35/15 synergy + steady fourball floor.
         </div>
       )}
 

@@ -94,7 +94,7 @@ export default function DraftBoard() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="rounded-3xl border border-black/10 bg-white px-8 py-10 text-center shadow-sm">
-          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Strand Sabr v3.3</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Strand Sabr v3.4</div>
           <div className="mt-3 text-lg font-medium">Loading the captain model...</div>
         </div>
       </div>

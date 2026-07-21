@@ -288,7 +288,7 @@ export default function BestTeamView() {
           <p className="mt-3 max-w-3xl text-sm text-black/55">
             {MY_CAPTAIN.nickname} is pre-assigned as captain. This traditional-draft model picks your other{" "}
             {DRAFT_PICKS_PER_CAPTAIN} players vs {OPPONENT_CAPTAIN.nickname} using match-play analytics
-            across foursomes, shamble, singles, and scramble — including high-handicap net leverage.
+            across fourball, shamble, singles, and scramble — including high-handicap net leverage.
           </p>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[#111]/45">
             Updated {new Date(data.updatedAt).toLocaleString()} • {data.source}

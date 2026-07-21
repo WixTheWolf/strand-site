@@ -55,7 +55,7 @@ export const STRAND_COURSES: StrandCourse[] = [
       "The original 18 that launched the resort in 2014.",
       "Wide fairways run firm and fast — McLay Kidd wants you to play your best golf here.",
       "Encourages imagination on every approach, like the world's greatest links.",
-      "Round 1 foursomes and Round 4 scramble are played here in 2026.",
+      "Round 1 fourball and Round 4 scramble are played here in 2026.",
     ],
     playedIn: "Rounds 1 & 4 • Friday & Saturday",
   },

@@ -138,13 +138,13 @@ function ScoreChips({ rounds, dark }: { rounds: RecentRound[]; dark?: boolean })
 }
 
 /** Format-fit metric for a team. */
-function formatMetric(team: Rated[], kind: "foursomes" | "shamble" | "singles" | "scramble"): number {
+function formatMetric(team: Rated[], kind: "fourball" | "shamble" | "singles" | "scramble"): number {
   if (!team.length) return 0;
   const bySkill = [...team].sort((a, b) => b.skill - a.skill);
   const byCeiling = [...team].sort((a, b) => b.ceiling - a.ceiling);
   const top = (arr: Rated[], n: number) => arr.slice(0, n);
   switch (kind) {
-    case "foursomes":
+    case "fourball":
       return top(bySkill, 4).reduce((s, r) => s + r.skill + r.consistency * 0.6, 0);
     case "shamble":
       return top(bySkill, 6).reduce((s, r) => s + r.skill * 0.7 + r.ceiling * 0.5, 0);
@@ -156,7 +156,7 @@ function formatMetric(team: Rated[], kind: "foursomes" | "shamble" | "singles" |
 }
 
 const formatLabels: Record<string, string> = {
-  foursomes: "R1 Foursomes",
+  fourball: "R1 Fourball",
   shamble: "R2 Shamble",
   singles: "R3 Singles",
   scramble: "R4 Scramble",
@@ -204,7 +204,7 @@ export default function DraftAdvisor({ players }: { players: PlayerDraftStats[] 
   const theirVal = projection.theirs.reduce((s, r) => s + r.value, 0);
   const winPct = Math.round(100 / (1 + Math.exp(-(myVal - theirVal) / 9)));
 
-  const formats = (["foursomes", "shamble", "singles", "scramble"] as const).map((k) => {
+  const formats = (["fourball", "shamble", "singles", "scramble"] as const).map((k) => {
     const mine = formatMetric(projection.mine, k);
     const theirs = formatMetric(projection.theirs, k);
     const total = mine + theirs || 1;

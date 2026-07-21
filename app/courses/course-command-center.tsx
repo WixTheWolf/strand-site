@@ -18,7 +18,7 @@ import type { PlayerDraftStats } from "@/lib/types";
 
 type CourseView = "gamble-sands" | "scarecrow" | "quicksands" | "cascades";
 type HoleFilter = "all" | "front" | "back" | "attack" | "closing";
-type CourseFormat = "foursomes" | "scramble" | "shamble" | "singles";
+type CourseFormat = "fourball" | "scramble" | "shamble" | "singles";
 
 interface DraftPayload {
   players: PlayerDraftStats[];
@@ -40,7 +40,7 @@ const FILTERS: { id: HoleFilter; label: string }[] = [
 ];
 
 const FORMAT_LABEL: Record<CourseFormat, string> = {
-  foursomes: "R1 · Foursomes",
+  fourball: "R1 · Fourball",
   scramble: "R4 · Two-Man Scramble",
   shamble: "R2 · Shamble",
   singles: "R3 · Singles",
@@ -83,8 +83,8 @@ function formatInstruction(format: CourseFormat, hole: HoleIntel, strokes: numbe
       : "Do not turn two chances into zero. Secure the center target before changing gears.";
   }
   return hole.plan === "protect"
-    ? "Alternate shot magnifies every miss. Choose the lane that leaves your partner a normal next shot."
-    : "Foursomes priority: grass, preferred angle, predictable leave. Heroics require match pressure—not boredom.";
+    ? "Fourball priority: one player builds a net-par floor before the partner challenges the demanding line."
+    : "One ball establishes position; the second player can attack the contour and create a winning low net.";
 }
 
 function StrokeDots({ count }: { count: number }) {
@@ -110,7 +110,7 @@ function ChampionshipGuide({
   const [teeName, setTeeName] = useState(course.defaultTee);
   const [playerId, setPlayerId] = useState("matt-wixted");
   const [filter, setFilter] = useState<HoleFilter>("all");
-  const [format, setFormat] = useState<CourseFormat>(course.id === "gamble-sands" ? "foursomes" : "shamble");
+  const [format, setFormat] = useState<CourseFormat>(course.id === "gamble-sands" ? "fourball" : "shamble");
 
   const tee = course.tees.find((item) => item.name === teeName) ?? course.tees[0];
   const selectedPlayer = players.find((player) => player.id === playerId) ?? players[0] ?? null;
@@ -119,7 +119,7 @@ function ChampionshipGuide({
     : courseHandicap(selectedPlayer.indexNum, tee, course.par);
   const visibleHoles = filteredHoles(course, filter);
   const formats: CourseFormat[] = course.id === "gamble-sands"
-    ? ["foursomes", "scramble"]
+    ? ["fourball", "scramble"]
     : ["shamble", "singles"];
 
   const board = useMemo(() => {
