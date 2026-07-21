@@ -158,8 +158,10 @@ function smoothedPedigree(player: PlayerDraftStats): number {
 }
 
 function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
-  const rawIndex = player.indexNum ?? player.estimatedIndex ?? 22;
-  const index = playingIndex(rawIndex);
+  const index = playingIndex(player.indexNum ?? player.estimatedIndex ?? 22);
+  const rawIndex = player.eventIndexCapped
+    ? player.manualIndex ?? player.indexNum ?? player.estimatedIndex ?? 22
+    : player.indexNum ?? player.estimatedIndex ?? 22;
   const performance = buildPerformanceProfile(player);
   const diffs = usableDifferentials(player.recentRounds);
   const primaryDiffs = diffs.full.length >= 3 ? diffs.full : diffs.all;

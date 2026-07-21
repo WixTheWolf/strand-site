@@ -66,7 +66,7 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
                   <div className="min-w-0">
                     <span className="text-sm font-medium">{player.nickname}</span>
                     <span className="ml-2 font-mono text-xs text-[#111]/50">
-                      {player.indexNum?.toFixed(1) ?? "—"} idx
+                      {player.indexNum === null ? "—" : `${player.indexNum.toFixed(1)}${player.eventIndexCapped ? "*" : ""}`} idx
                     </span>
                   </div>
                   {delta !== null && (
@@ -122,7 +122,7 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
                 <div className="flex items-baseline justify-between gap-3">
                   <div>
                     <span className="text-sm font-medium">{player.nickname}</span>
-                    <span className="ml-2 font-mono text-xs text-sky-950/50">{player.indexNum?.toFixed(1) ?? "—"} idx</span>
+                    <span className="ml-2 font-mono text-xs text-sky-950/50">{player.indexNum === null ? "—" : `${player.indexNum.toFixed(1)}${player.eventIndexCapped ? "*" : ""}`} idx</span>
                   </div>
                   <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-sky-800/60">Garmin aggregate</span>
                 </div>

@@ -115,8 +115,10 @@ export function computeFormatValues(player: PlayerDraftStats): FormatValues {
   // Gross skill reflects the real index; strokes received are capped at the
   // Strand ceiling, and every stroke forfeited to the cap is a net penalty
   // weighted by how much net scoring matters in each format.
-  const rawIndex = player.indexNum ?? player.estimatedIndex ?? 24;
-  const index = playingIndex(rawIndex);
+  const index = playingIndex(player.indexNum ?? player.estimatedIndex ?? 24);
+  const rawIndex = player.eventIndexCapped
+    ? player.manualIndex ?? player.indexNum ?? player.estimatedIndex ?? 24
+    : player.indexNum ?? player.estimatedIndex ?? 24;
   const forfeit = rawIndex - index;
   const grossSkill = Math.max(0, 40 - rawIndex);
   const netLeverage = strokeLeverage(index);
@@ -152,7 +154,9 @@ export function computeFormatValues(player: PlayerDraftStats): FormatValues {
 
 /** Cross-format match-play value — weights singles net leverage higher */
 export function computeMatchPlayValue(player: PlayerDraftStats): number {
-  const index = player.indexNum ?? player.estimatedIndex ?? 24;
+  const index = player.eventIndexCapped
+    ? player.manualIndex ?? player.indexNum ?? player.estimatedIndex ?? 24
+    : player.indexNum ?? player.estimatedIndex ?? 24;
   const formats = computeFormatValues(player);
   const eliteAnchor = index <= 8 ? 6 + (8 - index) * 0.5 : 0;
 
@@ -380,11 +384,13 @@ export function buildRationale(player: PlayerDraftStats): string {
   const parts: string[] = [];
 
   if (player.indexNum !== null) {
-    const label = player.dataSource === "ghin"
-      ? "verified index"
-      : player.dataSource === "manual"
-        ? "captain-set index"
-        : "index";
+    const label = player.eventIndex2026 !== undefined
+      ? "2026 roster index"
+      : player.dataSource === "ghin"
+        ? "verified index"
+        : player.dataSource === "manual"
+          ? "captain-set index"
+          : "index";
     parts.push(`${player.indexNum.toFixed(1)} ${label}`);
   } else if (player.estimatedIndex) {
     parts.push(`~${player.estimatedIndex} estimated index`);
@@ -427,10 +433,9 @@ export function buildPlayerStats(
     ghinStatus?: string | null;
   },
 ): PlayerDraftStats {
-  // GHIN is the official source per Strand rules. Priority:
-  // live GHIN index → hand-verified GHIN value (manualIndex) → TheGrint index
-  // (verified against GHIN favorites, it mirrors GHIN far better than the
-  // federation band) → federation band → estimated.
+  // The supplied 2026 roster sheet is the authoritative event handicap source.
+  // Live GHIN/TheGrint remains attached as provenance and score history, but a
+  // refresh must not silently replace the frozen event number used at Gamble.
   const ghinLiveIndex = parseHandicapNumber(grintMeta?.ghinIndex);
   const grintIndex = handicap
     ? parseHandicapNumber(handicap.index) ??
@@ -439,7 +444,7 @@ export function buildPlayerStats(
     : null;
   const liveIndex = ghinLiveIndex ?? grintIndex;
   const indexNum =
-    ghinLiveIndex ?? player.manualIndex ?? grintIndex ?? player.estimatedIndex ?? null;
+    player.eventIndex2026 ?? ghinLiveIndex ?? player.manualIndex ?? grintIndex ?? player.estimatedIndex ?? null;
   const ghinLowIndex = parseHandicapNumber(grintMeta?.ghinLowIndex);
   const lowestNum =
     ghinLowIndex ?? (handicap ? parseHandicapNumber(handicap.lowest) : null) ?? player.manualLowest ?? null;

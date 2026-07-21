@@ -26,6 +26,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 5.6,
+    eventIndex2026: 5.6,
   },
   {
     id: "brett-comfort",
@@ -36,6 +37,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 24.8,
+    eventIndex2026: 24.5,
     ghinClub: "USGA/SCGA GC",
   },
   {
@@ -47,6 +49,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: ["driver-reliable", "low-sample", "hole-in-one"],
     manualIndex: 18.5,
+    eventIndex2026: 18.5,
     reportedRounds2026: 4,
   },
   {
@@ -58,6 +61,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 7.7,
+    eventIndex2026: 7.7,
     ghinClub: "Point Sebago Golf Club",
   },
   {
@@ -69,6 +73,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 15.8,
+    eventIndex2026: 15.8,
     ghinClub: "USGA/Chicago District GC",
   },
   {
@@ -80,6 +85,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 20.5,
+    eventIndex2026: 20.5,
     ghinClub: "Knollwood Men's Golf Club",
   },
   {
@@ -91,6 +97,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 14.4,
+    eventIndex2026: 14.4,
     ghinClub: "Westside Golf Collective",
   },
   {
@@ -102,6 +109,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 8.4,
+    eventIndex2026: 8.4,
     ghinClub: "Griffith Park GC",
   },
   {
@@ -112,6 +120,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
+    eventIndex2026: 19.5,
   },
   {
     id: "matt-onorato",
@@ -122,6 +131,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 28,
+    eventIndex2026: 25,
+    eventIndexCapped: true,
     ghinClub: "Carolinas eClub NC Foothills",
   },
   {
@@ -133,6 +144,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 13.3,
+    eventIndex2026: 13.3,
   },
   {
     id: "matt-wixted",
@@ -143,6 +155,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 12.4,
+    eventIndex2026: 12.4,
     manualLowest: 12.4,
   },
   {
@@ -153,6 +166,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "Garmin Connect last-10 summary: averages +15 over par for 9 holes and +27 for 18. Aggregate scoring only; course, tee, date and round-level variance are unavailable.",
     grintId: null,
     tags: ["garmin-aggregate"],
+    eventIndex2026: 22.5,
     reportedScoring: {
       source: "garmin",
       sampleSize: 10,
@@ -170,6 +184,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 12.9,
+    eventIndex2026: 16.9,
     ghinClub: "Westside Golf Collective",
   },
   {
@@ -181,6 +196,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 24.8,
+    eventIndex2026: 24.8,
     ghinClub: "USGA/SCGA GC",
   },
   {
@@ -191,6 +207,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
+    eventIndex2026: 24.5,
   },
   {
     id: "ryan-darcy",
@@ -201,6 +218,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 12.4,
+    eventIndex2026: 12.4,
   },
   {
     id: "sam-blonski",
@@ -210,6 +228,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
+    eventIndex2026: 24.5,
   },
   {
     id: "shaun-eipper",
@@ -219,6 +238,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
+    eventIndex2026: 19.5,
   },
   {
     id: "tim-hummel",
@@ -229,6 +249,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 18.8,
+    eventIndex2026: 18.8,
     ghinClub: "Rancho Park Golf Club",
   },
 ];

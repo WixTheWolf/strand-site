@@ -29,7 +29,7 @@ type Props = {
 };
 
 function formatIndex(p: PlayerDraftStats): string {
-  if (p.indexNum !== null) return p.indexNum.toFixed(1);
+  if (p.indexNum !== null) return `${p.indexNum.toFixed(1)}${p.eventIndexCapped ? "*" : ""}`;
   if (p.estimatedIndex) return `~${p.estimatedIndex}`;
   return "—";
 }

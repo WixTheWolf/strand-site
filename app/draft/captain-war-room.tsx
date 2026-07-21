@@ -31,7 +31,7 @@ function average(values: number[]) {
 function formatIndex(player: PlayerDraftStats): string {
   const value = player.indexNum ?? player.estimatedIndex;
   if (value === null || value === undefined) return "—";
-  return value > 25 ? `${value.toFixed(1)}→25` : value.toFixed(1);
+  return `${value.toFixed(1)}${player.eventIndexCapped ? "*" : ""}`;
 }
 
 function formatEdge(value: number): string {
@@ -375,6 +375,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
   const roundCoverage = board.filter((metric) => metric.sampleSize > 0 || metric.aggregateSampleSize > 0).length;
   const roundsModeled = board.reduce((sum, metric) => sum + metric.performance.roundCount, 0);
   const aggregateRounds = board.reduce((sum, metric) => sum + metric.aggregateSampleSize, 0);
+  const eventHandicapCoverage = board.filter((metric) => metric.player.eventIndex2026 !== undefined).length;
   const detailedRounds = board.reduce((sum, metric) => sum + metric.performance.detailedRoundCount, 0);
   const puttingRounds = board.reduce(
     (sum, metric) => sum + (metric.player.recentRounds ?? []).filter((round) => round.shotStats?.putts != null).length,
@@ -417,6 +418,9 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
                 </span>
                 <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
                   {roundsModeled} rounds modeled
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
+                  {eventHandicapCoverage}/20 2026 HCs locked
                 </span>
               </div>
               <h2 className="mt-6 max-w-2xl text-3xl font-semibold tracking-[-0.035em] md:text-5xl">
@@ -762,7 +766,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
       </div>
 
       <div className="rounded-[1.6rem] border border-dashed border-black/15 bg-white/55 p-5 text-xs leading-5 text-black/50">
-        <b className="text-black/70">Strand Sabr v3.1:</b> {roundsModeled} attributable scorecards plus {aggregateRounds} Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Form, ceiling and volatility use the latest 20 differentials; aggregate-only data affects confidence but never creates synthetic differentials. Captain scouting is bounded, source-labeled and confidence-shrunk. Missing fields stay neutral.
+        <b className="text-black/70">Strand Sabr v3.2:</b> all {eventHandicapCoverage} event handicaps are locked to the supplied 2026 roster sheet; GHIN, TheGrint and Garmin remain performance provenance. The model uses {roundsModeled} attributable scorecards plus {aggregateRounds} Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Form, ceiling and volatility use the latest 20 differentials; aggregate-only data affects confidence but never creates synthetic differentials. Missing fields stay neutral.
       </div>
     </section>
   );

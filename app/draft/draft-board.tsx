@@ -19,6 +19,7 @@ interface DraftPayload {
     withScoringEvidence: number;
     roundsLoaded: number;
     aggregateRoundsReported: number;
+    eventHandicapPlayers: number;
     withCourseRatings: number;
     snapshotRoundPlayers: number;
   };
@@ -32,7 +33,7 @@ interface DraftPayload {
 type View = "war-room" | "advisor" | "captain" | "sandbox";
 
 function formatIndex(player: PlayerDraftStats) {
-  if (player.indexNum !== null) return player.indexNum.toFixed(1);
+  if (player.indexNum !== null) return `${player.indexNum.toFixed(1)}${player.eventIndexCapped ? "*" : ""}`;
   if (player.estimatedIndex) return `~${player.estimatedIndex}`;
   return "—";
 }
@@ -93,7 +94,7 @@ export default function DraftBoard() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="rounded-3xl border border-black/10 bg-white px-8 py-10 text-center shadow-sm">
-          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Strand Sabr v3.1</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Strand Sabr v3.2</div>
           <div className="mt-3 text-lg font-medium">Loading the captain model...</div>
         </div>
       </div>
@@ -176,7 +177,7 @@ export default function DraftBoard() {
         <div className="rounded-[1.75rem] border border-black/10 bg-[#111] p-5 text-white shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-white/60">Captain draft</div>
           <div className="mt-2 text-lg font-medium">WIX vs J-BONE</div>
-          <div className="mt-1 text-sm text-white/70">~1 month before trip · {DRAFT_PICKS_PER_CAPTAIN} picks each</div>
+          <div className="mt-1 text-sm text-white/70">{data.summary.eventHandicapPlayers}/20 2026 HCs locked · {DRAFT_PICKS_PER_CAPTAIN} picks each</div>
         </div>
       </div>
 

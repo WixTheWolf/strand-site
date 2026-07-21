@@ -22,6 +22,10 @@ export interface StrandPlayer {
   tags: string[];
   /** Captain-verified index when GHIN/TheGrint cannot be linked reliably */
   manualIndex?: number;
+  /** Authoritative handicap for the 2026 Strand event roster */
+  eventIndex2026?: number;
+  /** True when the displayed 2026 event handicap is limited by the event cap */
+  eventIndexCapped?: boolean;
   /** Verified GHIN low index when known */
   manualLowest?: number;
   /** Captain-reported activity when scorecards are unavailable */

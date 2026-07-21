@@ -23,7 +23,7 @@ interface PlayerMapProps {
 }
 
 function formatIndex(player: PlayerDraftStats) {
-  if (player.indexNum !== null) return player.indexNum.toFixed(1);
+  if (player.indexNum !== null) return `${player.indexNum.toFixed(1)}${player.eventIndexCapped ? "*" : ""}`;
   if (player.estimatedIndex) return `~${player.estimatedIndex}`;
   return "—";
 }

@@ -45,6 +45,11 @@ function formatNum(value: number | null | undefined, digits = 1) {
   return value.toFixed(digits);
 }
 
+function formatPlayerIndex(player: PlayerDraftStats) {
+  if (player.indexNum === null) return "—";
+  return `${player.indexNum.toFixed(1)}${player.eventIndexCapped ? "*" : ""}`;
+}
+
 function formatRaw(value: string | null | undefined) {
   if (!value || value === "N/A") return "—";
   return value;
@@ -86,7 +91,7 @@ function TeamRosterCard({
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xl font-medium">{formatNum(player.indexNum)}</div>
+          <div className="text-xl font-medium">{formatPlayerIndex(player)}</div>
           <div className={`text-xs uppercase tracking-[0.16em] ${dark ? "text-white/50" : "text-[#111]/50"}`}>
             index
           </div>
@@ -366,7 +371,7 @@ export default function BestTeamView() {
             <div key={pick.player.id} className="rounded-2xl border border-[#111]/10 bg-white p-4 shadow-sm">
               <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Pick #{pick.overallPick}</div>
               <div className="mt-1 font-medium">{playerLabel(pick.player)}</div>
-              <div className="text-lg font-medium">{formatNum(pick.player.indexNum)}</div>
+              <div className="text-lg font-medium">{formatPlayerIndex(pick.player)}</div>
               <div className="text-xs text-[#111]/55">#{pick.player.draftRank} value</div>
             </div>
           ))}
@@ -396,7 +401,7 @@ export default function BestTeamView() {
                 {[
                   ["draftRank", "Rank"],
                   ["name", "Player"],
-                  ["indexNum", "Index"],
+                  ["indexNum", "2026 HC"],
                   ["lowestNum", "Low"],
                   ["draftScore", "Score"],
                   ["attestNum", "Attest"],
@@ -429,7 +434,7 @@ export default function BestTeamView() {
                         <div className="font-medium">{player.name}</div>
                         <div className="text-xs text-[#111]/55">{player.nickname}</div>
                       </td>
-                      <td className="px-3 py-3 text-lg font-medium">{formatNum(player.indexNum)}</td>
+                      <td className="px-3 py-3 text-lg font-medium">{formatPlayerIndex(player)}</td>
                       <td className="px-3 py-3">{formatNum(player.lowestNum)}</td>
                       <td className="px-3 py-3">{formatNum(player.draftScore, 1)}</td>
                       <td className="px-3 py-3">{formatNum(player.attestNum, 0)}%</td>
@@ -489,6 +494,7 @@ export default function BestTeamView() {
                               <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Data provenance</div>
                               <div className="mt-2 space-y-1 text-sm">
                                 <div>Source: {player.dataSource}</div>
+                                <div>2026 event handicap: {formatPlayerIndex(player)}</div>
                                 <div>Score feed: {player.recentRoundsSource ?? "none"}</div>
                                 <div>Scorecards modeled: {player.recentRounds?.length ?? 0}</div>
                                 {player.reportedScoring && (

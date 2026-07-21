@@ -32,7 +32,7 @@ import { PlayerSkillGraph } from "./player-skill-graph";
 import RecentForm from "./recent-form";
 
 function formatIndex(player: PlayerDraftStats) {
-  if (player.indexNum !== null) return player.indexNum.toFixed(1);
+  if (player.indexNum !== null) return `${player.indexNum.toFixed(1)}${player.eventIndexCapped ? "*" : ""}`;
   if (player.estimatedIndex) return `~${player.estimatedIndex}`;
   return "—";
 }

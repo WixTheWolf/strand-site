@@ -36,8 +36,10 @@ const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n
 function rate(p: PlayerDraftStats): Rated {
   // Strand ceiling: anyone over 25 plays as a 25 — they keep their real
   // scoring but forfeit the strokes above the cap, a straight net penalty
-  const rawIndex = p.indexNum ?? p.estimatedIndex ?? 22;
-  const index = playingIndex(rawIndex);
+  const index = playingIndex(p.indexNum ?? p.estimatedIndex ?? 22);
+  const rawIndex = p.eventIndexCapped
+    ? p.manualIndex ?? p.indexNum ?? p.estimatedIndex ?? 22
+    : p.indexNum ?? p.estimatedIndex ?? 22;
   const capForfeit = rawIndex - index;
   const rounds = p.recentRounds ?? [];
   const scores = eighteenScores(rounds);
@@ -94,8 +96,7 @@ const toneClass: Record<Tone, string> = {
 
 function fmtIndex(p: PlayerDraftStats) {
   if (p.indexNum !== null) {
-    // Show the real index but make the ceiling explicit
-    return p.indexNum > HANDICAP_CAP ? `${p.indexNum.toFixed(1)}→${HANDICAP_CAP}` : p.indexNum.toFixed(1);
+    return p.eventIndexCapped ? `${p.indexNum.toFixed(1)}*` : p.indexNum.toFixed(1);
   }
   return p.estimatedIndex ? `~${Math.min(p.estimatedIndex, HANDICAP_CAP)}` : "—";
 }
