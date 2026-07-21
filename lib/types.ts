@@ -64,7 +64,7 @@ export interface PlayerDraftStats extends StrandPlayer {
   grintUsernameResolved?: string;
   grintProfileUrl?: string | null;
   ghinNumberResolved?: string | null;
-  /** Most recent posted rounds, newest first (up to 5) */
+  /** Most recent posted rounds, newest first (up to 20 live; snapshot may be smaller) */
   recentRounds?: RecentRound[];
   recentRoundsSource?: "ghin" | "grint" | null;
   /** Career Strand record from the archive (2018–2025) */

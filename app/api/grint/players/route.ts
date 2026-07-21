@@ -8,7 +8,7 @@ import { ERIC_THERRIEN, STRAND_PLAYERS } from "@/lib/players";
 import type { PlayerDraftStats, RecentRound } from "@/lib/types";
 
 /**
- * Last five posted rounds — live GHIN first, then TheGrint, then a captured
+ * Up to 20 posted rounds — live GHIN first, then TheGrint, then a captured
  * snapshot so recent form stays visible even when GHIN rate-limits the live
  * lookups (critical for draft day).
  */
@@ -18,11 +18,11 @@ async function fetchRecentRounds(
   grintId: string | null | undefined,
 ): Promise<{ rounds: RecentRound[]; source: PlayerDraftStats["recentRoundsSource"] }> {
   if (ghinNumber) {
-    const ghinRounds = await fetchGhinScores(ghinNumber, 5);
+    const ghinRounds = await fetchGhinScores(ghinNumber, 20);
     if (ghinRounds.length) return { rounds: ghinRounds, source: "ghin" };
   }
   if (grintId) {
-    const grintRounds = await fetchGrintScores(grintId, 5);
+    const grintRounds = await fetchGrintScores(grintId, 20);
     if (grintRounds.length) return { rounds: grintRounds, source: "grint" };
   }
   const snapshot = GHIN_ROUNDS_SNAPSHOT[playerId];

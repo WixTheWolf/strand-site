@@ -6,9 +6,13 @@ import { Countdown } from "../components/fx";
 const DRAFT_AT = new Date("2026-07-23T17:00:00-07:00").getTime();
 
 export const metadata = {
-  title: "Strand Draft Lab | Captain Mock Draft",
+  title: "Strand War Room | Captain WIX",
   description:
-    "Interactive captain mock draft vs Justin Uribe for Gamble Sands 2026 — skill graphs, scenarios, and live TheGrint handicaps.",
+    "Private captain war room for Gamble Sands 2026 — sabermetrics, format projections, pairing optimization, and live draft simulation.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function DraftPage() {
@@ -16,7 +20,7 @@ export default function DraftPage() {
     <div className="min-h-screen bg-[#f7f5f0] text-[#111]">
       <DraftHeader
         title="Draft Lab"
-        extraLink={{ href: "/draft/best-team", label: "Best team" }}
+        extraLink={{ href: "/draft/best-team", label: "Player data" }}
       />
       <div className="bg-[#1a3c34] text-white">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-5 py-4 md:px-8">

@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { DRAFT_PICKS_PER_CAPTAIN, isCaptain, TEAM_SIZE } from "@/lib/players";
+import { DRAFT_PICKS_PER_CAPTAIN, isCaptain } from "@/lib/players";
 import { summarizeTeam } from "@/lib/draft-engine";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 import CaptainMockDraft from "./captain-mock-draft";
+import CaptainWarRoom from "./captain-war-room";
 import DraftAdvisor from "./draft-advisor";
 
 interface DraftPayload {
@@ -20,14 +21,7 @@ interface DraftPayload {
   };
 }
 
-type View = "advisor" | "captain" | "sandbox";
-
-const heatStyles = {
-  heating: "bg-orange-100 text-orange-800 border-orange-200",
-  steady: "bg-emerald-100 text-emerald-800 border-emerald-200",
-  cooling: "bg-sky-100 text-sky-800 border-sky-200",
-  unknown: "bg-stone-100 text-stone-600 border-stone-200",
-};
+type View = "war-room" | "advisor" | "captain" | "sandbox";
 
 function formatIndex(player: PlayerDraftStats) {
   if (player.indexNum !== null) return player.indexNum.toFixed(1);
@@ -39,7 +33,7 @@ export default function DraftBoard() {
   const [data, setData] = useState<DraftPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<View>("advisor");
+  const [view, setView] = useState<View>("war-room");
   const [teamA, setTeamA] = useState<string[]>([]);
   const [teamB, setTeamB] = useState<string[]>([]);
   const [activeTeam, setActiveTeam] = useState<"A" | "B">("A");
@@ -113,9 +107,10 @@ export default function DraftBoard() {
   }
 
   const views: { key: View; label: string; hint: string }[] = [
-    { key: "advisor", label: "🎯 Live Advisor", hint: "Draft-day board" },
-    { key: "captain", label: "📋 Mock Draft", hint: "Practice vs J-BONE" },
-    { key: "sandbox", label: "🧪 Sandbox", hint: "Free-build teams" },
+    { key: "war-room", label: "War Room", hint: "Sabermetrics and win simulation" },
+    { key: "advisor", label: "Live Advisor", hint: "Original draft-day board" },
+    { key: "captain", label: "Mock Draft", hint: "Practice vs J-BONE" },
+    { key: "sandbox", label: "Sandbox", hint: "Free-build teams" },
   ];
 
   return (
@@ -175,6 +170,8 @@ export default function DraftBoard() {
           <div className="mt-1 text-sm text-white/70">~1 month before trip · {DRAFT_PICKS_PER_CAPTAIN} picks each</div>
         </div>
       </div>
+
+      {view === "war-room" && <CaptainWarRoom players={data.players} />}
 
       {view === "advisor" && <DraftAdvisor players={data.players} />}
 
