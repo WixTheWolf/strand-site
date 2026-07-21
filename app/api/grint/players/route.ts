@@ -43,6 +43,24 @@ async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promis
   return results;
 }
 
+/** Strip account and location identifiers from every public API branch. */
+function publicPlayer(player: PlayerDraftStats): PlayerDraftStats {
+  return {
+    ...player,
+    email: undefined,
+    grintId: null,
+    grintUsername: undefined,
+    grintSearchTerms: undefined,
+    grintLocation: undefined,
+    grintUsernameResolved: undefined,
+    grintProfileUrl: null,
+    location: undefined,
+    origin: undefined,
+    ghinNumber: null,
+    ghinNumberResolved: null,
+  };
+}
+
 export async function GET() {
   // Resolve players a few at a time — GHIN throttles a 20-way burst of
   // login/search/score requests, which was intermittently blanking the data.
@@ -124,22 +142,9 @@ export async function GET() {
     // Account IDs and contact/profile metadata are identifiers, not
     // performance metrics. Keep them server-side even when live lookups
     // resolve successfully.
-    players: ranked.map((player) => ({
-      ...player,
-      email: undefined,
-      grintId: null,
-      grintUsername: undefined,
-      grintSearchTerms: undefined,
-      grintLocation: undefined,
-      grintUsernameResolved: undefined,
-      grintProfileUrl: null,
-      location: undefined,
-      origin: undefined,
-      ghinNumber: null,
-      ghinNumberResolved: null,
-    })),
+    players: ranked.map(publicPlayer),
     recommendations,
-    optimalTeams: { A: teamA, B: teamB },
+    optimalTeams: { A: teamA.map(publicPlayer), B: teamB.map(publicPlayer) },
     rosterNote: {
       out: ERIC_THERRIEN.name,
       in: "Brian Kerns",

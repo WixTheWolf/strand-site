@@ -102,12 +102,20 @@ export async function resolvePlayerGrint(player: StrandPlayer): Promise<Resolved
 
   // No grintId — try to find the player on TheGrint before settling for a
   // manual/estimated index, so every handicap that CAN be live is live.
-  const terms = [
-    ...(player.grintSearchTerms ?? []),
-    player.email,
-    player.grintUsername,
-    player.name,
-  ].filter((term): term is string => Boolean(term && term.trim()));
+  // A name alone is not a stable identifier and can silently attach another
+  // golfer's index to the draft model. Only search when an authorized private
+  // link supplies an email, username, or explicit disambiguation terms.
+  const hasExplicitLookup = Boolean(
+    player.grintSearchTerms?.length || player.email || player.grintUsername,
+  );
+  const terms = hasExplicitLookup
+    ? [
+        ...(player.grintSearchTerms ?? []),
+        player.email,
+        player.grintUsername,
+        player.name,
+      ].filter((term): term is string => Boolean(term && term.trim()))
+    : [];
 
   const uniqueTerms = [...new Set(terms)];
 
