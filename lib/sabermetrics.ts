@@ -166,11 +166,21 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   const recentPotential = performance.formIndex;
   const rawNetEdge = recentPotential === null ? 0 : index - recentPotential;
   const record = player.strandRecord;
+  const stalenessPenalty = performance.daysSinceLastRound === null
+    ? 8
+    : performance.daysSinceLastRound > 365
+      ? 18
+      : performance.daysSinceLastRound > 180
+        ? 12
+        : performance.daysSinceLastRound > 90
+          ? 6
+          : 0;
   const confidence = clamp(
     sourceConfidence(player) * 0.72 +
       performance.dataDepth * 0.48 +
       Math.min(7, (record?.appearances ?? 0) * 1.25) +
-      (player.ghinRevisionDate ? 4 : 0),
+      (player.ghinRevisionDate ? 4 : 0) -
+      stalenessPenalty,
     12,
     96,
   );
@@ -192,6 +202,11 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   const scoringControl = performance.scoringControl ?? 50;
   const putting = performance.putting ?? 50;
   const pressure = performance.pressure ?? 50;
+  // Qualitative scouting is deliberately bounded. A reliable driver has more
+  // value in selected-drive formats; an undocumented sample is a forecast
+  // guardrail, not a claim that the player is worse.
+  const driverBonus = player.tags.includes("driver-reliable") ? 2.4 : 0;
+  const lowSamplePenalty = player.tags.includes("low-sample") ? 3.2 : 0;
 
   // Gamble rewards ceiling and ball striking on wide, firm corridors. Scarecrow
   // hosts singles late in the trip, so mistake avoidance, current form, and
@@ -214,22 +229,22 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
 
   const format: Record<StrandFormat, number> = {
     foursomes: clamp(
-      skill * 0.23 + consistency * 0.24 + scoringControl * 0.14 + ballStriking * 0.13 + gambleFit * 0.1 + confidence * 0.08 + pressure * 0.04 + pedigree * 0.04,
+      skill * 0.23 + consistency * 0.24 + scoringControl * 0.14 + ballStriking * 0.13 + gambleFit * 0.1 + confidence * 0.08 + pressure * 0.04 + pedigree * 0.04 + driverBonus * 0.3 - lowSamplePenalty,
       10,
       98,
     ),
     shamble: clamp(
-      netForm * 0.2 + ceiling * 0.17 + scoringControl * 0.15 + ballStriking * 0.12 + consistency * 0.12 + scarecrowFit * 0.1 + skill * 0.07 + confidence * 0.07,
+      netForm * 0.2 + ceiling * 0.17 + scoringControl * 0.15 + ballStriking * 0.12 + consistency * 0.12 + scarecrowFit * 0.1 + skill * 0.07 + confidence * 0.07 + driverBonus - lowSamplePenalty * 0.6,
       10,
       98,
     ),
     singles: clamp(
-      netForm * 0.28 + consistency * 0.19 + scoringControl * 0.14 + scarecrowFit * 0.12 + pressure * 0.09 + putting * 0.06 + endurance * 0.05 + confidence * 0.04 + pedigree * 0.03,
+      netForm * 0.28 + consistency * 0.19 + scoringControl * 0.14 + scarecrowFit * 0.12 + pressure * 0.09 + putting * 0.06 + endurance * 0.05 + confidence * 0.04 + pedigree * 0.03 + driverBonus * 0.2 - lowSamplePenalty * 1.15,
       10,
       98,
     ),
     scramble: clamp(
-      skill * 0.22 + ceiling * 0.22 + ballStriking * 0.17 + scoringControl * 0.13 + gambleFit * 0.1 + putting * 0.06 + consistency * 0.05 + confidence * 0.05,
+      skill * 0.22 + ceiling * 0.22 + ballStriking * 0.17 + scoringControl * 0.13 + gambleFit * 0.1 + putting * 0.06 + consistency * 0.05 + confidence * 0.05 + driverBonus - lowSamplePenalty * 0.55,
       10,
       98,
     ),
@@ -253,6 +268,10 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   if (confidence < 50) evidence.push("thin data — recommendation is fragile");
   if (performance.daysSinceLastRound !== null && performance.daysSinceLastRound > 75) evidence.push("stale scoring record");
   if (rawIndex > index) evidence.push(`${(rawIndex - index).toFixed(1)} strokes lost to the 25 cap`);
+  if (player.tags.includes("driver-reliable")) evidence.push("captain-scouted reliable driver");
+  if (player.reportedRounds2026 && performance.roundCount === 0) {
+    evidence.push(`${player.reportedRounds2026} reported 2026 rounds — scores unavailable`);
+  }
 
   return {
     player,

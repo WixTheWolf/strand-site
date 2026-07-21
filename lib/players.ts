@@ -36,15 +36,18 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 24.8,
+    ghinClub: "USGA/SCGA GC",
   },
   {
     id: "brian-kerns",
     name: "Brian Kerns",
     nickname: "KERNS",
     initials: "BK",
-    blurb: "",
+    blurb: "Captain-set 18.5 playing index. Four rounds in 2026 with scores unavailable; typically shoots in the mid-90s. Reliable driver and a career hole-in-one.",
     grintId: null,
-    tags: [],
+    tags: ["driver-reliable", "low-sample", "hole-in-one"],
+    manualIndex: 18.5,
+    reportedRounds2026: 4,
   },
   {
     id: "fred-geisinger",
@@ -55,6 +58,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 7.7,
+    ghinClub: "Point Sebago Golf Club",
   },
   {
     id: "jack-groot",
@@ -65,6 +69,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 15.8,
+    ghinClub: "USGA/Chicago District GC",
   },
   {
     id: "jason-olson",
@@ -75,6 +80,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 20.5,
+    ghinClub: "Knollwood Men's Golf Club",
   },
   {
     id: "jordan-brodbeck",
@@ -85,6 +91,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 14.4,
+    ghinClub: "Westside Golf Collective",
   },
   {
     id: "justin-uribe",
@@ -95,6 +102,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 8.4,
+    ghinClub: "Griffith Park GC",
   },
   {
     id: "kevin-gordon",
@@ -104,8 +112,6 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 21.2,
-    manualLowest: 21.2,
   },
   {
     id: "matt-onorato",
@@ -116,6 +122,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 28,
+    ghinClub: "Carolinas eClub NC Foothills",
   },
   {
     id: "matt-schroeder",
@@ -155,7 +162,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 16.9,
+    manualIndex: 12.9,
+    ghinClub: "Westside Golf Collective",
   },
   {
     id: "pat-morse",
@@ -166,6 +174,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 24.8,
+    ghinClub: "USGA/SCGA GC",
   },
   {
     id: "rhett-fahrney",
@@ -194,7 +203,6 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 24,
   },
   {
     id: "shaun-eipper",
@@ -214,6 +222,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 18.8,
+    ghinClub: "Rancho Park Golf Club",
   },
 ];
 

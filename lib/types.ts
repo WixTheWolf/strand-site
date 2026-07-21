@@ -24,6 +24,8 @@ export interface StrandPlayer {
   manualIndex?: number;
   /** Verified GHIN low index when known */
   manualLowest?: number;
+  /** Captain-reported activity when scorecards are unavailable */
+  reportedRounds2026?: number;
   estimatedIndex?: number;
   photoUrl?: string;
   out?: boolean;
@@ -66,6 +68,8 @@ export interface RecentRound {
   date: string;
   score: number;
   course?: string;
+  /** Tee set used for the round when included in the consented scoring record */
+  teeName?: string;
   differential?: number | null;
   /** True when the posted round was 9 holes (shown with an asterisk) */
   nineHole?: boolean;

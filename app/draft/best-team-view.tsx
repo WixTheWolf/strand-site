@@ -211,8 +211,7 @@ export default function BestTeamView() {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.nickname.toLowerCase().includes(q) ||
-          p.email?.toLowerCase().includes(q) ||
-          p.location?.toLowerCase().includes(q) ||
+          p.ghinClub?.toLowerCase().includes(q) ||
           p.tags.some((t) => t.includes(q)),
       );
     }
@@ -371,19 +370,19 @@ export default function BestTeamView() {
           <div>
             <h2 className="text-xl font-medium">Full player data sheet</h2>
             <p className="mt-1 text-sm text-[#111]/65">
-              Every field we have — GHIN, location, draft model, tags, and team assignment.
+              Performance-only roster data: index provenance, scoring depth, latest post, model value and Strand record.
             </p>
           </div>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, email, location, tag..."
+            placeholder="Search name, club or scouting tag..."
             className="w-full rounded-2xl border bg-white px-4 py-3 text-sm outline-none sm:max-w-xs"
           />
         </div>
 
         <div className="overflow-x-auto rounded-[1.75rem] border border-[#111]/10 bg-white shadow-sm">
-          <table className="min-w-[1400px] w-full text-left text-sm">
+          <table className="min-w-[1080px] w-full text-left text-sm">
             <thead className="border-b bg-[#f7f5f0] text-[10px] uppercase tracking-[0.16em] text-[#111]/55">
               <tr>
                 {[
@@ -393,7 +392,6 @@ export default function BestTeamView() {
                   ["lowestNum", "Low"],
                   ["draftScore", "Score"],
                   ["attestNum", "Attest"],
-                  ["heat", "Heat"],
                   ["strand", "Record"],
                 ].map(([key, label]) => (
                   <th key={key} className="px-3 py-3">
@@ -405,11 +403,9 @@ export default function BestTeamView() {
                 ))}
                 <th className="px-3 py-3">Team</th>
                 <th className="px-3 py-3">Source</th>
-                <th className="px-3 py-3">Location</th>
+                <th className="px-3 py-3">Rounds</th>
+                <th className="px-3 py-3">Last post</th>
                 <th className="px-3 py-3">GHIN club</th>
-                <th className="px-3 py-3">TheGrint</th>
-                <th className="px-3 py-3">GHIN #</th>
-                <th className="px-3 py-3">Email</th>
                 <th className="px-3 py-3">Details</th>
               </tr>
             </thead>
@@ -430,11 +426,6 @@ export default function BestTeamView() {
                       <td className="px-3 py-3">{formatNum(player.draftScore, 1)}</td>
                       <td className="px-3 py-3">{formatNum(player.attestNum, 0)}%</td>
                       <td className="px-3 py-3">
-                        <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase ${heatStyles[player.heat]}`}>
-                          {player.heat}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3">
                         <div className="font-medium">{recordLabel(player)}</div>
                         {player.strandRecord && player.strandRecord.appearances > 0 && (
                           <div className="text-xs text-[#111]/45">
@@ -448,23 +439,9 @@ export default function BestTeamView() {
                           {player.dataSource}
                         </span>
                       </td>
-                      <td className="px-3 py-3 text-xs">
-                        {player.location ?? "—"}
-                        {player.origin ? <div className="text-[#111]/45">from {player.origin}</div> : null}
-                      </td>
+                      <td className="px-3 py-3 font-mono text-xs">{player.recentRounds?.length ?? 0}</td>
+                      <td className="px-3 py-3 font-mono text-xs">{player.recentRounds?.[0]?.date ?? "—"}</td>
                       <td className="px-3 py-3 text-xs">{player.ghinClub ?? "—"}</td>
-                      <td className="px-3 py-3 text-xs">
-                        {player.grintProfileUrl ? (
-                          <a href={player.grintProfileUrl} target="_blank" rel="noopener noreferrer" className="font-medium underline decoration-[#111]/20">
-                            {player.grintUsernameResolved ?? player.grintUsername ?? "Profile"}
-                          </a>
-                        ) : (
-                          <div>{player.grintUsernameResolved ?? player.grintUsername ?? "—"}</div>
-                        )}
-                        {player.grintId ? <div className="text-[#111]/45">id {player.grintId}</div> : null}
-                      </td>
-                      <td className="px-3 py-3 text-xs">{player.ghinNumberResolved ?? player.ghinNumber ?? "Verify"}</td>
-                      <td className="px-3 py-3 text-xs">{player.email ?? "—"}</td>
                       <td className="px-3 py-3">
                         <button
                           type="button"
@@ -477,7 +454,7 @@ export default function BestTeamView() {
                     </tr>
                     {expanded && (
                       <tr className="border-b bg-[#f7f5f0]/60">
-                        <td colSpan={16} className="px-4 py-4">
+                        <td colSpan={13} className="px-4 py-4">
                           <div className="grid gap-4 lg:grid-cols-3">
                             <div>
                               <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Profile</div>
@@ -499,11 +476,12 @@ export default function BestTeamView() {
                               </div>
                             </div>
                             <div>
-                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">GHIN / TheGrint</div>
+                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#111]/45">Data provenance</div>
                               <div className="mt-2 space-y-1 text-sm">
-                                <div>Grint profile: {player.grintProfileUrl ?? "—"}</div>
-                                <div>Grint location: {player.grintLocation ?? "—"}</div>
-                                <div>GHIN #: {player.ghinNumberResolved ?? player.ghinNumber ?? "Pending verification"}</div>
+                                <div>Source: {player.dataSource}</div>
+                                <div>Score feed: {player.recentRoundsSource ?? "none"}</div>
+                                <div>Rounds modeled: {player.recentRounds?.length ?? 0}</div>
+                                <div>Club: {player.ghinClub ?? "—"}</div>
                                 {player.handicap ? (
                                   <>
                                     <div>Index raw: {formatRaw(player.handicap.index)}</div>
@@ -520,6 +498,22 @@ export default function BestTeamView() {
                               </div>
                             </div>
                           </div>
+                          {(player.recentRounds?.length ?? 0) > 0 && (
+                            <div className="mt-5 overflow-hidden rounded-2xl border border-black/[0.07] bg-white">
+                              <div className="grid grid-cols-[86px_1fr_62px_62px_92px] gap-3 border-b border-black/[0.06] bg-black/[0.025] px-3 py-2 text-[8px] font-semibold uppercase tracking-[0.13em] text-black/35">
+                                <span>Date</span><span>Course / tee</span><span className="text-right">Score</span><span className="text-right">Diff</span><span className="text-right">Rating / slope</span>
+                              </div>
+                              {player.recentRounds?.slice(0, 20).map((round, index) => (
+                                <div key={`${round.date}-${round.course}-${index}`} className="grid grid-cols-[86px_1fr_62px_62px_92px] gap-3 border-b border-black/[0.05] px-3 py-2 text-xs last:border-0">
+                                  <span className="font-mono text-black/45">{round.date}</span>
+                                  <span className="truncate text-black/65">{round.course ?? "—"}{round.teeName ? ` · ${round.teeName}` : ""}</span>
+                                  <span className="font-mono text-right font-semibold">{round.score}{round.nineHole ? "*" : ""}</span>
+                                  <span className="font-mono text-right text-black/60">{round.differential?.toFixed(1) ?? "—"}</span>
+                                  <span className="font-mono text-right text-black/40">{round.courseRating?.toFixed(1) ?? "—"} / {round.slopeRating ?? "—"}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </td>
                       </tr>
                     )}

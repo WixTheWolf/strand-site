@@ -3,7 +3,7 @@ import DraftHeader from "../../components/draft-header";
 
 export const metadata = {
   title: "Player Data | Strand War Room",
-  description: "Full player data sheet and legacy roster model for Gamble Sands 2026",
+  description: "Full consented player scoring sheet and roster evidence for Gamble Sands 2026",
   robots: {
     index: false,
     follow: false,

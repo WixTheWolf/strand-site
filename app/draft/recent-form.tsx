@@ -54,7 +54,7 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
       {withRounds.length > 0 ? (
         <div className="grid gap-3 md:grid-cols-2">
           {withRounds.map((player) => {
-            const rounds = player.recentRounds ?? [];
+            const rounds = (player.recentRounds ?? []).slice(0, 5);
             const delta = trendDelta(rounds);
             return (
               <div key={player.id} className="rounded-2xl border border-[#111]/10 bg-[#f7f5f0] p-4">

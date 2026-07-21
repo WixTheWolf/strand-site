@@ -3,7 +3,6 @@ import {
   DRAFT_PICKS_PER_CAPTAIN,
   isCaptain,
   STRAND_PLAYERS,
-  TEAM_SIZE,
   TOTAL_DRAFT_PICKS,
 } from "./players";
 import { parseHandicapNumber } from "./grint";
@@ -29,20 +28,17 @@ function getHeat(indexNum: number | null, lowestNum: number | null, attestNum: n
     return { heat: "unknown", heatLabel: "No GHIN data", formDelta: null };
   }
 
+  // A historical low index is not a form signal. The previous model treated
+  // current-minus-low as "playing below index," which reverses the meaning of
+  // the data. Actual heating/cooling is calculated from recent differentials
+  // in player-performance.ts and sabermetrics.ts.
   if (lowestNum !== null) {
     const delta = indexNum - lowestNum;
     if (delta >= 1.5) {
       return {
-        heat: "heating",
-        heatLabel: `Playing ${delta.toFixed(1)} below index`,
-        formDelta: delta,
-      };
-    }
-    if (delta <= -1) {
-      return {
-        heat: "cooling",
-        heatLabel: "Index below recent low",
-        formDelta: delta,
+        heat: attestNum >= 60 ? "steady" : "unknown",
+        heatLabel: `${delta.toFixed(1)} above historical low index`,
+        formDelta: null,
       };
     }
   }
@@ -134,15 +130,23 @@ export function computeFormatValues(player: PlayerDraftStats): FormatValues {
 
   const reliability = Math.min(5, player.attestNum / 12);
   const strategy = strategicBonus(player);
+  // Captain-supplied scouting traits stay deliberately small and
+  // format-specific. A reliable driver is useful when a partner can capitalize
+  // on a ball in play, but it is not a substitute for posted scoring data.
+  const driverBonus = player.tags.includes("driver-reliable") ? 1 : 0;
+  // A captain-set number backed by only a handful of undocumented rounds is
+  // less forecastable than a current GHIN record. Penalize uncertainty, not
+  // the player's underlying ability.
+  const samplePenalty = player.tags.includes("low-sample") ? 1.25 : 0;
 
   return {
-    fourball: grossSkill * 1.2 + strategy + (index <= 9 ? (9 - index) * 0.8 : 0) - forfeit * 0.5,
+    fourball: grossSkill * 1.2 + strategy + driverBonus * 0.6 + (index <= 9 ? (9 - index) * 0.8 : 0) - forfeit * 0.5 - samplePenalty,
     // Scramble team HC only counts the high index at 15%
-    scramble: grossSkill * 0.85 + strategy * 1.15 + reliability - forfeit * 0.15,
+    scramble: grossSkill * 0.85 + strategy * 1.15 + reliability + driverBonus - forfeit * 0.15 - samplePenalty * 0.6,
     // Singles: full course handicap difference between opponents (stroke leverage matters)
-    singles: grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy - forfeit * 1.25,
+    singles: grossSkill * 0.45 + netLeverage * 1.25 + formBonus + strategy + driverBonus * 0.2 - forfeit * 1.25 - samplePenalty * 1.2,
     // Shamble uses same 35% low + 15% high team weighting as scramble
-    shamble: grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5 - forfeit * 0.7,
+    shamble: grossSkill * 0.55 + netLeverage * 0.7 + strategy + reliability * 0.5 + driverBonus - forfeit * 0.7 - samplePenalty * 0.6,
   };
 }
 
@@ -372,33 +376,15 @@ export function simulateOptimalDraft(
   return { wixPicks, justinPicks, wixRoster, justinRoster };
 }
 
-function computeDraftScore(
-  player: StrandPlayer,
-  indexNum: number | null,
-  lowestNum: number | null,
-  attestNum: number,
-  heat: HeatStatus,
-  formDelta: number | null,
-): number {
-  // Real index for skill; strokes forfeited to the 25 ceiling come off the top
-  const effectiveIndex = indexNum ?? player.estimatedIndex ?? 24;
-  const handicapScore = Math.max(0, 36 - effectiveIndex) - (effectiveIndex - playingIndex(effectiveIndex));
-
-  let formScore = 0;
-  if (heat === "heating" && formDelta) formScore = Math.min(8, formDelta * 3);
-  if (heat === "cooling") formScore = -2;
-
-  const attestScore = Math.min(6, attestNum / 15);
-  const strategyScore = strategicBonus(player);
-
-  return handicapScore + formScore + attestScore + strategyScore;
-}
-
 export function buildRationale(player: PlayerDraftStats): string {
   const parts: string[] = [];
 
   if (player.indexNum !== null) {
-    const label = player.dataSource === "ghin" || player.dataSource === "manual" ? "verified index" : "index";
+    const label = player.dataSource === "ghin"
+      ? "verified index"
+      : player.dataSource === "manual"
+        ? "captain-set index"
+        : "index";
     parts.push(`${player.indexNum.toFixed(1)} ${label}`);
   } else if (player.estimatedIndex) {
     parts.push(`~${player.estimatedIndex} estimated index`);

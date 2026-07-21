@@ -142,6 +142,9 @@ export function buildPerformanceProfile(player: PlayerDraftStats): PlayerPerform
     validNumber(round.differential),
   );
   const differentials = differentialRounds.map((round) => round.differential as number);
+  // WHS and pre-event form decisions are anchored to the latest 20. Older
+  // rounds remain visible as history but do not widen today's floor/ceiling.
+  const currentDifferentials = differentials.slice(0, 20);
   const latestTimestamp = rounds[0] ? roundDate(rounds[0]) : 0;
   const latestRoundDate = rounds[0]?.date ?? null;
   const daysSinceLastRound = daysBeforeTournament(latestTimestamp);
@@ -262,9 +265,9 @@ export function buildPerformanceProfile(player: PlayerDraftStats): PlayerPerform
     trend,
     weightedForm: weightedAverage(differentials.slice(0, 20)),
     formIndex: formIndex(differentials),
-    ceiling: quantile(differentials, 0.2),
-    floor: quantile(differentials, 0.8),
-    volatility: standardDeviation(differentials),
+    ceiling: quantile(currentDifferentials, 0.2),
+    floor: quantile(currentDifferentials, 0.8),
+    volatility: standardDeviation(currentDifferentials),
     competitiveRounds: competitionRounds.length,
     competitiveDifferential,
     awayRounds: awayRounds.length,

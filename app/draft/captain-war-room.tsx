@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { isCaptain } from "@/lib/players";
 import {
   buildSaberBoard,
@@ -19,6 +19,7 @@ import {
 import type { PlayerDraftStats } from "@/lib/types";
 
 const WIX_PICKS_FIRST = false;
+const DRAFT_STORAGE_KEY = "strand-2026-wix-draft-v3";
 
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
@@ -133,6 +134,70 @@ function DataPoint({ label, value, note }: { label: string; value: string; note?
   );
 }
 
+function InsightCard({
+  eyebrow,
+  metric,
+  stat,
+  note,
+  tone = "green",
+}: {
+  eyebrow: string;
+  metric: PlayerSaberMetrics;
+  stat: string;
+  note: string;
+  tone?: "green" | "sand" | "orange";
+}) {
+  const accent = tone === "orange" ? "bg-[#d36b35]" : tone === "sand" ? "bg-[#d2b47b]" : "bg-[#2d6a4f]";
+  return (
+    <article className="relative overflow-hidden rounded-[1.5rem] border border-black/10 bg-white p-4 shadow-sm">
+      <span className={`absolute inset-y-0 left-0 w-1 ${accent}`} />
+      <div className="text-[9px] font-semibold uppercase tracking-[0.18em] text-black/40">{eyebrow}</div>
+      <div className="mt-2 flex items-end justify-between gap-3">
+        <div>
+          <div className="text-lg font-semibold tracking-tight">{metric.player.nickname}</div>
+          <div className="text-[11px] text-black/45">{metric.player.name}</div>
+        </div>
+        <div className="font-mono text-xl font-semibold">{stat}</div>
+      </div>
+      <p className="mt-3 text-xs leading-5 text-black/55">{note}</p>
+    </article>
+  );
+}
+
+function RecentLedger({ metric }: { metric: PlayerSaberMetrics }) {
+  const recent = (metric.player.recentRounds ?? []).slice(0, 10);
+  if (!recent.length) {
+    return (
+      <div className="mt-4 rounded-xl border border-dashed border-black/10 bg-white/60 p-4 text-xs text-black/50">
+        No scorecards available. {metric.player.reportedRounds2026
+          ? `${metric.player.reportedRounds2026} rounds were reported in 2026, but the scores are unknown.`
+          : "The model uses the available playing-index estimate with low confidence."}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 overflow-hidden rounded-xl border border-black/[0.07] bg-white">
+      <div className="hidden grid-cols-[78px_1fr_70px_70px_90px] gap-3 border-b border-black/[0.06] bg-black/[0.025] px-3 py-2 text-[8px] font-semibold uppercase tracking-[0.13em] text-black/35 md:grid">
+        <span>Date</span><span>Course / tee</span><span className="text-right">Score</span><span className="text-right">Diff</span><span className="text-right">Rating / slope</span>
+      </div>
+      {recent.map((round, index) => (
+        <div key={`${round.date}-${round.course}-${index}`} className="grid grid-cols-[1fr_auto] gap-2 border-b border-black/[0.05] px-3 py-2.5 text-xs last:border-0 md:grid-cols-[78px_1fr_70px_70px_90px] md:gap-3">
+          <span className="font-mono text-black/45">{round.date.slice(5)}</span>
+          <span className="min-w-0 truncate text-black/65" title={`${round.course ?? "Course unavailable"}${round.teeName ? ` · ${round.teeName}` : ""}`}>
+            {round.course ?? "Course unavailable"}{round.teeName ? ` · ${round.teeName}` : ""}
+          </span>
+          <span className="font-mono font-semibold md:text-right">{round.score}{round.nineHole ? "*" : ""}</span>
+          <span className="font-mono text-black/60 md:text-right">{round.differential?.toFixed(1) ?? "—"}</span>
+          <span className="col-span-2 font-mono text-[10px] text-black/40 md:col-span-1 md:text-right">
+            {round.courseRating?.toFixed(1) ?? "—"} / {round.slopeRating ?? "—"}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function PlayerIntel({ metric }: { metric: PlayerSaberMetrics }) {
   const p = metric.performance;
   const doubleAvoidance = p.doubleBogeyPct !== null || p.tripleBogeyPct !== null
@@ -178,6 +243,16 @@ function PlayerIntel({ metric }: { metric: PlayerSaberMetrics }) {
           <DataPoint label="Last post" value={p.latestRoundDate ?? "—"} note={`${metric.player.recentRoundsSource ?? "no round feed"} · ${metric.confidenceLabel.toLowerCase()} confidence`} />
         </div>
       </div>
+      <div className="md:col-span-2 xl:col-span-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Recent scoring ledger</div>
+            <div className="mt-1 text-xs text-black/45">Newest 10 rounds · full history remains in the model</div>
+          </div>
+          {metric.player.blurb && <div className="max-w-2xl text-xs leading-5 text-black/55">Scout: {metric.player.blurb}</div>}
+        </div>
+        <RecentLedger metric={metric} />
+      </div>
     </div>
   );
 }
@@ -220,9 +295,29 @@ function FormatCard({
 
 export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[] }) {
   const [assignments, setAssignments] = useState<DraftAssignment[]>([]);
+  const [draftRestored, setDraftRestored] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
   const board = useMemo(() => buildSaberBoard(players), [players]);
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as DraftAssignment[];
+        const validIds = new Set(players.filter((player) => !isCaptain(player.id)).map((player) => player.id));
+        setAssignments(parsed.filter((assignment) => validIds.has(assignment.playerId)).slice(0, 18));
+      }
+    } catch {
+      // Corrupt local state should never block the war room.
+    } finally {
+      setDraftRestored(true);
+    }
+  }, [players]);
+
+  useEffect(() => {
+    if (!draftRestored) return;
+    window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(assignments));
+  }, [assignments, draftRestored]);
   const metricMap = useMemo(
     () => new Map(board.map((metric) => [metric.player.id, metric])),
     [board],
@@ -258,7 +353,21 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
   const roundCoverage = board.filter((metric) => metric.sampleSize > 0).length;
   const roundsModeled = board.reduce((sum, metric) => sum + metric.performance.roundCount, 0);
   const detailedRounds = board.reduce((sum, metric) => sum + metric.performance.detailedRoundCount, 0);
-  const shotStatPlayers = board.filter((metric) => metric.performance.statRoundCount > 0).length;
+  const puttingRounds = board.reduce(
+    (sum, metric) => sum + (metric.player.recentRounds ?? []).filter((round) => round.shotStats?.putts != null).length,
+    0,
+  );
+  const draftableBoard = board.filter(
+    (metric) => !isCaptain(metric.player.id) && !assignedIds.has(metric.player.id),
+  );
+  const valueTarget = draftableBoard[0];
+  const safeAnchor = [...draftableBoard].sort(
+    (a, b) => (b.consistency * 0.55 + b.confidence * 0.45) - (a.consistency * 0.55 + a.confidence * 0.45),
+  )[0];
+  const ceilingPlay = [...draftableBoard].sort((a, b) => b.ceiling - a.ceiling)[0];
+  const riskFlag = [...draftableBoard].sort(
+    (a, b) => (a.confidence - a.volatility * 2.2) - (b.confidence - b.volatility * 2.2),
+  )[0];
   const lockedMine = assignments.filter((assignment) => assignment.side === "mine");
   const lockedOpponent = assignments.filter((assignment) => assignment.side === "opponent");
 
@@ -365,6 +474,47 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
         </div>
       </div>
 
+      {valueTarget && safeAnchor && ceilingPlay && riskFlag && (
+        <section>
+          <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/40">Decision desk</div>
+              <h2 className="mt-1 text-xl font-semibold tracking-tight">The board in four calls</h2>
+            </div>
+            <div className="text-[10px] uppercase tracking-[0.14em] text-black/40">Auto-updates after every pick</div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <InsightCard
+              eyebrow="Best all-format value"
+              metric={valueTarget}
+              stat={`${valueTarget.draftGrade.toFixed(0)}`}
+              note={`${formatEdge(valueTarget.strandValueAdded)} SVA · ${valueTarget.evidence.slice(0, 2).join(" · ")}`}
+            />
+            <InsightCard
+              eyebrow="Safest anchor"
+              metric={safeAnchor}
+              stat={`${safeAnchor.consistency.toFixed(0)}`}
+              note={`${safeAnchor.confidenceLabel} trust · ${safeAnchor.fullRoundSampleSize} full rounds · consistency score`}
+              tone="sand"
+            />
+            <InsightCard
+              eyebrow="Highest ceiling"
+              metric={ceilingPlay}
+              stat={`${ceilingPlay.ceiling.toFixed(0)}`}
+              note={`Best-round upside for scramble and shamble. ${ceilingPlay.volatility.toFixed(1)} differential volatility.`}
+              tone="green"
+            />
+            <InsightCard
+              eyebrow="Risk flag"
+              metric={riskFlag}
+              stat={`${riskFlag.confidence.toFixed(0)}`}
+              note={`${riskFlag.evidence.filter((item) => item.includes("thin") || item.includes("stale") || item.includes("cap")).join(" · ") || "Wide outcome range—pair with a high-floor player."}`}
+              tone="orange"
+            />
+          </div>
+        </section>
+      )}
+
       <div className="rounded-[1.8rem] border border-black/10 bg-white p-4 shadow-sm md:p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
@@ -372,6 +522,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
             <div className="mt-1 text-sm text-black/60">
               {lockedMine.length} Team WIX picks · {lockedOpponent.length} Team J-BONE picks · projection auto-completes the rest
             </div>
+            <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-emerald-700/70">Saved automatically on this device</div>
           </div>
           <div className="flex gap-2">
             <button
@@ -571,11 +722,11 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
             </div>
             <div className="rounded-2xl bg-[#f7f5f0] p-4">
               <div className="font-mono text-2xl font-semibold">{detailedRounds}</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Rich GHIN rounds</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Rating + slope rounds</div>
             </div>
             <div className="rounded-2xl bg-[#f7f5f0] p-4">
-              <div className="font-mono text-2xl font-semibold">{shotStatPlayers}/20</div>
-              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Players with shot stats</div>
+              <div className="font-mono text-2xl font-semibold">{puttingRounds}</div>
+              <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-black/40">Rounds with putts</div>
             </div>
           </div>
           <div className="mt-5 space-y-3 text-xs leading-5 text-black/55">
@@ -588,7 +739,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
       </div>
 
       <div className="rounded-[1.6rem] border border-dashed border-black/15 bg-white/55 p-5 text-xs leading-5 text-black/50">
-        <b className="text-black/70">Model v2.1:</b> the consented roster snapshot now contributes 95 GHIN rounds and 19 TheGrint handicap records. Authorized live GHIN data can add rating, slope, PCC, home/away and competition type, index usage, exceptional-score flags, GIR, fairways, putting and hole-level scoring; unavailable fields remain neutral.
+        <b className="text-black/70">Strand Sabr v3.0:</b> {roundsModeled} attributable rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Form, ceiling and volatility use the latest 20 differentials; older rounds remain context only. Captain scouting is bounded, source-labeled and confidence-shrunk. Missing fields stay neutral.
       </div>
     </section>
   );

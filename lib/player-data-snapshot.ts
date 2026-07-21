@@ -1,4 +1,5 @@
 import type { GrintHandicap, RecentRound } from "./types";
+import { CONSENTED_ROUNDS } from "./consented-rounds";
 
 export const PLAYER_DATA_SNAPSHOT_CAPTURED_AT = "2026-07-21T01:57:11.994Z";
 
@@ -7,7 +8,7 @@ export const PLAYER_DATA_SNAPSHOT_CAPTURED_AT = "2026-07-21T01:57:11.994Z";
  * GHIN and TheGrint records. It contains no emails, member numbers, usernames,
  * profile IDs, or locations. Authorized live data overrides this snapshot.
  */
-export const PLAYER_DATA_SNAPSHOT: Record<
+const BASE_PLAYER_DATA_SNAPSHOT: Record<
   string,
   { handicap: GrintHandicap | null; rounds: RecentRound[] }
 > = {
@@ -654,7 +655,7 @@ export const PLAYER_DATA_SNAPSHOT: Record<
     "handicap": {
       "lowest": "N/A",
       "attest": "35.0",
-      "index": "24.0",
+      "index": "17~19",
       "index_ghap": "21~23",
       "index_federation": "17~19",
       "cIndex": null,
@@ -768,3 +769,21 @@ export const PLAYER_DATA_SNAPSHOT: Record<
     ]
   }
 };
+
+/**
+ * The detailed, player-consented records supplied by the captain replace the
+ * older five-round summaries. This keeps the original verified handicap
+ * payloads while ensuring every downstream metric uses the richest record.
+ */
+export const PLAYER_DATA_SNAPSHOT: Record<
+  string,
+  { handicap: GrintHandicap | null; rounds: RecentRound[] }
+> = Object.fromEntries(
+  Object.entries(BASE_PLAYER_DATA_SNAPSHOT).map(([playerId, snapshot]) => [
+    playerId,
+    {
+      ...snapshot,
+      rounds: CONSENTED_ROUNDS[playerId] ?? snapshot.rounds,
+    },
+  ]),
+);

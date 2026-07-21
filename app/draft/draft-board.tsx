@@ -14,6 +14,12 @@ interface DraftPayload {
   players: PlayerDraftStats[];
   recommendations: DraftRecommendation[];
   optimalTeams: { A: PlayerDraftStats[]; B: PlayerDraftStats[] };
+  summary: {
+    withRounds: number;
+    roundsLoaded: number;
+    withCourseRatings: number;
+    snapshotRoundPlayers: number;
+  };
   rosterNote: {
     out: string;
     in: string;
@@ -85,8 +91,8 @@ export default function DraftBoard() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="rounded-3xl border border-black/10 bg-white px-8 py-10 text-center shadow-sm">
-          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Connecting to TheGrint</div>
-          <div className="mt-3 text-lg font-medium">Loading handicaps & form...</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-[#111]/50">Strand Sabr v3.0</div>
+          <div className="mt-3 text-lg font-medium">Loading the captain model...</div>
         </div>
       </div>
     );
@@ -120,8 +126,8 @@ export default function DraftBoard() {
           <p className="label">Draft Lab</p>
           <h1 className="section-title mt-3">Captain prep for Gamble Sands</h1>
           <p className="mt-3 max-w-3xl text-sm text-black/55">
-            Mock traditional drafts vs Justin Uribe (J-BONE) — prep for the captain draft ~one month before The
-            Strand. Thursday night is The Matchmaker for pairings, not roster picks.
+            Draft against Justin Uribe (J-BONE) with a 327-round, confidence-weighted model built for the four
+            Strand formats. Lock the real picks as they happen; the board recalculates WIX&apos;s best response instantly.
           </p>
         </div>
         <button
@@ -149,20 +155,21 @@ export default function DraftBoard() {
         </div>
       </div>
 
-      <div className="mb-6 grid gap-4 md:grid-cols-4">
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Live TheGrint</div>
-          <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "live").length}/20 linked</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Evidence base</div>
+          <div className="mt-2 font-mono text-2xl font-semibold">{data.summary.roundsLoaded}</div>
+          <div className="mt-1 text-xs text-black/45">attributable rounds modeled</div>
         </div>
         <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">GHIN verified</div>
-          <div className="mt-2 font-medium">{data.players.filter((p) => p.dataSource === "ghin").length} indexes</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Player coverage</div>
+          <div className="mt-2 font-mono text-2xl font-semibold">{data.summary.withRounds}/20</div>
+          <div className="mt-1 text-xs text-black/45">players with score history</div>
         </div>
         <div className="rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Heating up</div>
-          <div className="mt-2 text-lg font-medium">
-            {data.players.filter((p) => p.heat === "heating").map((p) => p.nickname).join(", ") || "—"}
-          </div>
+          <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Course-adjusted depth</div>
+          <div className="mt-2 font-mono text-2xl font-semibold text-orange-900">{data.summary.withCourseRatings}/20</div>
+          <div className="mt-1 text-xs text-orange-800/55">players with rating + slope records</div>
         </div>
         <div className="rounded-[1.75rem] border border-black/10 bg-[#111] p-5 text-white shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-white/60">Captain draft</div>

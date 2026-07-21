@@ -44,9 +44,12 @@ export default function PlayerMap({
     return map;
   }, [picks]);
 
-  const bounds = zoom === "socal"
-    ? { minLat: 33.4, maxLat: 34.5, minLng: -119.2, maxLng: -117.8 }
-    : MAP_BOUNDS;
+  const bounds = useMemo(
+    () => zoom === "socal"
+      ? { minLat: 33.4, maxLat: 34.5, minLng: -119.2, maxLng: -117.8 }
+      : MAP_BOUNDS,
+    [zoom],
+  );
 
   const points = useMemo(() => {
     return players
