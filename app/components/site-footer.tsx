@@ -25,6 +25,9 @@ export default function SiteFooter() {
               </p>
             </div>
             <div className="flex flex-wrap gap-6 text-sm text-white/55">
+              <Link href="/my-strand" className="nav-link hover:text-white">
+                My Strand
+              </Link>
               <Link href="/live" className="nav-link hover:text-white">
                 Live Scoring
               </Link>

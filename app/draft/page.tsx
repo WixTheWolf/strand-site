@@ -1,9 +1,7 @@
 import DraftBoard from "./draft-board";
 import DraftHeader from "../components/draft-header";
 import { Countdown } from "../components/fx";
-
-// Draft night: Thursday, July 23 at 6:00 PM Pacific — J-BONE won the flip
-const DRAFT_AT = new Date("2026-07-23T18:00:00-07:00").getTime();
+import { DRAFT_AT } from "@/lib/tournament";
 
 export const metadata = {
   title: "Strand War Room | Captain WIX",

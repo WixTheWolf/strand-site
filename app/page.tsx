@@ -121,23 +121,18 @@ export default function HomePage() {
             </p>
             <div className="hero-fade mt-8 flex flex-wrap items-center gap-3" style={{ "--d": "700ms" } as CSSProperties}>
               <Magnetic>
-                <Link href="/live" className="btn-primary">
+                <Link href="/my-strand" className="btn-primary">
+                  Open My Strand
+                </Link>
+              </Magnetic>
+              <Magnetic>
+                <Link href="/live" className="btn-ghost">
                   Live Scoring
                 </Link>
               </Magnetic>
               <Magnetic>
-                <a href="#players" className="btn-ghost">
-                  The Field
-                </a>
-              </Magnetic>
-              <Magnetic>
                 <Link href="/courses" className="btn-ghost">
                   Course Intel
-                </Link>
-              </Magnetic>
-              <Magnetic>
-                <Link href="/draft" className="btn-ghost">
-                  Draft Lab
                 </Link>
               </Magnetic>
             </div>

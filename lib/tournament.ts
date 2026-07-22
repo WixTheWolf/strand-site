@@ -1,5 +1,8 @@
 import { MY_CAPTAIN, OPPONENT_CAPTAIN } from "./mock-draft";
 
+/** Captain draft: Thursday, July 23 at 6:00 PM Pacific. */
+export const DRAFT_AT = new Date("2026-07-23T18:00:00-07:00").getTime();
+
 export const CAPTAINS = {
   wix: {
     ...MY_CAPTAIN,
