@@ -40,6 +40,10 @@ function resultLabel(winner: "wix" | "jbone" | "tie" | "pending", wixName: strin
   return "Not started";
 }
 
+function holeDraftKey(matchId: string, hole: number) {
+  return `strand-2026-unsynced-hole:${matchId}:${hole}`;
+}
+
 export default function MatchScorecard({ matchId }: { matchId: string }) {
   const [payload, setPayload] = useState<LivePayload | null>(null);
   const [activeHole, setActiveHole] = useState(1);
@@ -48,6 +52,8 @@ export default function MatchScorecard({ matchId }: { matchId: string }) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [online, setOnline] = useState(true);
 
   const load = useCallback(async () => {
     try {
@@ -73,6 +79,16 @@ export default function MatchScorecard({ matchId }: { matchId: string }) {
     const saved = window.localStorage.getItem("strand-scorer-name");
     if (saved) setScorerName(saved);
   }, []);
+  useEffect(() => {
+    const update = () => setOnline(window.navigator.onLine);
+    update();
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
+  }, []);
 
   const session = payload?.config.sessions.find((item) => item.matches.some((match) => match.id === matchId));
   const match = session?.matches.find((item) => item.id === matchId);
@@ -88,18 +104,41 @@ export default function MatchScorecard({ matchId }: { matchId: string }) {
 
   useEffect(() => {
     if (!payload) return;
+    setDirty(false);
+    try {
+      const local = window.localStorage.getItem(holeDraftKey(matchId, activeHole));
+      if (local) {
+        setDraft(JSON.parse(local) as HoleScore);
+        setDirty(true);
+        setMessage(`Recovered unsynced scores for hole ${activeHole} from this device.`);
+        return;
+      }
+    } catch {
+      window.localStorage.removeItem(holeDraftKey(matchId, activeHole));
+    }
     setDraft(payload.scores[matchId]?.holes[activeHole] ?? {});
     setMessage(null);
   }, [activeHole, matchId, payload]);
 
-  const setPlayerScore = (playerId: string, value: number | null) => setDraft((current) => ({
-    ...current,
-    playerGross: { ...(current.playerGross ?? {}), [playerId]: value },
-  }));
-  const setTeamScore = (teamId: "wix" | "jbone", value: number | null) => setDraft((current) => ({
-    ...current,
-    teamGross: { ...(current.teamGross ?? {}), [teamId]: value },
-  }));
+  useEffect(() => {
+    if (!dirty) return;
+    window.localStorage.setItem(holeDraftKey(matchId, activeHole), JSON.stringify(draft));
+  }, [activeHole, dirty, draft, matchId]);
+
+  const setPlayerScore = (playerId: string, value: number | null) => {
+    setDirty(true);
+    setDraft((current) => ({
+      ...current,
+      playerGross: { ...(current.playerGross ?? {}), [playerId]: value },
+    }));
+  };
+  const setTeamScore = (teamId: "wix" | "jbone", value: number | null) => {
+    setDirty(true);
+    setDraft((current) => ({
+      ...current,
+      teamGross: { ...(current.teamGross ?? {}), [teamId]: value },
+    }));
+  };
 
   const save = async () => {
     if (!payload || !session || !match) return;
@@ -114,6 +153,11 @@ export default function MatchScorecard({ matchId }: { matchId: string }) {
     setMessage(null);
     try {
       if (scorerName.trim()) window.localStorage.setItem("strand-scorer-name", scorerName.trim());
+      window.localStorage.setItem(holeDraftKey(matchId, activeHole), JSON.stringify(draft));
+      if (!window.navigator.onLine) {
+        setMessage(`No signal. Hole ${activeHole} is safe on this device—tap save again when you reconnect.`);
+        return;
+      }
       const response = await fetch("/api/live-scoring", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -121,6 +165,8 @@ export default function MatchScorecard({ matchId }: { matchId: string }) {
       });
       const result = await response.json() as { ok?: boolean; score?: MatchScore; error?: string };
       if (!response.ok || !result.ok || !result.score) throw new Error(result.error ?? "Score did not save.");
+      window.localStorage.removeItem(holeDraftKey(matchId, activeHole));
+      setDirty(false);
       const nextPayload = { ...payload, scores: { ...payload.scores, [matchId]: result.score } };
       setPayload(nextPayload);
       const nextResult = scoreMatch(payload.config, session, match, result.score);
@@ -132,7 +178,9 @@ export default function MatchScorecard({ matchId }: { matchId: string }) {
         setMessage(nextResult.complete ? "Match complete. All three points are final." : `Hole ${activeHole} saved.`);
       }
     } catch (caught) {
-      setMessage(caught instanceof Error ? caught.message : "Score did not save.");
+      window.localStorage.setItem(holeDraftKey(matchId, activeHole), JSON.stringify(draft));
+      const detail = caught instanceof Error ? caught.message : "Score did not save.";
+      setMessage(`${detail} Hole ${activeHole} is still safe on this device—tap save to retry.`);
     } finally {
       setSaving(false);
     }
@@ -197,7 +245,11 @@ export default function MatchScorecard({ matchId }: { matchId: string }) {
           <div className="border border-black/10 bg-[#faf8f3] p-5 md:p-7">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div><div className="text-[10px] uppercase tracking-[0.2em] text-black/35">Enter gross scores</div><h2 className="mt-1 text-3xl font-medium tracking-[-0.04em]">Hole {activeHole}</h2></div>
-              {currentResult.winner !== "pending" ? <div className="rounded-full bg-black px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white">Saved · {resultLabel(currentResult.winner, "WIX", "J-BONE")}</div> : null}
+              <div className="flex flex-wrap items-center gap-2">
+                {!online ? <div className="rounded-full bg-amber-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-amber-900">No signal · device save</div> : null}
+                {dirty ? <div className="rounded-full bg-sky-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-sky-900">Safe on device · not synced</div> : null}
+                {!dirty && currentResult.winner !== "pending" ? <div className="rounded-full bg-black px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white">Synced · {resultLabel(currentResult.winner, "WIX", "J-BONE")}</div> : null}
+              </div>
             </div>
 
             {session.format === "scramble" ? (
@@ -217,7 +269,7 @@ export default function MatchScorecard({ matchId }: { matchId: string }) {
             {session.format === "shamble" ? (
               <div className="mt-6 border-t border-black/8 pt-5">
                 <label className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40" htmlFor="selected-drive">Selected drive · optional tracking</label>
-                <select id="selected-drive" value={draft.selectedDrivePlayerId ?? ""} onChange={(event) => setDraft((current) => ({ ...current, selectedDrivePlayerId: event.target.value || null }))} className="mt-2 w-full border border-black/12 bg-white px-4 py-3 text-sm outline-none"><option value="">Choose player</option>{players.map((player) => <option key={player.id} value={player.id}>{player.name}</option>)}</select>
+                <select id="selected-drive" value={draft.selectedDrivePlayerId ?? ""} onChange={(event) => { setDirty(true); setDraft((current) => ({ ...current, selectedDrivePlayerId: event.target.value || null })); }} className="mt-2 w-full border border-black/12 bg-white px-4 py-3 text-sm outline-none"><option value="">Choose player</option>{players.map((player) => <option key={player.id} value={player.id}>{player.name}</option>)}</select>
               </div>
             ) : null}
 

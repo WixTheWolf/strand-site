@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { isCaptain } from "@/lib/players";
+import { DRAFT_TEAM_TRANSFER_KEY, type DraftTeamTransfer } from "@/lib/live-scoring";
 import {
   buildSaberBoard,
   completeDraft,
@@ -402,6 +403,18 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
 
   const undoLast = () => setAssignments((current) => current.slice(0, -1));
 
+  const sendTeamsToScoring = () => {
+    if (assignments.length !== 18) return;
+    const transfer: DraftTeamTransfer = {
+      version: 1,
+      capturedAt: new Date().toISOString(),
+      wixPlayerIds: projectedDraft.mine.map((player) => player.id),
+      jbonePlayerIds: projectedDraft.opponent.map((player) => player.id),
+    };
+    window.localStorage.setItem(DRAFT_TEAM_TRANSFER_KEY, JSON.stringify(transfer));
+    window.location.assign("/live/setup");
+  };
+
   return (
     <section className="space-y-6">
       <div className="overflow-hidden rounded-[2.2rem] bg-[#102f28] text-white shadow-[0_24px_70px_rgba(16,47,40,0.22)]">
@@ -552,6 +565,13 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
             <div className="mt-1 text-[10px] uppercase tracking-[0.12em] text-emerald-700/70">Saved automatically on this device</div>
           </div>
           <div className="flex gap-2">
+            <button
+              onClick={sendTeamsToScoring}
+              disabled={assignments.length !== 18}
+              className="rounded-xl bg-[#183d33] px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white disabled:cursor-not-allowed disabled:bg-black/5 disabled:text-black/30"
+            >
+              Send teams to scoring
+            </button>
             <button
               onClick={undoLast}
               disabled={!assignments.length}

@@ -2,13 +2,28 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CHAMPIONSHIP_COURSES } from "@/lib/course-intelligence";
-import { FORMAT_RULES, validateTournamentConfig, type MatchScore, type TeamId, type TournamentConfig } from "@/lib/live-scoring";
+import {
+  DRAFT_TEAM_TRANSFER_KEY,
+  FORMAT_RULES,
+  validateTournamentConfig,
+  type DraftTeamTransfer,
+  type MatchScore,
+  type TeamId,
+  type TournamentConfig,
+} from "@/lib/live-scoring";
 
 interface LivePayload {
   config: TournamentConfig;
   scores: Record<string, MatchScore>;
   storageMode: "shared" | "preview";
   error?: string;
+}
+
+const SETUP_DRAFT_KEY = "strand-2026-scoring-setup-draft-v1";
+
+interface SetupDraftBackup {
+  serverVersion: number;
+  config: TournamentConfig;
 }
 
 function cloneConfig(config: TournamentConfig): TournamentConfig {
@@ -40,6 +55,7 @@ export default function ScoringSetup() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [activeSession, setActiveSession] = useState("fourball");
+  const [backupReady, setBackupReady] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -47,13 +63,53 @@ export default function ScoringSetup() {
       const next = await response.json() as LivePayload;
       if (!response.ok || next.error) throw new Error(next.error ?? "Unable to load setup.");
       setPayload(next);
-      setDraft(cloneConfig(next.config));
+      let nextDraft = cloneConfig(next.config);
+      let restoredMessage: string | null = null;
+
+      try {
+        const transferRaw = window.localStorage.getItem(DRAFT_TEAM_TRANSFER_KEY);
+        const transfer = transferRaw ? JSON.parse(transferRaw) as DraftTeamTransfer : null;
+        const allIds = new Set(nextDraft.players.map((player) => player.id));
+        const transferredIds = transfer ? [...transfer.wixPlayerIds, ...transfer.jbonePlayerIds] : [];
+        if (
+          transfer?.version === 1 &&
+          transfer.wixPlayerIds.length === 10 &&
+          transfer.jbonePlayerIds.length === 10 &&
+          new Set(transferredIds).size === 20 &&
+          transferredIds.every((id) => allIds.has(id))
+        ) {
+          const wixIds = new Set(transfer.wixPlayerIds);
+          nextDraft.players.forEach((player) => {
+            player.teamId = wixIds.has(player.id) ? "wix" : "jbone";
+          });
+          restoredMessage = "Draft-night teams imported. Review them, then build and lock the 25 matches.";
+          window.localStorage.removeItem(DRAFT_TEAM_TRANSFER_KEY);
+        } else {
+          const backupRaw = window.localStorage.getItem(SETUP_DRAFT_KEY);
+          const backup = backupRaw ? JSON.parse(backupRaw) as SetupDraftBackup : null;
+          if (backup?.serverVersion === next.config.version) {
+            nextDraft = cloneConfig(backup.config);
+            restoredMessage = "Recovered the unfinished captain setup from this device.";
+          }
+        }
+      } catch {
+        window.localStorage.removeItem(SETUP_DRAFT_KEY);
+      }
+
+      setDraft(nextDraft);
+      setMessage(restoredMessage);
+      setBackupReady(true);
     } catch (caught) {
       setMessage(caught instanceof Error ? caught.message : "Unable to load setup.");
     }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    if (!backupReady || !draft || !payload) return;
+    const backup: SetupDraftBackup = { serverVersion: payload.config.version, config: draft };
+    window.localStorage.setItem(SETUP_DRAFT_KEY, JSON.stringify(backup));
+  }, [backupReady, draft, payload]);
   const errors = useMemo(() => draft ? validateTournamentConfig(draft) : [], [draft]);
   const session = draft?.sessions.find((item) => item.id === activeSession) ?? draft?.sessions[0];
 
@@ -111,6 +167,8 @@ export default function ScoringSetup() {
       if (!response.ok || !result.ok || !result.config) throw new Error(result.details?.join(" ") ?? result.error ?? "Setup did not save.");
       setDraft(cloneConfig(result.config));
       setPayload((current) => current ? { ...current, config: result.config as TournamentConfig } : current);
+      setBackupReady(false);
+      window.localStorage.removeItem(SETUP_DRAFT_KEY);
       setMessage("Teams and all 25 matches are locked.");
     } catch (caught) {
       setMessage(caught instanceof Error ? caught.message : "Setup did not save.");
@@ -168,6 +226,7 @@ export default function ScoringSetup() {
       {errors.length ? <div className="mt-5 border border-rose-200 bg-rose-50 p-5"><div className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-800">Fix before locking</div><ul className="mt-3 space-y-2 text-sm text-rose-900">{errors.map((error) => <li key={error}>• {error}</li>)}</ul></div> : null}
 
       <section className="mt-5 border border-black/10 bg-[#12362c] p-5 text-white md:p-7"><div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-end"><div><label htmlFor="captain-pin" className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">Captain PIN</label><input id="captain-pin" type="password" value={pin} onChange={(event) => setPin(event.target.value)} placeholder={payload.storageMode === "preview" ? "preview" : "Enter scoring PIN"} className="mt-2 w-full max-w-md border border-white/15 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30" />{message ? <p className="mt-3 text-sm text-white/70">{message}</p> : null}</div><div className="flex flex-wrap gap-2"><button type="button" disabled={saving || errors.length > 0} onClick={() => void save()} className="bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-black disabled:opacity-35">{saving ? "Saving…" : "Lock teams + pairings"}</button><button type="button" disabled={saving} onClick={() => void resetScores()} className="border border-rose-300/35 px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-rose-100">Reset all scores</button></div></div></section>
+      <p className="mt-3 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-black/35">Unfinished setup is backed up automatically on this device.</p>
     </main>
   );
 }

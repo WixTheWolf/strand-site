@@ -136,6 +136,14 @@ export const FORMAT_RULES: Record<LiveFormat, { label: string; allowanceLabel: s
 
 export const TOTAL_TOURNAMENT_POINTS = 75;
 export const POINTS_TO_WIN = 38;
+export const DRAFT_TEAM_TRANSFER_KEY = "strand-2026-draft-team-transfer-v1";
+
+export interface DraftTeamTransfer {
+  version: 1;
+  capturedAt: string;
+  wixPlayerIds: string[];
+  jbonePlayerIds: string[];
+}
 
 function byIndex(a: LivePlayer, b: LivePlayer) {
   return a.index - b.index || a.name.localeCompare(b.name);
