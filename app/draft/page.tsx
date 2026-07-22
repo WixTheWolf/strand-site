@@ -2,8 +2,8 @@ import DraftBoard from "./draft-board";
 import DraftHeader from "../components/draft-header";
 import { Countdown } from "../components/fx";
 
-// Draft night: Thursday, July 23 at 5:00 PM Pacific — J-BONE won the flip
-const DRAFT_AT = new Date("2026-07-23T17:00:00-07:00").getTime();
+// Draft night: Thursday, July 23 at 6:00 PM Pacific — J-BONE won the flip
+const DRAFT_AT = new Date("2026-07-23T18:00:00-07:00").getTime();
 
 export const metadata = {
   title: "Strand War Room | Captain WIX",
@@ -27,7 +27,7 @@ export default function DraftPage() {
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">Draft night</div>
             <div className="mt-1 text-sm font-medium uppercase tracking-[0.14em]">
-              Thursday, July 23 · 5:00 PM Pacific — J-BONE is on the clock first
+              Thursday, July 23 · 6:00 PM Pacific — J-BONE is on the clock first
             </div>
           </div>
           <Countdown
