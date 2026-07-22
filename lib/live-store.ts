@@ -1,5 +1,7 @@
 import "server-only";
 
+import { Redis } from "@upstash/redis";
+
 import {
   createInitialTournamentConfig,
   type MatchScore,
@@ -24,30 +26,20 @@ function memoryStore(): MemoryStore {
 }
 
 function redisCredentials() {
-  // Native Upstash installations use UPSTASH_* while older Vercel KV and
-  // some Marketplace connections inject KV_REST_API_*. Accept both so the
-  // tournament store can be connected without renaming provider secrets.
   const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
-  return url && token ? { url: url.replace(/\/$/, ""), token } : null;
+  return url && token ? { url, token } : null;
 }
 
-async function redisCommand<T>(command: (string | number)[]): Promise<T> {
-  const credentials = redisCredentials();
-  if (!credentials) throw new Error("Shared live scoring storage is not configured.");
-  const response = await fetch(credentials.url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${credentials.token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(command),
-    cache: "no-store",
+let sharedRedis: Redis | undefined;
+
+function redis() {
+  if (!redisCredentials()) throw new Error("Shared live scoring storage is not configured.");
+  sharedRedis ??= Redis.fromEnv({
+    automaticDeserialization: false,
+    readYourWrites: true,
   });
-  if (!response.ok) throw new Error(`Live scoring storage returned ${response.status}.`);
-  const payload = await response.json() as { result?: T; error?: string };
-  if (payload.error) throw new Error(payload.error);
-  return payload.result as T;
+  return sharedRedis;
 }
 
 function parseJson<T>(value: string | null): T | null {
@@ -69,10 +61,10 @@ export async function getLiveConfig(): Promise<TournamentConfig> {
     if (!store.config) store.config = createInitialTournamentConfig();
     return store.config;
   }
-  const stored = parseJson<TournamentConfig>(await redisCommand<string | null>(["GET", CONFIG_KEY]));
+  const stored = parseJson<TournamentConfig>(await redis().get<string>(CONFIG_KEY));
   if (stored) return stored;
   const initial = createInitialTournamentConfig();
-  await redisCommand(["SET", CONFIG_KEY, JSON.stringify(initial)]);
+  await redis().set(CONFIG_KEY, JSON.stringify(initial));
   return initial;
 }
 
@@ -81,7 +73,7 @@ export async function setLiveConfig(config: TournamentConfig) {
     memoryStore().config = config;
     return;
   }
-  await redisCommand(["SET", CONFIG_KEY, JSON.stringify(config)]);
+  await redis().set(CONFIG_KEY, JSON.stringify(config));
 }
 
 export async function getLiveScores(config: TournamentConfig): Promise<Record<string, MatchScore>> {
@@ -90,7 +82,7 @@ export async function getLiveScores(config: TournamentConfig): Promise<Record<st
     const current = memoryStore().scores;
     return Object.fromEntries(matchIds.filter((id) => current[id]).map((id) => [id, current[id]]));
   }
-  const values = await redisCommand<(string | null)[]>(["MGET", ...matchIds.map((id) => `${SCORE_PREFIX}${id}`)]);
+  const values = await redis().mget<(string | null)[]>(...matchIds.map((id) => `${SCORE_PREFIX}${id}`));
   return Object.fromEntries(matchIds.flatMap((id, index) => {
     const score = parseJson<MatchScore>(values[index]);
     return score ? [[id, score]] : [];
@@ -99,7 +91,7 @@ export async function getLiveScores(config: TournamentConfig): Promise<Record<st
 
 export async function getMatchScore(matchId: string): Promise<MatchScore> {
   if (!redisCredentials()) return memoryStore().scores[matchId] ?? { matchId, holes: {} };
-  return parseJson<MatchScore>(await redisCommand<string | null>(["GET", `${SCORE_PREFIX}${matchId}`])) ?? { matchId, holes: {} };
+  return parseJson<MatchScore>(await redis().get<string>(`${SCORE_PREFIX}${matchId}`)) ?? { matchId, holes: {} };
 }
 
 export async function setMatchScore(score: MatchScore) {
@@ -107,7 +99,7 @@ export async function setMatchScore(score: MatchScore) {
     memoryStore().scores[score.matchId] = score;
     return;
   }
-  await redisCommand(["SET", `${SCORE_PREFIX}${score.matchId}`, JSON.stringify(score)]);
+  await redis().set(`${SCORE_PREFIX}${score.matchId}`, JSON.stringify(score));
 }
 
 export async function resetLiveScores(config: TournamentConfig) {
@@ -116,5 +108,5 @@ export async function resetLiveScores(config: TournamentConfig) {
     memoryStore().scores = {};
     return;
   }
-  if (keys.length) await redisCommand(["DEL", ...keys]);
+  if (keys.length) await redis().del(...keys);
 }
