@@ -73,6 +73,12 @@ function rate(p: PlayerDraftStats): Rated {
   else if (rec && rec.appearances > 0)
     tags.push({ icon: "🎒", label: `0–${rec.losses} strand`, tone: "cold" });
   else tags.push({ icon: "🆕", label: "strand rookie", tone: "warn" });
+  if (rec?.championshipYears.length)
+    tags.push({
+      icon: "📅",
+      label: rec.championshipYears.map((year) => `'${String(year).slice(-2)}`).join(" · "),
+      tone: "ceiling",
+    });
   if (rawIndex > HANDICAP_CAP)
     tags.push({ icon: "🧢", label: `plays as ${HANDICAP_CAP} (−${capForfeit.toFixed(1)} net)`, tone: "warn" });
   if ((p.formDelta ?? 0) >= 2) tags.push({ icon: "🔥", label: `${(p.formDelta ?? 0).toFixed(1)} below idx`, tone: "hot" });

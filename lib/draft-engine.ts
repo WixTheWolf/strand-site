@@ -403,8 +403,9 @@ export function buildRationale(player: PlayerDraftStats): string {
   }
 
   const rec = player.strandRecord;
-  if (rec && rec.wins >= 2) parts.push(`${rec.wins}× Strand champ (${rec.wins}–${rec.losses})`);
-  else if (rec && rec.wins === 1) parts.push(`Strand champ (${rec.wins}–${rec.losses})`);
+  const titleYears = rec?.championshipYears.join(", ");
+  if (rec && rec.wins >= 2) parts.push(`${rec.wins}× Strand champ (${titleYears}; ${rec.wins}–${rec.losses})`);
+  else if (rec && rec.wins === 1) parts.push(`Strand champ (${titleYears}; ${rec.wins}–${rec.losses})`);
   else if (rec && rec.appearances > 0) parts.push(`still hunting a title (0–${rec.losses})`);
   else parts.push("Strand rookie");
   if (player.tags.includes("captain")) parts.push("proven captain");
@@ -483,6 +484,8 @@ export function buildPlayerStats(
           losses: record.losses,
           appearances: record.appearances,
           winPct: record.winPct,
+          championshipYears: record.championshipYears,
+          appearanceYears: record.appearanceYears,
         }
       : undefined,
     dataSource: ghinLiveIndex !== null

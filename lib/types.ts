@@ -125,8 +125,15 @@ export interface PlayerDraftStats extends StrandPlayer {
   /** Most recent posted rounds, newest first (up to 60 live; snapshot may be smaller) */
   recentRounds?: RecentRound[];
   recentRoundsSource?: "ghin" | "grint" | "snapshot" | null;
-  /** Career Strand record from the archive (2018–2025) */
-  strandRecord?: { wins: number; losses: number; appearances: number; winPct: number | null };
+  /** Career Strand record from the archive and captain-verified title ledger (2018–2025) */
+  strandRecord?: {
+    wins: number;
+    losses: number;
+    appearances: number;
+    winPct: number | null;
+    championshipYears: number[];
+    appearanceYears: number[];
+  };
 }
 
 export interface DraftRecommendation {

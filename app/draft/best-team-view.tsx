@@ -441,9 +441,16 @@ export default function BestTeamView() {
                       <td className="px-3 py-3">
                         <div className="font-medium">{recordLabel(player)}</div>
                         {player.strandRecord && player.strandRecord.appearances > 0 && (
-                          <div className="text-xs text-[#111]/45">
-                            {player.strandRecord.appearances} trips · {player.strandRecord.winPct}%
-                          </div>
+                          <>
+                            <div className="text-xs text-[#111]/45">
+                              {player.strandRecord.appearances} trips · {player.strandRecord.winPct}%
+                            </div>
+                            {player.strandRecord.championshipYears.length > 0 && (
+                              <div className="mt-0.5 font-mono text-[10px] text-amber-700/75">
+                                🏆 {player.strandRecord.championshipYears.join(" · ")}
+                              </div>
+                            )}
+                          </>
                         )}
                       </td>
                       <td className="px-3 py-3 text-xs font-semibold uppercase tracking-[0.12em]">{team}</td>
@@ -487,6 +494,15 @@ export default function BestTeamView() {
                               <div className="mt-2 space-y-1 text-sm">
                                 <div>Heat label: {player.heatLabel}</div>
                                 <div>Form delta: {formatNum(player.formDelta)}</div>
+                                <div>
+                                  Strand history: {recordLabel(player)}
+                                  {player.strandRecord ? ` · ${player.strandRecord.appearances} documented trips` : ""}
+                                </div>
+                                <div>
+                                  Championship years: {player.strandRecord?.championshipYears.length
+                                    ? player.strandRecord.championshipYears.join(", ")
+                                    : "none"}
+                                </div>
                                 <div>Rationale: {rationaleMap.get(player.id) ?? "—"}</div>
                               </div>
                             </div>

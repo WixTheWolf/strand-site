@@ -25,7 +25,8 @@ export default function HistorySection() {
               >
                 Fred&apos;s original site
               </a>
-              . Win/loss totals reflect documented team-match appearances.
+              . Appearance records use the documented team rosters; individual
+              title years are reconciled to the captain-verified championship ledger.
             </p>
           </div>
           <Image
@@ -98,8 +99,9 @@ export default function HistorySection() {
                   <thead className="sticky top-0 bg-white text-[10px] uppercase tracking-[0.12em] text-black/35">
                     <tr>
                       <th className="pb-2 font-medium">Player</th>
-                      <th className="pb-2 font-medium">W</th>
-                      <th className="pb-2 font-medium">L</th>
+                      <th className="pb-2 font-medium">Record</th>
+                      <th className="pb-2 font-medium">Trips</th>
+                      <th className="pb-2 font-medium">Championships</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -108,8 +110,11 @@ export default function HistorySection() {
                       .map((rec) => (
                         <tr key={rec.playerId} className="border-t border-black/6">
                           <td className="py-2 font-medium">{rec.name}</td>
-                          <td className="py-2 text-black/55">{rec.wins}</td>
-                          <td className="py-2 text-black/55">{rec.losses}</td>
+                          <td className="py-2 text-black/55">{rec.wins}–{rec.losses}</td>
+                          <td className="py-2 text-black/55">{rec.appearances}</td>
+                          <td className="py-2 font-mono text-xs text-black/55">
+                            {rec.championshipYears.length ? rec.championshipYears.join(" · ") : "—"}
+                          </td>
                         </tr>
                       ))}
                   </tbody>

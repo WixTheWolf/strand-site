@@ -10,6 +10,7 @@ export interface StrandTournament {
   courses: string[];
   winnerRoster: string[];
   loserRoster: string[];
+  otherRoster?: string[];
   summary: string;
   sourceUrl: string;
 }
@@ -223,6 +224,7 @@ export const STRAND_TOURNAMENTS: StrandTournament[] = [
     courses: ["Omni Rancho Las Palmas", "La Quinta Dunes"],
     winnerRoster: ["Drew", "Kevin Gordon"],
     loserRoster: ["Justin Uribe", "Rhett Fahrney"],
+    otherRoster: ["Matt Lowell", "Jordan Brodbeck", "Fred Geisinger", "Eric"],
     summary:
       "Inaugural Strand used a pairing-points format. Drew/Kev led at 49; Lowell/Jordan 46; Fred/Eric 42; Justin/Rhett 38.",
     sourceUrl: "https://www.strandinvitational.life/the-strand/palm-springs-2018",
@@ -281,7 +283,7 @@ const NAME_TO_ID: Record<string, string> = {
   "brian kerns": "brian-kerns",
   kerns: "brian-kerns",
   lowell: "matt-lowell",
-  drew: "drew",
+  drew: "andrew-mager",
   eric: "eric-therrien",
   geoff: "geoff",
   punz: "punz",
@@ -310,8 +312,47 @@ export interface PlayerStrandRecord {
   losses: number;
   appearances: number;
   winPct: number | null;
+  championshipYears: number[];
+  appearanceYears: number[];
   years: { year: number; result: "W" | "L"; team: string }[];
 }
+
+/**
+ * Captain-verified championship ledger supplied from the historical Strand
+ * spreadsheet on 2026-07-23. This is authoritative for individual titles,
+ * including 2019 and 2020 where the legacy site does not list full rosters.
+ */
+export const STRAND_CHAMPIONSHIP_YEARS: Record<string, number[]> = {
+  "andrew-mager": [2018, 2019],
+  "brett-comfort": [],
+  "brian-kerns": [],
+  "fred-geisinger": [2021, 2022, 2023, 2024, 2025],
+  "jack-groot": [],
+  "jason-olson": [2020, 2021, 2022, 2025],
+  "jordan-brodbeck": [2019, 2020, 2021, 2023],
+  "justin-uribe": [2019, 2020, 2022, 2025],
+  "kevin-gordon": [2018, 2020, 2022, 2024],
+  "matt-onorato": [2019, 2020, 2021, 2022, 2023, 2024, 2025],
+  "matt-schroeder": [2023, 2025],
+  "matt-wixted": [2024],
+  "nick-kane": [2023, 2024, 2025],
+  "nick-sprowls": [2021, 2023, 2025],
+  "pat-morse": [2025],
+  "rhett-fahrney": [2019, 2021, 2023],
+  "ryan-darcy": [2024],
+  "sam-blonski": [],
+  "shaun-eipper": [2022],
+  "tim-hummel": [2022, 2023, 2024],
+};
+
+/**
+ * Exact captain corrections for players whose zero-win history cannot be
+ * reconstructed from a champions sheet alone.
+ */
+const VERIFIED_APPEARANCE_YEARS: Record<string, number[]> = {
+  "brett-comfort": [2023, 2024, 2025],
+  "sam-blonski": [2023, 2024, 2025],
+};
 
 export function buildPlayerRecords(players: { id: string; name: string }[]): PlayerStrandRecord[] {
   const records = new Map<string, PlayerStrandRecord>();
@@ -324,6 +365,8 @@ export function buildPlayerRecords(players: { id: string; name: string }[]): Pla
       losses: 0,
       appearances: 0,
       winPct: null,
+      championshipYears: [],
+      appearanceYears: [],
       years: [],
     });
   }
@@ -339,6 +382,10 @@ export function buildPlayerRecords(players: { id: string; name: string }[]): Pla
       if (id) winnerIds.add(id);
     }
     for (const name of event.loserRoster) {
+      const id = rosterNameToId(name);
+      if (id) loserIds.add(id);
+    }
+    for (const name of event.otherRoster ?? []) {
       const id = rosterNameToId(name);
       if (id) loserIds.add(id);
     }
@@ -361,10 +408,47 @@ export function buildPlayerRecords(players: { id: string; name: string }[]): Pla
   }
 
   return [...records.values()]
-    .map((rec) => ({
-      ...rec,
-      winPct: rec.appearances ? Math.round((rec.wins / rec.appearances) * 100) : null,
-    }))
+    .map((rec) => {
+      const championshipYears = STRAND_CHAMPIONSHIP_YEARS[rec.playerId] ?? [];
+      const verifiedAppearances = VERIFIED_APPEARANCE_YEARS[rec.playerId];
+
+      if (verifiedAppearances) {
+        rec.years = verifiedAppearances.map((year) => ({
+          year,
+          result: championshipYears.includes(year) ? "W" as const : "L" as const,
+          team: "Captain-verified record",
+        }));
+      }
+
+      for (const year of championshipYears) {
+        const existing = rec.years.find((entry) => entry.year === year);
+        if (existing) {
+          existing.result = "W";
+          existing.team = "Captain-verified champion";
+        } else {
+          rec.years.push({ year, result: "W", team: "Captain-verified champion" });
+        }
+      }
+
+      const years = [...new Map(
+        rec.years
+          .sort((a, b) => Number(a.result === "W") - Number(b.result === "W"))
+          .map((entry) => [entry.year, entry]),
+      ).values()].sort((a, b) => b.year - a.year);
+      const wins = years.filter((entry) => entry.result === "W").length;
+      const losses = years.length - wins;
+
+      return {
+        ...rec,
+        years,
+        wins,
+        losses,
+        appearances: years.length,
+        championshipYears: [...championshipYears].sort((a, b) => a - b),
+        appearanceYears: years.map((entry) => entry.year).sort((a, b) => a - b),
+        winPct: years.length ? Math.round((wins / years.length) * 100) : null,
+      };
+    })
     .sort((a, b) => b.wins - a.wins || b.appearances - a.appearances);
 }
 
