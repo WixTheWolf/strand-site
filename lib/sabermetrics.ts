@@ -1,4 +1,5 @@
 import { CAPTAIN_IDS, isCaptain, TOTAL_DRAFT_PICKS } from "./players";
+import { officialDraftSide } from "./draft-order";
 import { buildPerformanceProfile, type PlayerPerformanceProfile } from "./player-performance";
 import { playingIndex } from "./tournament";
 import type { PlayerDraftStats, RecentRound } from "./types";
@@ -44,6 +45,8 @@ export interface PlayerSaberMetrics {
   sampleSize: number;
   fullRoundSampleSize: number;
   aggregateSampleSize: number;
+  captainRead: number;
+  captainNote: string;
   evidence: string[];
   performance: PlayerPerformanceProfile;
 }
@@ -99,6 +102,23 @@ export interface DraftProjection {
   mine: PlayerDraftStats[];
   opponent: PlayerDraftStats[];
   remaining: PlayerDraftStats[];
+}
+
+export interface CaptainIntel {
+  rating: -2 | -1 | 0 | 1 | 2;
+  note?: string;
+}
+
+export type CaptainIntelMap = Record<string, CaptainIntel>;
+
+export interface DraftCandidateScenario {
+  metric: PlayerSaberMetrics;
+  wixProbability: number;
+  floorProbability: number;
+  ceilingProbability: number;
+  robustProbability: number;
+  impactVsMedian: number;
+  responseCount: number;
 }
 
 const clamp = (value: number, min: number, max: number) =>
@@ -157,7 +177,10 @@ function smoothedPedigree(player: PlayerDraftStats): number {
   return ((record.wins + 1) / (record.appearances + 2)) * 100;
 }
 
-function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
+function preliminaryMetrics(
+  player: PlayerDraftStats,
+  captainIntel?: CaptainIntel,
+): PlayerSaberMetrics {
   const index = playingIndex(player.indexNum ?? player.estimatedIndex ?? 22);
   const rawIndex = player.eventIndexCapped
     ? player.manualIndex ?? player.indexNum ?? player.estimatedIndex ?? 22
@@ -217,6 +240,12 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
   // guardrail, not a claim that the player is worse.
   const driverBonus = player.tags.includes("driver-reliable") ? 2.4 : 0;
   const lowSamplePenalty = player.tags.includes("low-sample") ? 3.2 : 0;
+  // Captain reads capture information the score feeds cannot see: health,
+  // confidence, recent unposted play, partner chemistry and competitive feel.
+  // The adjustment is intentionally bounded so a hunch can break a close tie,
+  // never erase the measured scoring record.
+  const captainRead = clamp(captainIntel?.rating ?? 0, -2, 2);
+  const captainNote = captainIntel?.note?.trim() ?? "";
 
   // Gamble's wide, firm corridors reward ceiling and ball striking, but the
   // architect's preferred ground routes make touch and rollout control real
@@ -241,22 +270,22 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
 
   const format: Record<StrandFormat, number> = {
     fourball: clamp(
-      skill * 0.23 + consistency * 0.24 + scoringControl * 0.14 + ballStriking * 0.13 + gambleFit * 0.1 + confidence * 0.08 + pressure * 0.04 + pedigree * 0.04 + driverBonus * 0.3 - lowSamplePenalty,
+      skill * 0.23 + consistency * 0.24 + scoringControl * 0.14 + ballStriking * 0.13 + gambleFit * 0.1 + confidence * 0.08 + pressure * 0.04 + pedigree * 0.04 + driverBonus * 0.3 - lowSamplePenalty + captainRead * 1.0,
       10,
       98,
     ),
     shamble: clamp(
-      netForm * 0.2 + ceiling * 0.17 + scoringControl * 0.15 + ballStriking * 0.12 + consistency * 0.12 + scarecrowFit * 0.1 + skill * 0.07 + confidence * 0.07 + driverBonus - lowSamplePenalty * 0.6,
+      netForm * 0.2 + ceiling * 0.17 + scoringControl * 0.15 + ballStriking * 0.12 + consistency * 0.12 + scarecrowFit * 0.1 + skill * 0.07 + confidence * 0.07 + driverBonus - lowSamplePenalty * 0.6 + captainRead * 1.25,
       10,
       98,
     ),
     singles: clamp(
-      netForm * 0.28 + consistency * 0.19 + scoringControl * 0.14 + scarecrowFit * 0.12 + pressure * 0.09 + putting * 0.06 + endurance * 0.05 + confidence * 0.04 + pedigree * 0.03 + driverBonus * 0.2 - lowSamplePenalty * 1.15,
+      netForm * 0.28 + consistency * 0.19 + scoringControl * 0.14 + scarecrowFit * 0.12 + pressure * 0.09 + putting * 0.06 + endurance * 0.05 + confidence * 0.04 + pedigree * 0.03 + driverBonus * 0.2 - lowSamplePenalty * 1.15 + captainRead * 1.5,
       10,
       98,
     ),
     scramble: clamp(
-      skill * 0.22 + ceiling * 0.22 + ballStriking * 0.17 + scoringControl * 0.13 + gambleFit * 0.1 + putting * 0.06 + consistency * 0.05 + confidence * 0.05 + driverBonus - lowSamplePenalty * 0.55,
+      skill * 0.22 + ceiling * 0.22 + ballStriking * 0.17 + scoringControl * 0.13 + gambleFit * 0.1 + putting * 0.06 + consistency * 0.05 + confidence * 0.05 + driverBonus - lowSamplePenalty * 0.55 + captainRead * 1.15,
       10,
       98,
     ),
@@ -293,6 +322,13 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
     evidence.push(`Garmin last ${scoring.sampleSize}: ${averages}`);
     evidence.push("aggregate only — course context unavailable");
   }
+  if (captainRead !== 0 || captainNote) {
+    evidence.push(
+      captainRead === 0
+        ? `captain note: ${captainNote}`
+        : `captain read ${captainRead > 0 ? "+" : ""}${captainRead}${captainNote ? `: ${captainNote}` : ""}`,
+    );
+  }
 
   return {
     player,
@@ -319,13 +355,18 @@ function preliminaryMetrics(player: PlayerDraftStats): PlayerSaberMetrics {
     sampleSize: diffs.all.length,
     fullRoundSampleSize: diffs.full.length,
     aggregateSampleSize,
+    captainRead,
+    captainNote,
     evidence,
     performance,
   };
 }
 
-export function buildSaberBoard(players: PlayerDraftStats[]): PlayerSaberMetrics[] {
-  const board = players.map(preliminaryMetrics);
+export function buildSaberBoard(
+  players: PlayerDraftStats[],
+  captainIntel: CaptainIntelMap = {},
+): PlayerSaberMetrics[] {
+  const board = players.map((player) => preliminaryMetrics(player, captainIntel[player.id]));
   const draftable = board.filter((metric) => !isCaptain(metric.player.id));
   const fieldAverage = average(draftable.map((metric) => metric.tournamentScore));
 
@@ -606,26 +647,19 @@ function bestRosterFit(
   return best;
 }
 
-function ownerForPick(pickNumber: number, wixPicksFirst: boolean): DraftSide {
-  const first: DraftSide = wixPicksFirst ? "mine" : "opponent";
-  const second: DraftSide = wixPicksFirst ? "opponent" : "mine";
-  return pickNumber % 2 === 1 ? first : second;
-}
-
 export function currentDraftOwner(
   assignments: DraftAssignment[],
-  wixPicksFirst = false,
 ): DraftSide | null {
   if (assignments.length >= TOTAL_DRAFT_PICKS) return null;
-  return ownerForPick(assignments.length + 1, wixPicksFirst);
+  return officialDraftSide(assignments.length + 1);
 }
 
 export function completeDraft(
   players: PlayerDraftStats[],
   assignments: DraftAssignment[],
-  wixPicksFirst = false,
+  board = buildSaberBoard(players),
 ): DraftProjection {
-  const metricMap = new Map(buildSaberBoard(players).map((metric) => [metric.player.id, metric]));
+  const metricMap = new Map(board.map((metric) => [metric.player.id, metric]));
   const mineCaptain = players.find((player) => player.id === CAPTAIN_IDS[0]);
   const opponentCaptain = players.find((player) => player.id === CAPTAIN_IDS[1]);
   const assignedIds = new Set(assignments.map((assignment) => assignment.playerId));
@@ -648,7 +682,7 @@ export function completeDraft(
   );
 
   for (let pick = assignments.length + 1; pick <= TOTAL_DRAFT_PICKS && remaining.length; pick += 1) {
-    const owner = ownerForPick(pick, wixPicksFirst);
+    const owner = officialDraftSide(pick);
     const roster = owner === "mine" ? mine : opponent;
     const candidate = bestRosterFit(roster, remaining, metricMap);
     roster.push(candidate);
@@ -656,6 +690,90 @@ export function completeDraft(
   }
 
   return { mine, opponent, remaining };
+}
+
+function probabilityAfterAssignments(
+  players: PlayerDraftStats[],
+  board: PlayerSaberMetrics[],
+  assignments: DraftAssignment[],
+): number {
+  const completed = completeDraft(players, assignments, board);
+  return projectTournament(
+    rosterMetrics(completed.mine, board),
+    rosterMetrics(completed.opponent, board),
+  ).analyticWinProbability;
+}
+
+/**
+ * Evaluate every legal player at the current pick.
+ *
+ * On WIX turns, each candidate is tested against every possible immediate
+ * J-BONE response. The displayed robust probability blends the model's most
+ * likely completion with the worst response so the recommendation does not
+ * depend on Justin cooperating.
+ */
+export function rankDraftCandidates(
+  players: PlayerDraftStats[],
+  board: PlayerSaberMetrics[],
+  assignments: DraftAssignment[],
+  owner = currentDraftOwner(assignments),
+): DraftCandidateScenario[] {
+  if (!owner) return [];
+  const assigned = new Set(assignments.map((assignment) => assignment.playerId));
+  const candidates = board.filter(
+    (metric) => !isCaptain(metric.player.id) && !assigned.has(metric.player.id),
+  );
+
+  const raw = candidates.map((metric): DraftCandidateScenario => {
+    const forced = [...assignments, { playerId: metric.player.id, side: owner }];
+    const wixProbability = probabilityAfterAssignments(players, board, forced);
+    let outcomes = [wixProbability];
+
+    if (owner === "mine" && forced.length < TOTAL_DRAFT_PICKS) {
+      const remainingResponses = candidates.filter(
+        (candidate) => candidate.player.id !== metric.player.id,
+      );
+      outcomes = remainingResponses.map((response) =>
+        probabilityAfterAssignments(players, board, [
+          ...forced,
+          { playerId: response.player.id, side: "opponent" },
+        ]),
+      );
+    }
+
+    const floorProbability = Math.min(...outcomes);
+    const ceilingProbability = Math.max(...outcomes);
+    const robustProbability = wixProbability * 0.65 + floorProbability * 0.35;
+
+    return {
+      metric,
+      wixProbability,
+      floorProbability,
+      ceilingProbability,
+      robustProbability,
+      impactVsMedian: 0,
+      responseCount: outcomes.length,
+    };
+  });
+
+  const comparisonValues = raw
+    .map((scenario) => owner === "mine" ? scenario.robustProbability : scenario.wixProbability)
+    .sort((a, b) => a - b);
+  const median = comparisonValues[Math.floor(comparisonValues.length / 2)] ?? 0.5;
+
+  return raw
+    .map((scenario) => {
+      const comparison = owner === "mine" ? scenario.robustProbability : scenario.wixProbability;
+      return {
+        ...scenario,
+        impactVsMedian: owner === "mine" ? comparison - median : median - comparison,
+      };
+    })
+    .sort((a, b) =>
+      owner === "mine"
+        ? b.robustProbability - a.robustProbability
+        : a.wixProbability - b.wixProbability,
+    );
 }
 
 export function rosterMetrics(

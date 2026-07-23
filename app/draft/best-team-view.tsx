@@ -1,10 +1,22 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
-import { getOptimalTeamWithPicks, simulateOptimalDraft, summarizeTeam } from "@/lib/draft-engine";
+import { summarizeTeam } from "@/lib/draft-engine";
+import {
+  buildSaberBoard,
+  completeDraft,
+  rosterMetrics,
+  simulateTournament,
+} from "@/lib/sabermetrics";
+import {
+  CAPTAIN_INTEL_STORAGE_KEY,
+  JBONE_PICK_NUMBERS,
+  WIX_PICK_NUMBERS,
+} from "@/lib/draft-order";
 import { MY_CAPTAIN, OPPONENT_CAPTAIN, DRAFT_PICKS_PER_CAPTAIN } from "@/lib/mock-draft";
 import { STRAND_RULES } from "@/lib/tournament";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
+import type { CaptainIntelMap } from "@/lib/sabermetrics";
 
 interface DraftPayload {
   updatedAt: string;
@@ -162,12 +174,11 @@ export default function BestTeamView() {
   const [data, setData] = useState<DraftPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Draft-night reality: Justin won the flip, so J-BONE leads off by default
-  const [firstPick, setFirstPick] = useState<"wix" | "jbone">("jbone");
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("draftRank");
   const [sortAsc, setSortAsc] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [captainIntel, setCaptainIntel] = useState<CaptainIntelMap>({});
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -184,24 +195,57 @@ export default function BestTeamView() {
   }, []);
 
   useEffect(() => {
+    // Initial client-side API hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [loadData]);
 
-  const wixFirst = firstPick === "wix";
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(CAPTAIN_INTEL_STORAGE_KEY);
+      if (stored) {
+        // Apply the same bounded qualitative layer used by the live War Room.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCaptainIntel(JSON.parse(stored) as CaptainIntelMap);
+      }
+    } catch {
+      // Optional local context; fall back to the measured data-only model.
+    }
+  }, []);
 
-  const simulation = useMemo(
-    () => (data ? simulateOptimalDraft(data.players, wixFirst) : null),
-    [data, wixFirst],
+  const board = useMemo(
+    () => (data ? buildSaberBoard(data.players, captainIntel) : []),
+    [data, captainIntel],
   );
-
+  const projection = useMemo(
+    () => (data ? completeDraft(data.players, [], board) : null),
+    [data, board],
+  );
+  const metricMap = useMemo(
+    () => new Map(board.map((metric, index) => [metric.player.id, { metric, rank: index + 1 }])),
+    [board],
+  );
   const wixTeam = useMemo(
-    () => (data && simulation ? getOptimalTeamWithPicks(data.players, data.recommendations, "A", simulation, wixFirst) : []),
-    [data, simulation, wixFirst],
+    () =>
+      (projection?.mine ?? []).map((player, index) => ({
+        overallPick: index === 0 ? 0 : WIX_PICK_NUMBERS[index - 1] ?? index * 2,
+        player,
+        rationale:
+          metricMap.get(player.id)?.metric.evidence.join(" • ") ??
+          "Captain — pre-assigned to your team",
+      })),
+    [projection, metricMap],
   );
-
   const justinTeam = useMemo(
-    () => (data && simulation ? getOptimalTeamWithPicks(data.players, data.recommendations, "B", simulation, wixFirst) : []),
-    [data, simulation, wixFirst],
+    () =>
+      (projection?.opponent ?? []).map((player, index) => ({
+        overallPick: index === 0 ? 0 : JBONE_PICK_NUMBERS[index - 1] ?? index * 2 - 1,
+        player,
+        rationale:
+          metricMap.get(player.id)?.metric.evidence.join(" • ") ??
+          "Captain — pre-assigned to opponent",
+      })),
+    [projection, metricMap],
   );
 
   const wixSummary = useMemo(() => summarizeTeam(wixTeam.map((p) => p.player)), [wixTeam]);
@@ -210,15 +254,28 @@ export default function BestTeamView() {
   const wixIds = useMemo(() => new Set(wixTeam.map((p) => p.player.id)), [wixTeam]);
   const justinIds = useMemo(() => new Set(justinTeam.map((p) => p.player.id)), [justinTeam]);
 
+  const tournamentSimulation = useMemo(
+    () =>
+      simulateTournament(
+        rosterMetrics(projection?.mine ?? [], board),
+        rosterMetrics(projection?.opponent ?? [], board),
+      ),
+    [projection, board],
+  );
+
   const rationaleMap = useMemo(
-    () => new Map(data?.recommendations.map((rec) => [rec.playerId, rec.rationale]) ?? []),
-    [data],
+    () => new Map(board.map((metric) => [metric.player.id, metric.evidence.join(" • ")])),
+    [board],
   );
 
   const filteredPlayers = useMemo(() => {
     if (!data) return [];
     const q = search.trim().toLowerCase();
-    let list = data.players;
+    let list = data.players.map((player) => ({
+      ...player,
+      draftRank: metricMap.get(player.id)?.rank ?? player.draftRank,
+      draftScore: metricMap.get(player.id)?.metric.draftGrade ?? player.draftScore,
+    }));
     if (q) {
       list = list.filter(
         (p) =>
@@ -244,7 +301,7 @@ export default function BestTeamView() {
       const bn = typeof bv === "number" ? bv : 0;
       return sortAsc ? an - bn : bn - an;
     });
-  }, [data, search, sortKey, sortAsc]);
+  }, [data, search, sortKey, sortAsc, metricMap]);
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortAsc((v) => !v);
@@ -286,30 +343,20 @@ export default function BestTeamView() {
           <p className="label">Optimal draft</p>
           <h1 className="section-title mt-3">{MY_CAPTAIN.nickname}&apos;s best team</h1>
           <p className="mt-3 max-w-3xl text-sm text-black/55">
-            {MY_CAPTAIN.nickname} is pre-assigned as captain. This traditional-draft model picks your other{" "}
+            {MY_CAPTAIN.nickname} is pre-assigned as captain. The same Strand Sabr engine used in the
+            live War Room projects your other{" "}
             {DRAFT_PICKS_PER_CAPTAIN} players vs {OPPONENT_CAPTAIN.nickname} using match-play analytics
-            across fourball, shamble, singles, and scramble — including high-handicap net leverage.
+            across fourball, shamble, singles, and scramble. The official order is locked: J-BONE odd
+            picks, WIX even picks.
           </p>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[#111]/45">
-            Updated {new Date(data.updatedAt).toLocaleString()} • {data.source}
+            Updated {new Date(data.updatedAt).toLocaleString()} • {data.source} •{" "}
+            {Object.values(captainIntel).filter((item) => item.rating !== 0 || item.note?.trim()).length} captain reads applied
           </p>
         </div>
-        <div className="flex items-end gap-4">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[11px] uppercase tracking-[0.16em] text-[#111]/45">First pick</span>
-            <div className="flex gap-1.5">
-              {(["jbone", "wix"] as const).map((who) => (
-                <button
-                  key={who}
-                  onClick={() => setFirstPick(who)}
-                  className={`rounded-xl px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
-                    firstPick === who ? "bg-[#111] text-white" : "border border-[#111]/15 bg-white"
-                  }`}
-                >
-                  {who === "jbone" ? "J-BONE" : "WIX"}
-                </button>
-              ))}
-            </div>
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-900">
+            Official order locked · J-BONE picks first
           </div>
           <button
             onClick={loadData}
@@ -339,8 +386,8 @@ export default function BestTeamView() {
           <div className="mt-2 text-2xl font-medium">{formatNum(wixSummary.matchValue, 0)}</div>
         </div>
         <div className="rounded-[1.75rem] border border-orange-200 bg-orange-50 p-5 shadow-sm">
-          <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Heating up on roster</div>
-          <div className="mt-2 text-2xl font-medium">{wixSummary.heating}</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-orange-700/70">Projected WIX win</div>
+          <div className="mt-2 text-2xl font-medium">{(tournamentSimulation.winProbability * 100).toFixed(0)}%</div>
         </div>
         <div className="rounded-[1.75rem] border border-[#111]/10 bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-[0.22em] text-[#111]/50">Justin&apos;s avg index</div>
@@ -351,8 +398,7 @@ export default function BestTeamView() {
       <section className="mb-12">
         <h2 className="text-xl font-medium">Your roster — {MY_CAPTAIN.nickname} + 9 picks</h2>
         <p className="mt-1 text-sm text-[#111]/65">
-          Traditional order, {MY_CAPTAIN.nickname} picking {wixFirst ? "first" : "second"}: picks{" "}
-          {wixFirst ? "#1, 3, 5, 7, 9, 11, 13, 15, 17" : "#2, 4, 6, 8, 10, 12, 14, 16, 18"} (captain locked)
+          Straight alternating order: WIX owns picks #2, 4, 6, 8, 10, 12, 14, 16 and 18.
         </p>
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {wixTeam.map((pick) => (
@@ -364,7 +410,7 @@ export default function BestTeamView() {
       <section className="mb-12">
         <h2 className="text-xl font-medium">{OPPONENT_CAPTAIN.nickname}&apos;s counter-roster</h2>
         <p className="mt-1 text-sm text-[#111]/65">
-          What Justin gets if he drafts optimally picking {wixFirst ? "second" : "first"}.
+          What Justin gets if he drafts optimally from picks #1, 3, 5, 7, 9, 11, 13, 15 and 17.
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {justinTeam.map((pick) => (

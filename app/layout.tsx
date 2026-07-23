@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "The Strand Invitational | Gamble Sands 2026",
   description: "The Strand Invitational tournament site — live scoring, schedule, players, and draft lab.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#183d33",
 };
 
 export default function RootLayout({

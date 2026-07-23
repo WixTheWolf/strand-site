@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { buildPlayerStats, getOptimalDraftOrder, getOptimalTeam, rankPlayers, simulateOptimalDraft } from "@/lib/draft-engine";
+import { buildPlayerStats, rankPlayers } from "@/lib/draft-engine";
+import { buildSaberBoard, completeDraft } from "@/lib/sabermetrics";
 import { fetchGhinScores } from "@/lib/ghin";
 import { fetchGrintHandicap, fetchGrintScores } from "@/lib/grint";
 import { resolvePlayerGrint } from "@/lib/grint-resolve";
 import { withPrivateDataLink } from "@/lib/player-data-links";
 import { PLAYER_DATA_SNAPSHOT, PLAYER_DATA_SNAPSHOT_CAPTURED_AT } from "@/lib/player-data-snapshot";
-import { ERIC_THERRIEN, STRAND_PLAYERS } from "@/lib/players";
+import { ERIC_THERRIEN, isCaptain, STRAND_PLAYERS } from "@/lib/players";
 import type { PlayerDraftStats, RecentRound } from "@/lib/types";
 
 /**
@@ -96,10 +97,18 @@ export async function GET() {
   });
 
   const ranked = rankPlayers(stats);
-  const recommendations = getOptimalDraftOrder(stats);
-  const simulation = simulateOptimalDraft(stats, true);
-  const teamA = getOptimalTeam(stats, "A", simulation);
-  const teamB = getOptimalTeam(stats, "B", simulation);
+  const saberBoard = buildSaberBoard(ranked);
+  const recommendations = saberBoard
+    .filter((metric) => !isCaptain(metric.player.id))
+    .map((metric, index) => ({
+      pick: index + 1,
+      playerId: metric.player.id,
+      rationale: metric.evidence.join(" • "),
+    }));
+  // Official 2026 order: J-BONE has every odd pick; WIX has every even pick.
+  const projection = completeDraft(ranked, [], saberBoard);
+  const teamA = projection.mine;
+  const teamB = projection.opponent;
 
   let blazeHandicap = null;
   try {

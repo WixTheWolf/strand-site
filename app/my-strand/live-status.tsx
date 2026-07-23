@@ -36,6 +36,8 @@ export default function MyStrandLiveStatus() {
   }, []);
 
   useEffect(() => {
+    // Initial client-side API hydration, followed by the live polling subscription.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
     const timer = window.setInterval(() => void load(), 15_000);
     return () => window.clearInterval(timer);

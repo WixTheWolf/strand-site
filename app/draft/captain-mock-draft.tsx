@@ -6,6 +6,7 @@ import { Confetti } from "@/app/components/fx";
 import { getPlayerPhoto } from "@/lib/player-assets";
 import { TEAM_SIZE } from "@/lib/players";
 import { summarizeTeam } from "@/lib/draft-engine";
+import { CAPTAIN_INTEL_STORAGE_KEY } from "@/lib/draft-order";
 import {
   createScenario,
   deleteScenario,
@@ -27,6 +28,7 @@ import {
   type MockDraftScenario,
 } from "@/lib/mock-draft";
 import type { PlayerDraftStats } from "@/lib/types";
+import type { CaptainIntelMap } from "@/lib/sabermetrics";
 import DraftAnalytics from "./draft-analytics";
 import { PlayerSkillGraph } from "./player-skill-graph";
 import RecentForm from "./recent-form";
@@ -47,10 +49,24 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
   const [newName, setNewName] = useState("");
   const [search, setSearch] = useState("");
   const [celebrate, setCelebrate] = useState(false);
+  const [captainIntel, setCaptainIntel] = useState<CaptainIntelMap>({});
   const celebrateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
     if (celebrateTimer.current) clearTimeout(celebrateTimer.current);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(CAPTAIN_INTEL_STORAGE_KEY);
+      if (stored) {
+        // Restore the same bounded captain reads used by the live War Room.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCaptainIntel(JSON.parse(stored) as CaptainIntelMap);
+      }
+    } catch {
+      // Optional local captain context; the data-only model remains available.
+    }
   }, []);
 
   const playerMap = useMemo(() => new Map(players.map((p) => [p.id, p])), [players]);
@@ -97,7 +113,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
     if (!active) return;
     const pickNumber = getNextPickNumber(active.picks);
     if (pickNumber > TOTAL_DRAFT_PICKS) return;
-    const side = forcedSide ?? getCurrentOwner(active.picks, active.iPickFirst);
+    const side = forcedSide ?? getCurrentOwner(active.picks);
     if (!side) return;
     if (getDraftedIds(active.picks).has(playerId)) return;
 
@@ -125,12 +141,12 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
   const autoJustin = () => {
     if (!active) return;
-    const owner = getCurrentOwner(active.picks, active.iPickFirst);
+    const owner = getCurrentOwner(active.picks);
     if (owner !== "justin") return;
     const available = getAvailablePlayers(players, active.picks);
     const suggestion = suggestJustinPick(
       available,
-      getPicksForSide(active.picks, "mine"),
+      active.picks,
       players,
     );
     if (suggestion) makePick(suggestion.id, "justin");
@@ -146,7 +162,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
     );
   });
 
-  const currentOwner = active ? getCurrentOwner(active.picks, active.iPickFirst) : null;
+  const currentOwner = active ? getCurrentOwner(active.picks) : null;
   const nextPick = active ? getNextPickNumber(active.picks) : 1;
   const draftComplete = active ? active.picks.length >= TOTAL_DRAFT_PICKS : false;
 
@@ -173,9 +189,9 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             <h2 className="mt-1 text-xl font-medium">Mock draft scenarios</h2>
             <p className="mt-2 max-w-2xl text-sm text-[#111]/70">
               You&apos;re <strong>{MY_CAPTAIN.nickname}</strong> — already on your team. Draft{" "}
-              <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in a traditional draft vs{" "}
-              <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned). Live captain draft is ~one
-              month before The Strand; Thursday night is <strong>The Matchmaker</strong> for pairings.
+              <strong>{DRAFT_PICKS_PER_CAPTAIN} players</strong> in the official straight alternating draft vs{" "}
+              <strong>{OPPONENT_CAPTAIN.nickname}</strong> (also pre-assigned). J-BONE owns every odd
+              pick; WIX owns every even pick. Thursday night at Gamble Sands is <strong>The Matchmaker</strong> for pairings.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -232,15 +248,9 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
 
         {active && (
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={active.iPickFirst}
-                onChange={(e) => persist({ ...active, iPickFirst: e.target.checked, picks: [] })}
-                disabled={active.picks.length > 0}
-              />
-              I pick first every round
-            </label>
+            <div className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-900">
+              Official order locked · J-BONE 1, 3, 5… · WIX 2, 4, 6…
+            </div>
             <button onClick={undoPick} className="rounded-xl border px-3 py-1.5 text-xs uppercase tracking-[0.12em]">
               Undo pick
             </button>
@@ -281,7 +291,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
                     ? `Your pick — ${MY_CAPTAIN.name}`
                     : `Justin\u2019s pick — ${OPPONENT_CAPTAIN.name}`}
                 </div>
-                <div className="mt-2 text-sm opacity-80">{formatPickLabel(nextPick, active.iPickFirst)}</div>
+                <div className="mt-2 text-sm opacity-80">{formatPickLabel(nextPick)}</div>
                 {currentOwner === "justin" && (
                   <button
                     onClick={autoJustin}
@@ -302,7 +312,7 @@ export default function CaptainMockDraft({ players }: CaptainMockDraftProps) {
             currentOwner={currentOwner}
             draftComplete={draftComplete}
             picks={active.picks}
-            iPickFirst={active.iPickFirst}
+            captainIntel={captainIntel}
           />
 
           <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">

@@ -6,7 +6,6 @@ import { summarizeTeam } from "@/lib/draft-engine";
 import type { DraftRecommendation, PlayerDraftStats } from "@/lib/types";
 import CaptainMockDraft from "./captain-mock-draft";
 import CaptainWarRoom from "./captain-war-room";
-import DraftAdvisor from "./draft-advisor";
 
 interface DraftPayload {
   updatedAt: string;
@@ -30,7 +29,7 @@ interface DraftPayload {
   };
 }
 
-type View = "war-room" | "advisor" | "captain" | "sandbox";
+type View = "war-room" | "captain" | "sandbox";
 
 function formatIndex(player: PlayerDraftStats) {
   if (player.indexNum !== null) return `${player.indexNum.toFixed(1)}${player.eventIndexCapped ? "*" : ""}`;
@@ -64,6 +63,8 @@ export default function DraftBoard() {
   }, []);
 
   useEffect(() => {
+    // Initial client-side API hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, [loadData]);
 
@@ -116,10 +117,9 @@ export default function DraftBoard() {
   }
 
   const views: { key: View; label: string; hint: string }[] = [
-    { key: "war-room", label: "War Room", hint: "Sabermetrics and win simulation" },
-    { key: "advisor", label: "Live Advisor", hint: "Original draft-day board" },
-    { key: "captain", label: "Mock Draft", hint: "Practice vs J-BONE" },
-    { key: "sandbox", label: "Sandbox", hint: "Free-build teams" },
+    { key: "war-room", label: "Live War Room", hint: "Official draft tracker, sabermetrics and win simulation" },
+    { key: "captain", label: "Mock Draft", hint: "Practice the official order vs J-BONE" },
+    { key: "sandbox", label: "Team Sandbox", hint: "Explore any roster combination" },
   ];
 
   return (
@@ -129,8 +129,8 @@ export default function DraftBoard() {
           <p className="label">Draft Lab</p>
           <h1 className="section-title mt-3">Captain prep for Gamble Sands</h1>
           <p className="mt-3 max-w-3xl text-sm text-black/55">
-            Draft against Justin Uribe (J-BONE) with 327 attributable scorecards plus Garmin aggregate evidence,
-            confidence-weighted for the four Strand formats. Lock the real picks as they happen; the board recalculates WIX&apos;s best response instantly.
+            Draft against Justin Uribe (J-BONE) with {data.summary.roundsLoaded} attributable scorecards plus Garmin aggregate evidence,
+            confidence-weighted across all 75 points. The official straight order is locked: J-BONE owns every odd pick and WIX every even pick.
           </p>
         </div>
         <button
@@ -182,8 +182,6 @@ export default function DraftBoard() {
       </div>
 
       {view === "war-room" && <CaptainWarRoom players={data.players} />}
-
-      {view === "advisor" && <DraftAdvisor players={data.players} />}
 
       {view === "captain" && <CaptainMockDraft players={data.players} />}
 

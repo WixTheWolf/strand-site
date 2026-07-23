@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect -- API and localStorage snapshots intentionally hydrate interactive scoring state after mount. */
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";

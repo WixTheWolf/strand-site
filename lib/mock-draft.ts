@@ -5,7 +5,12 @@ import {
   TEAM_SIZE,
   TOTAL_DRAFT_PICKS,
 } from "./players";
-import { computeMatchPlayValue, marginalTeamValue } from "./draft-engine";
+import {
+  buildSaberBoard,
+  rankDraftCandidates,
+  type DraftAssignment,
+} from "./sabermetrics";
+import { officialDraftSide } from "./draft-order";
 import type { PlayerDraftStats } from "./types";
 
 export type DraftSide = "mine" | "justin";
@@ -21,7 +26,6 @@ export interface MockDraftScenario {
   name: string;
   createdAt: string;
   updatedAt: string;
-  iPickFirst: boolean;
   picks: DraftPick[];
   notes: string;
 }
@@ -38,22 +42,21 @@ export const OPPONENT_CAPTAIN = {
   nickname: "J-BONE",
 };
 
-const STORAGE_KEY = "strand-mock-draft-scenarios";
+const STORAGE_KEY = "strand-mock-draft-scenarios-v4";
+const LEGACY_STORAGE_KEY = "strand-mock-draft-scenarios";
 
-/** Traditional (linear) order — the same captain leads off every round */
-export function getPickOwner(pickNumber: number, iPickFirst: boolean): DraftSide {
-  const first = iPickFirst ? "mine" : "justin";
-  const second = iPickFirst ? "justin" : "mine";
-  return pickNumber % 2 === 1 ? first : second;
+/** Official linear order: J-BONE odd picks, WIX even picks. */
+export function getPickOwner(pickNumber: number): DraftSide {
+  return officialDraftSide(pickNumber) === "mine" ? "mine" : "justin";
 }
 
 export function getNextPickNumber(picks: DraftPick[]): number {
   return picks.length + 1;
 }
 
-export function getCurrentOwner(picks: DraftPick[], iPickFirst: boolean): DraftSide | null {
+export function getCurrentOwner(picks: DraftPick[]): DraftSide | null {
   if (picks.length >= TOTAL_DRAFT_PICKS) return null;
-  return getPickOwner(getNextPickNumber(picks), iPickFirst);
+  return getPickOwner(getNextPickNumber(picks));
 }
 
 export function getPicksForSide(picks: DraftPick[], side: DraftSide): DraftPick[] {
@@ -85,53 +88,59 @@ export function getFullRoster(
 
 export function suggestJustinPick(
   available: PlayerDraftStats[],
-  myPicks: DraftPick[],
+  allPicks: DraftPick[],
   allPlayers: PlayerDraftStats[],
 ): PlayerDraftStats | null {
   if (!available.length) return null;
 
-  const justinCaptain = allPlayers.find((player) => player.id === OPPONENT_CAPTAIN.id);
-  const justinBase = justinCaptain ? [justinCaptain] : [];
-  const myTeam = getFullRoster(allPlayers, myPicks, "mine");
-  const myValue = marginalTeamValue(myTeam);
-
-  let best = available[0];
-  let bestScore = -Infinity;
-
-  for (const candidate of available) {
-    const score =
-      marginalTeamValue([...justinBase, candidate]) -
-      myValue * 0.1 +
-      computeMatchPlayValue(candidate) * 0.05;
-    if (score > bestScore) {
-      bestScore = score;
-      best = candidate;
-    }
-  }
-
-  return best;
+  const assignments: DraftAssignment[] = allPicks.map((pick) => ({
+    playerId: pick.playerId,
+    side: pick.side === "mine" ? "mine" : "opponent",
+  }));
+  const board = buildSaberBoard(allPlayers);
+  return rankDraftCandidates(allPlayers, board, assignments, "opponent")[0]?.metric.player ?? available[0];
 }
 
 // Justin won the flip — new scenarios start from draft-night reality (J-BONE picks first)
-export function createScenario(name: string, iPickFirst = false): MockDraftScenario {
+export function createScenario(name: string): MockDraftScenario {
   const now = new Date().toISOString();
   return {
     id: `scenario-${Date.now()}`,
     name,
     createdAt: now,
     updatedAt: now,
-    iPickFirst,
     picks: [],
     notes: "",
+  };
+}
+
+function normalizeScenario(raw: MockDraftScenario & { iPickFirst?: boolean }): MockDraftScenario {
+  const picks = (raw.picks ?? [])
+    .slice(0, TOTAL_DRAFT_PICKS)
+    .map((pick, index) => ({
+      pickNumber: index + 1,
+      playerId: pick.playerId,
+      side: getPickOwner(index + 1),
+    }));
+  return {
+    id: raw.id,
+    name: raw.name,
+    createdAt: raw.createdAt,
+    updatedAt: raw.updatedAt,
+    picks,
+    notes: raw.notes ?? "",
   };
 }
 
 export function loadScenarios(): MockDraftScenario[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return [];
-    return JSON.parse(raw) as MockDraftScenario[];
+    const normalized = (JSON.parse(raw) as (MockDraftScenario & { iPickFirst?: boolean })[])
+      .map(normalizeScenario);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    return normalized;
   } catch {
     return [];
   }
@@ -161,8 +170,8 @@ export function deleteScenario(scenarios: MockDraftScenario[], id: string) {
   return next;
 }
 
-export function formatPickLabel(pickNumber: number, iPickFirst: boolean): string {
-  const owner = getPickOwner(pickNumber, iPickFirst);
+export function formatPickLabel(pickNumber: number): string {
+  const owner = getPickOwner(pickNumber);
   return owner === "mine" ? `${MY_CAPTAIN.nickname} picks` : `${OPPONENT_CAPTAIN.nickname} picks`;
 }
 
@@ -172,14 +181,12 @@ export const SCENARIO_TEMPLATES = [
   { name: "Justin takes Fred #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "fred-geisinger") },
   { name: "Justin takes Mager #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "andrew-mager") },
   { name: "Justin takes D'Arcy #1", preset: (s: MockDraftScenario) => presetJustinFirstPick(s, "ryan-darcy") },
-  { name: "Draft night — Justin picks first", preset: (s: MockDraftScenario) => ({ ...s, iPickFirst: false, picks: [] }) },
-  { name: "I pick first — hypothetical", preset: (s: MockDraftScenario) => ({ ...s, iPickFirst: true, picks: [] }) },
+  { name: "Draft night — official order", preset: (s: MockDraftScenario) => ({ ...s, picks: [] }) },
 ];
 
 function presetJustinFirstPick(scenario: MockDraftScenario, playerId: string): MockDraftScenario {
   return {
     ...scenario,
-    iPickFirst: false,
     picks: [{ pickNumber: 1, playerId, side: "justin" }],
     name: scenario.name,
   };

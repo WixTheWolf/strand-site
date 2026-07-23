@@ -322,7 +322,7 @@ export interface SimulatedDraftResult {
 /** Optimal traditional draft with match-play roster analytics; captains pre-assigned */
 export function simulateOptimalDraft(
   stats: PlayerDraftStats[],
-  wixPicksFirst = true,
+  wixPicksFirst = false,
 ): SimulatedDraftResult {
   const draftable = getDraftablePlayers(stats);
   const wixCaptain = stats.find((player) => player.id === CAPTAIN_IDS[0])!;
@@ -529,7 +529,7 @@ export function getOptimalDraftOrder(stats: PlayerDraftStats[]): DraftRecommenda
 export function getTeamPickSlots(
   teamName: "A" | "B",
   rounds = DRAFT_PICKS_PER_CAPTAIN,
-  wixPicksFirst = true,
+  wixPicksFirst = false,
 ): number[] {
   const onOdd = teamName === "A" ? wixPicksFirst : !wixPicksFirst;
   return Array.from({ length: rounds }, (_, round) => round * 2 + (onOdd ? 1 : 2));
@@ -546,7 +546,7 @@ export function getOptimalTeamWithPicks(
   recommendations: DraftRecommendation[],
   teamName: "A" | "B" = "A",
   simulation?: SimulatedDraftResult,
-  wixPicksFirst = true,
+  wixPicksFirst = false,
 ): OptimalTeamPick[] {
   const sim = simulation ?? simulateOptimalDraft(stats, wixPicksFirst);
   const picks = teamName === "A" ? sim.wixPicks : sim.justinPicks;
@@ -576,7 +576,7 @@ export function getOptimalTeam(
   teamName: "A" | "B" = "A",
   simulation?: SimulatedDraftResult,
 ): PlayerDraftStats[] {
-  const sim = simulation ?? simulateOptimalDraft(stats, teamName === "A");
+  const sim = simulation ?? simulateOptimalDraft(stats, false);
   return teamName === "A" ? sim.wixRoster : sim.justinRoster;
 }
 

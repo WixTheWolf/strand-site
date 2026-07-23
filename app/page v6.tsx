@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function StrandV6FullSite() {
   const logoSrc = "/logo.png";
   const heroSrc = "/courses/gamble-sands.jpg";
@@ -122,16 +124,25 @@ export default function StrandV6FullSite() {
       <section id="home" className="mx-auto max-w-[1500px] p-4 md:p-6">
         <div className="relative overflow-hidden rounded-[2rem] shadow-2xl">
           <div className="absolute inset-0">
-            <img src={heroSrc} alt="Gamble Sands hero" className="h-full w-full object-cover" />
+            <Image
+              src={heroSrc}
+              alt="Gamble Sands hero"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,28,22,0.82),rgba(12,28,22,0.56),rgba(12,28,22,0.2))]" />
           </div>
 
           <div className="relative z-10 px-5 py-5 md:px-8 md:py-7">
             <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
               <div className="flex items-center gap-4 text-white">
-                <img
+                <Image
                   src={logoSrc}
                   alt="The Strand Invitational logo"
+                  width={200}
+                  height={80}
                   className="h-14 w-auto object-contain brightness-0 invert"
                 />
                 <div>

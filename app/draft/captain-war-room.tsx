@@ -9,18 +9,21 @@ import {
   currentDraftOwner,
   FORMAT_META,
   optimizePairs,
-  projectTournament,
+  rankDraftCandidates,
   rosterMetrics,
   simulateTournament,
+  type CaptainIntel,
+  type CaptainIntelMap,
   type DraftAssignment,
-  type DraftSide,
   type PlayerSaberMetrics,
   type StrandFormat,
 } from "@/lib/sabermetrics";
+import { CAPTAIN_INTEL_STORAGE_KEY, officialDraftSide } from "@/lib/draft-order";
 import type { PlayerDraftStats } from "@/lib/types";
+import CaptainIntelPanel from "./captain-intel-panel";
 
-const WIX_PICKS_FIRST = false;
-const DRAFT_STORAGE_KEY = "strand-2026-wix-draft-v3";
+const DRAFT_STORAGE_KEY = "strand-2026-wix-draft-v4";
+const LEGACY_DRAFT_STORAGE_KEY = "strand-2026-wix-draft-v3";
 
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
@@ -50,51 +53,6 @@ function probabilityTone(value: number) {
   if (value >= 0.58) return "text-emerald-300";
   if (value >= 0.48) return "text-amber-200";
   return "text-orange-300";
-}
-
-interface CandidateScenario {
-  metric: PlayerSaberMetrics;
-  wixProbability: number;
-  impactVsMedian: number;
-}
-
-function candidateScenarios(
-  players: PlayerDraftStats[],
-  board: PlayerSaberMetrics[],
-  assignments: DraftAssignment[],
-  owner: DraftSide | null,
-): CandidateScenario[] {
-  if (!owner) return [];
-  const assigned = new Set(assignments.map((assignment) => assignment.playerId));
-  const candidates = board.filter(
-    (metric) => !isCaptain(metric.player.id) && !assigned.has(metric.player.id),
-  );
-  const raw = candidates.map((metric) => {
-    const forced = [...assignments, { playerId: metric.player.id, side: owner }];
-    const completed = completeDraft(players, forced, WIX_PICKS_FIRST);
-    const mine = rosterMetrics(completed.mine, board);
-    const opponent = rosterMetrics(completed.opponent, board);
-    return {
-      metric,
-      wixProbability: projectTournament(mine, opponent).analyticWinProbability,
-      impactVsMedian: 0,
-    };
-  });
-  const probabilities = raw.map((scenario) => scenario.wixProbability).sort((a, b) => a - b);
-  const median = probabilities[Math.floor(probabilities.length / 2)] ?? 0.5;
-  return raw
-    .map((scenario) => ({
-      ...scenario,
-      impactVsMedian:
-        owner === "mine"
-          ? scenario.wixProbability - median
-          : median - scenario.wixProbability,
-    }))
-    .sort((a, b) =>
-      owner === "mine"
-        ? b.wixProbability - a.wixProbability
-        : a.wixProbability - b.wixProbability,
-    );
 }
 
 function MetricBar({ value, tone = "green" }: { value: number; tone?: "green" | "orange" | "sand" }) {
@@ -319,16 +277,30 @@ function FormatCard({
 export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[] }) {
   const [assignments, setAssignments] = useState<DraftAssignment[]>([]);
   const [draftRestored, setDraftRestored] = useState(false);
+  const [captainIntel, setCaptainIntel] = useState<CaptainIntelMap>({});
+  const [intelRestored, setIntelRestored] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
-  const board = useMemo(() => buildSaberBoard(players), [players]);
+  const board = useMemo(() => buildSaberBoard(players, captainIntel), [players, captainIntel]);
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem(DRAFT_STORAGE_KEY);
+      const stored =
+        window.localStorage.getItem(DRAFT_STORAGE_KEY) ??
+        window.localStorage.getItem(LEGACY_DRAFT_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as DraftAssignment[];
         const validIds = new Set(players.filter((player) => !isCaptain(player.id)).map((player) => player.id));
-        setAssignments(parsed.filter((assignment) => validIds.has(assignment.playerId)).slice(0, 18));
+        const normalized = parsed
+          .filter((assignment) => validIds.has(assignment.playerId))
+          .slice(0, 18)
+          .map((assignment, index) => ({
+            playerId: assignment.playerId,
+            side: officialDraftSide(index + 1),
+          }));
+        // Restore the external localStorage snapshot after hydration.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setAssignments(normalized);
+        window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(normalized));
       }
     } catch {
       // Corrupt local state should never block the war room.
@@ -341,18 +313,38 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
     if (!draftRestored) return;
     window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(assignments));
   }, [assignments, draftRestored]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(CAPTAIN_INTEL_STORAGE_KEY);
+      if (stored) {
+        // Restore the external localStorage snapshot after hydration.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCaptainIntel(JSON.parse(stored) as CaptainIntelMap);
+      }
+    } catch {
+      // Captain intel is optional; bad local state falls back to the data-only model.
+    } finally {
+      setIntelRestored(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!intelRestored) return;
+    window.localStorage.setItem(CAPTAIN_INTEL_STORAGE_KEY, JSON.stringify(captainIntel));
+  }, [captainIntel, intelRestored]);
   const metricMap = useMemo(
     () => new Map(board.map((metric) => [metric.player.id, metric])),
     [board],
   );
-  const owner = currentDraftOwner(assignments, WIX_PICKS_FIRST);
+  const owner = currentDraftOwner(assignments);
   const scenarios = useMemo(
-    () => candidateScenarios(players, board, assignments, owner),
+    () => rankDraftCandidates(players, board, assignments, owner),
     [players, board, assignments, owner],
   );
   const projectedDraft = useMemo(
-    () => completeDraft(players, assignments, WIX_PICKS_FIRST),
-    [players, assignments],
+    () => completeDraft(players, assignments, board),
+    [players, assignments, board],
   );
   const projectedMine = useMemo(
     () => rosterMetrics(projectedDraft.mine, board),
@@ -413,6 +405,13 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
     };
     window.localStorage.setItem(DRAFT_TEAM_TRANSFER_KEY, JSON.stringify(transfer));
     window.location.assign("/live/setup");
+  };
+
+  const updateCaptainIntel = (playerId: string, value: CaptainIntel) => {
+    setCaptainIntel((current) => ({
+      ...current,
+      [playerId]: value,
+    }));
   };
 
   return (
@@ -488,13 +487,18 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
                   </div>
                   <div className="text-right">
                     <div className="font-mono text-2xl font-semibold">
-                      {(topScenario.wixProbability * 100).toFixed(0)}%
+                      {((owner === "mine" ? topScenario.robustProbability : topScenario.wixProbability) * 100).toFixed(0)}%
                     </div>
-                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/45">WIX win after pick</div>
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-white/45">
+                      {owner === "mine" ? "robust WIX win" : "WIX win after pick"}
+                    </div>
                   </div>
                 </div>
                 <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-sm leading-6 text-white/70">
                   {topScenario.metric.evidence.join(" · ")}. Projected Strand value: {formatEdge(topScenario.metric.strandValueAdded)} points versus an average player.
+                  {owner === "mine" && (
+                    <> Downside tested against all {topScenario.responseCount} possible immediate J-BONE responses: {(topScenario.floorProbability * 100).toFixed(0)}% floor.</>
+                  )}
                 </div>
                 <button
                   onClick={() => lockPick(topScenario.metric.player.id)}
@@ -554,6 +558,8 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
           </div>
         </section>
       )}
+
+      <CaptainIntelPanel board={board} intel={captainIntel} onChange={updateCaptainIntel} />
 
       <div className="rounded-[1.8rem] border border-black/10 bg-white p-4 shadow-sm md:p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -638,11 +644,12 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
         </div>
 
         <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-black/[0.08]">
-          <div className="hidden grid-cols-[minmax(240px,1.6fr)_70px_90px_110px_105px_150px] gap-3 border-b border-black/[0.08] bg-[#f8f6f1] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.14em] text-black/35 lg:grid">
+          <div className="hidden grid-cols-[minmax(240px,1.6fr)_70px_90px_110px_90px_105px_150px] gap-3 border-b border-black/[0.08] bg-[#f8f6f1] px-4 py-3 text-[9px] font-semibold uppercase tracking-[0.14em] text-black/35 lg:grid">
             <span>Player / evidence</span>
             <span className="text-right">Index</span>
             <span className="text-right">Net edge</span>
             <span className="text-right">Pick impact</span>
+            <span className="text-right">Floor</span>
             <span className="text-right">Data trust</span>
             <span />
           </div>
@@ -651,7 +658,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
             const isExpanded = expandedPlayer === metric.player.id;
             return (
               <article key={metric.player.id} className="border-b border-black/[0.07] last:border-0">
-                <div className="grid gap-4 p-4 lg:grid-cols-[minmax(240px,1.6fr)_70px_90px_110px_105px_150px] lg:items-center">
+                <div className="grid gap-4 p-4 lg:grid-cols-[minmax(240px,1.6fr)_70px_90px_110px_90px_105px_150px] lg:items-center">
                   <div className="flex items-start gap-3">
                     <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold ${index === 0 ? "bg-[#102f28] text-white" : "bg-black/[0.05] text-black/45"}`}>
                       {index + 1}
@@ -669,7 +676,13 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
                       <EvidenceList metric={metric} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 lg:contents">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-5 lg:contents">
+                    <div className="lg:text-right">
+                      <div className="text-[9px] uppercase tracking-[0.12em] text-black/35 lg:hidden">Floor</div>
+                      <div className="mt-1 font-mono text-sm font-semibold text-black/60 lg:mt-0">
+                        {(scenario.floorProbability * 100).toFixed(0)}%
+                      </div>
+                    </div>
                     <div className="lg:text-right">
                       <div className="text-[9px] uppercase tracking-[0.12em] text-black/35 lg:hidden">Index</div>
                       <div className="mt-1 font-mono text-sm font-semibold lg:mt-0">{formatIndex(metric.player)}</div>

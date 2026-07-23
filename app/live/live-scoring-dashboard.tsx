@@ -58,7 +58,7 @@ export default function LiveScoringDashboard() {
   const [payload, setPayload] = useState<LivePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeSession, setActiveSession] = useState("fourball");
-  const [clock, setClock] = useState(Date.now());
+  const [clock, setClock] = useState<number | null>(null);
 
   const load = useCallback(async (quiet = false) => {
     try {
@@ -74,6 +74,8 @@ export default function LiveScoringDashboard() {
   }, []);
 
   useEffect(() => {
+    // Initial client-side API hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
     const interval = window.setInterval(() => void load(true), 10000);
     return () => window.clearInterval(interval);
@@ -124,7 +126,7 @@ export default function LiveScoringDashboard() {
             </div>
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-white/50">
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-              Auto-refresh · {relativeTime(payload.polledAt, clock)}
+              Auto-refresh · {clock === null ? "syncing" : relativeTime(payload.polledAt, clock)}
             </div>
           </div>
 

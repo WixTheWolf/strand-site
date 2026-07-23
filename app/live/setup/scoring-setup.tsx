@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect -- API and localStorage snapshots intentionally hydrate captain setup state after mount. */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CHAMPIONSHIP_COURSES } from "@/lib/course-intelligence";
