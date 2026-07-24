@@ -1,3 +1,4 @@
+import Link from "next/link";
 import DraftBoard from "./draft-board";
 import DraftHeader from "../components/draft-header";
 import { Countdown } from "../components/fx";
@@ -27,6 +28,12 @@ export default function DraftPage() {
             <div className="mt-1 text-sm font-medium uppercase tracking-[0.14em]">
               Thursday, July 23 · 6:00 PM Pacific — J-BONE is on the clock first
             </div>
+            <Link
+              href="/draft/plan"
+              className="mt-2 inline-block rounded-xl border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-white hover:bg-white/20"
+            >
+              📋 WIX pick plan →
+            </Link>
           </div>
           <Countdown
             target={DRAFT_AT}
