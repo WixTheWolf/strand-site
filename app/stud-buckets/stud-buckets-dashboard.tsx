@@ -12,6 +12,7 @@ import {
   type StrandFormat,
 } from "@/lib/sabermetrics";
 import { JBONE_TEAM, PATH_TO_38, STUD_BUCKETS_TEAM, TEAM_STANDARDS } from "@/lib/stud-buckets";
+import { teammateJob } from "@/lib/stud-buckets-team";
 import type { PlayerDraftStats } from "@/lib/types";
 
 type DraftPayload = { updatedAt: string; source: string; players: PlayerDraftStats[] };
@@ -24,17 +25,6 @@ const pct = (value: number) => `${Math.round(value * 100)}%`;
 
 function bestFormat(metric: PlayerSaberMetrics): StrandFormat {
   return (Object.keys(metric.format) as StrandFormat[]).sort((a, b) => metric.format[b] - metric.format[a])[0];
-}
-
-function role(metric: PlayerSaberMetrics) {
-  if (metric.player.id === STUD_BUCKETS_TEAM.captainId) return "Captain · tone setter";
-  if (metric.index <= 9) return "Gross-score weapon";
-  if (metric.consistency >= 74) return "Floor setter";
-  if (metric.ceiling >= 74) return "Momentum swing";
-  if (metric.index >= 22 && metric.netEdge >= 0) return "Net-pressure piece";
-  if (metric.scarecrowFit > metric.gambleFit + 4) return "Scarecrow specialist";
-  if (metric.gambleFit > metric.scarecrowFit + 4) return "Gamble Sands fit";
-  return "Flexible matchup piece";
 }
 
 function Initials({ metric }: { metric: PlayerSaberMetrics }) {
@@ -115,7 +105,7 @@ export default function StudBucketsDashboard() {
               <p className="mt-7 max-w-2xl text-base leading-7 text-white/58">The operating plan for all ten Stud Buckets: player roles, format pairings, opponent pressure points and the cleanest path to 38.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="#pairings" className="rounded-full bg-[#e39a50] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#10251e]">Recommended pairs</Link>
-                <Link href="/courses" className="rounded-full border border-white/14 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/75">Course intel</Link>
+                <Link href="/stud-buckets/course-prep" className="rounded-full border border-white/14 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/75">Team course intel</Link>
                 <Link href="/live" className="rounded-full border border-white/14 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/75">Live scoring</Link>
               </div>
             </div>
@@ -177,15 +167,30 @@ export default function StudBucketsDashboard() {
         <section id="roster" className="mx-auto max-w-[1440px] scroll-mt-24 px-5 py-16 md:px-8 md:py-24">
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9a6031]">The ten</p>
           <h2 className="mt-3 text-4xl font-semibold tracking-[-0.055em] md:text-6xl">Everyone has a job.</h2>
-          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            {team.map((metric) => { const format = bestFormat(metric); return (
-              <article key={metric.player.id} className="rounded-[1.75rem] border border-black/8 bg-white p-5 shadow-sm">
-                <div className="flex justify-between"><Initials metric={metric} /><div className="text-right"><div className="text-2xl font-semibold">{n(metric.index)}</div><div className="text-[9px] uppercase text-black/30">Index</div></div></div>
-                <h3 className="mt-5 text-xl font-semibold">{metric.player.name}</h3><p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#9a6031]">{role(metric)}</p>
-                <div className="mt-5 rounded-2xl bg-[#f2efe7] p-4 text-xs"><div className="flex justify-between"><span className="text-black/42">Best format</span><span className="font-semibold">{FORMAT_META[format].label}</span></div><div className="mt-2 flex justify-between"><span className="text-black/42">Format score</span><span className="font-mono font-semibold">{n(metric.format[format], 0)}</span></div><div className="mt-2 flex justify-between"><span className="text-black/42">Confidence</span><span className="font-semibold">{metric.confidenceLabel}</span></div></div>
-                <p className="mt-4 text-xs leading-5 text-black/48">{metric.evidence.slice(0, 3).join(" · ")}</p>
-              </article>
-            ); })}
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-black/52">These are actual assignments, not assembly-line labels. Know your job, own it and let the other nine do theirs.</p>
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {team.map((metric) => {
+              const format = bestFormat(metric);
+              const job = teammateJob(metric.player.id);
+              return (
+                <article key={metric.player.id} className="rounded-[1.75rem] border border-black/8 bg-white p-5 shadow-sm">
+                  <div className="flex justify-between">
+                    <div className="flex items-center gap-3">
+                      <Initials metric={metric} />
+                      <div>
+                        <h3 className="text-xl font-semibold">{metric.player.nickname}</h3>
+                        <div className="text-[9px] text-black/35">{metric.player.name}</div>
+                      </div>
+                    </div>
+                    <div className="text-right"><div className="text-2xl font-semibold">{n(metric.index)}</div><div className="text-[9px] uppercase text-black/30">Index</div></div>
+                  </div>
+                  <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#9a6031]">{job.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-black/58">{job.mission}</p>
+                  <div className="mt-5 rounded-2xl bg-[#f2efe7] p-4 text-xs"><div className="flex justify-between"><span className="text-black/42">Best format</span><span className="font-semibold">{FORMAT_META[format].label}</span></div><div className="mt-2 flex justify-between"><span className="text-black/42">Format score</span><span className="font-mono font-semibold">{n(metric.format[format], 0)}</span></div><div className="mt-2 flex justify-between"><span className="text-black/42">Confidence</span><span className="font-semibold">{metric.confidenceLabel}</span></div></div>
+                  <p className="mt-4 border-l-2 border-[#e39a50] pl-3 text-xs italic leading-5 text-black/45">{job.lockerRoom}</p>
+                </article>
+              );
+            })}
           </div>
         </section>
 

@@ -15,6 +15,7 @@ import {
   type StrandFormat,
 } from "@/lib/sabermetrics";
 import { JBONE_TEAM, STUD_BUCKETS_TEAM } from "@/lib/stud-buckets";
+import { teammateJob } from "@/lib/stud-buckets-team";
 import type { PlayerDraftStats } from "@/lib/types";
 
 type DraftPayload = {
@@ -33,17 +34,6 @@ const number = (value: number, digits = 0) =>
 
 function bestFormat(metric: PlayerSaberMetrics): StrandFormat {
   return [...FORMAT_ORDER].sort((a, b) => metric.format[b] - metric.format[a])[0];
-}
-
-function role(metric: PlayerSaberMetrics) {
-  if (metric.player.id === STUD_BUCKETS_TEAM.captainId) return "Captain · tone setter";
-  if (metric.index <= 10) return "Gross-score weapon";
-  if (metric.consistency >= 74) return "Floor setter";
-  if (metric.ceiling >= 74) return "Momentum swing";
-  if (metric.index >= 22 && metric.netEdge >= 0) return "Net-pressure piece";
-  if (metric.scarecrowFit > metric.gambleFit + 4) return "Scarecrow specialist";
-  if (metric.gambleFit > metric.scarecrowFit + 4) return "Gamble Sands fit";
-  return "Flexible matchup piece";
 }
 
 function plannedCourseHandicap(metric: PlayerSaberMetrics, course: ChampionshipCourseIntel) {
@@ -272,12 +262,14 @@ export default function TeamPrepMetrics() {
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Our roster only</p>
                 <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em]">Everyone has a job.</h3>
+                <p className="mt-2 max-w-xl text-xs leading-5 text-white/40">Specific assignments, zero interchangeable human components.</p>
               </div>
               <div className="text-[9px] uppercase tracking-[0.14em] text-white/28">10 players · captain included</div>
             </div>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {team.map((metric) => {
                 const format = bestFormat(metric);
+                const job = teammateJob(metric.player.id);
                 return (
                   <article key={metric.player.id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.055] p-5">
                     <div className="flex items-start justify-between gap-4">
@@ -285,7 +277,8 @@ export default function TeamPrepMetrics() {
                         <Initials metric={metric} captain={metric.player.id === STUD_BUCKETS_TEAM.captainId} />
                         <div>
                           <h4 className="font-semibold">{metric.player.nickname}</h4>
-                          <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#efbd88]">{role(metric)}</p>
+                          <p className="text-[8px] text-white/30">{metric.player.name}</p>
+                          <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#efbd88]">{job.title}</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -311,6 +304,8 @@ export default function TeamPrepMetrics() {
                       <span className="text-white/38">Best deployment</span>
                       <span className="font-semibold text-white/78">{FORMAT_META[format].label}</span>
                     </div>
+                    <p className="mt-4 text-xs leading-5 text-white/48">{job.mission}</p>
+                    <p className="mt-4 border-l-2 border-[#e39a50] pl-3 text-[10px] italic leading-4 text-white/35">{job.lockerRoom}</p>
                   </article>
                 );
               })}

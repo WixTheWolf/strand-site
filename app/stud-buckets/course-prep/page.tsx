@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import AccessGate from "../access-gate";
+import ShareTeamGuide from "./share-team-guide";
 import TeamPrepMetrics from "./team-prep-metrics";
 import {
   CHAMPIONSHIP_COURSES,
@@ -18,6 +19,7 @@ import {
   studBucketsAccessConfigured,
   verifyStudBucketsSession,
 } from "@/lib/stud-buckets-auth";
+import { STUD_BUCKETS_GOLD } from "@/lib/stud-buckets-team";
 
 export const metadata: Metadata = {
   title: "Stud Buckets Game Plan | The Strand 2026",
@@ -368,13 +370,13 @@ export default async function CoursePrepPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-[#071b18] via-[#071b18]/90 to-[#071b18]/55" />
           <div className="relative mx-auto max-w-[1440px] px-5 py-20 md:px-8 md:py-28">
             <div className="max-w-4xl">
-              <div className="inline-flex rounded-full border border-[#e39a50]/30 bg-[#e39a50]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Private · Stud Buckets only · study this</div>
+              <div className="inline-flex rounded-full border border-[#e39a50]/30 bg-[#e39a50]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Private · Stud Buckets only · officially overprepared</div>
               <h1 className="mt-7 max-w-[11ch] text-6xl font-semibold leading-[0.88] tracking-[-0.075em] sm:text-7xl md:text-8xl">Win before we arrive.</h1>
-              <p className="mt-7 max-w-2xl text-base leading-7 text-white/62 md:text-lg">The complete Stud Buckets assignment: our ten-man metric board, WIX and J-BONE captain benchmark, personal strokes, 36 course decisions and the work required before Gamble Sands.</p>
+              <p className="mt-7 max-w-2xl text-base leading-7 text-white/62 md:text-lg">The complete Stud Buckets assignment: ten real jobs, personal strokes, 36 course decisions, no beer math and just enough data to become deeply annoying to play against.</p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Link href="#gamble-sands" className="rounded-full bg-[#e39a50] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#10251e]">Open the 36-hole book</Link>
                 <Link href="#team-metrics" className="rounded-full border border-white/16 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78">Our team board</Link>
-                <Link href="#first-tee" className="rounded-full border border-white/16 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78">Save the first-tee card</Link>
+                <ShareTeamGuide />
               </div>
             </div>
           </div>
@@ -389,6 +391,29 @@ export default async function CoursePrepPage() {
                 <p className="mt-2 text-xs leading-5 text-black/50">{copy}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="border-b border-black/8 bg-[#e39a50] py-16 md:py-24">
+          <div className="mx-auto max-w-[1440px] px-5 md:px-8">
+            <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10251e]/55">The gold</p>
+                <h2 className="mt-3 text-5xl font-semibold tracking-[-0.065em] text-[#10251e] md:text-7xl">Ten tips worth actual points.</h2>
+              </div>
+              <p className="max-w-2xl text-sm leading-7 text-[#10251e]/62">
+                Read these once sober, once after the first round and once when somebody says, “I think I can carry that.”
+              </p>
+            </div>
+            <div className="mt-10 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+              {STUD_BUCKETS_GOLD.map((item, index) => (
+                <article key={item.title} className="rounded-[1.5rem] bg-[#071b18] p-5 text-white shadow-lg">
+                  <div className="font-mono text-[10px] text-[#efbd88]">{String(index + 1).padStart(2, "0")}</div>
+                  <h3 className="mt-4 text-xl font-semibold">{item.title}</h3>
+                  <p className="mt-3 text-xs leading-5 text-white/55">{item.tip}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 

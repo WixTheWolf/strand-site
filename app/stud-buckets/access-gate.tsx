@@ -49,7 +49,7 @@ export default function AccessGate({ configured }: { configured: boolean }) {
             bucket.
           </h1>
           <p className="mt-5 max-w-sm text-sm leading-6 text-white/58">
-            Pairings, player roles, opponent intel and the path to 38. Keep the link and code inside the team.
+            Ten jobs, personal strokes, pairings, 50 holes of course intel and the path to 38. Keep the link and code inside the team.
           </p>
         </div>
 
@@ -73,7 +73,7 @@ export default function AccessGate({ configured }: { configured: boolean }) {
               disabled={loading || !code.trim()}
               className="mt-4 w-full rounded-2xl bg-[#e39a50] px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[#13231e] transition hover:bg-[#efad68] disabled:cursor-not-allowed disabled:opacity-45"
             >
-              {loading ? "Opening HQ…" : "Open team HQ"}
+              {loading ? "Opening the bucket…" : "Open the bucket"}
             </button>
           </form>
         ) : (
