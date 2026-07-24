@@ -15,8 +15,8 @@ import {
 } from "@/lib/stud-buckets-auth";
 
 export const metadata: Metadata = {
-  title: "Gamble Sands Course Book | The Strand 2026",
-  description: "Private Gamble Sands course intelligence and hole-by-hole preparation.",
+  title: "Strand Caddie | Gamble Sands 2026",
+  description: "Private format-aware course, hole and shot decisions for Gamble Sands.",
   robots: { index: false, follow: false, nocache: true },
 };
 
