@@ -193,7 +193,7 @@ export const QUICKSANDS_HOLES: QuickSandsHole[] = [
 ];
 
 export const COURSE_SOURCE_NOTE =
-  "Verified July 21, 2026. Yardages, ratings, slopes, pars and stroke indexes come from Gamble Sands scorecards. Strategy is paraphrased from the resort, its designers and the architect playing lesson; daily wind, tee markers and hole locations remain decisive.";
+  "Verified July 24, 2026. Yardages, ratings, slopes, pars, stroke indexes and local rules come from Gamble Sands scorecards. Strategy is paraphrased from the resort, its designers and the architect playing lesson; daily wind, tee markers and hole locations remain decisive.";
 
 export function courseHandicap(index: number, tee: CourseTee, par: number): number {
   return Math.round(index * (tee.slope / 113) + (tee.rating - par));

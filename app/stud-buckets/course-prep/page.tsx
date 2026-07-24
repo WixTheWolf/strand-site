@@ -27,11 +27,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-const FEATURED_HOLES: Record<ChampionshipCourseIntel["id"], number[]> = {
-  "gamble-sands": [2, 8, 12, 13, 17, 18],
-  scarecrow: [1, 5, 9, 12, 15, 18],
-};
-
 const COURSE_PREP: Record<ChampionshipCourseIntel["id"], string[]> = {
   "gamble-sands": [
     "Build a carry-and-release wedge chart from 80–160 yards. The landing number matters more than the final yardage.",
@@ -44,6 +39,21 @@ const COURSE_PREP: Record<ChampionshipCourseIntel["id"], string[]> = {
     "Train side selection from the tee: right or left must be chosen from the pin location, not from habit.",
     "Hit uneven-lie approaches and controlled three-quarter shots. The ground moves more than it appears.",
     "Make 6–10 footers under consequence. Singles will be won by finishing holes, not by winning the driving contest.",
+  ],
+};
+
+const FORMAT_SCRIPT: Record<ChampionshipCourseIntel["id"], [string, string][]> = {
+  "gamble-sands": [
+    ["Fourball · 80%", "Lead with a playable ball, then let the second player challenge the diagonal line or feeder slope."],
+    ["Scramble · 35/15", "Order drives by volatility: establish grass first, then give the longer or hotter driver a full green light."],
+    ["Scoring windows", "Expect the clearest birdie pressure on 2, 8, 12, 13 and 18. Attack only with the correct ground line."],
+    ["Closing defense", "Holes 15–17 were designed to decide matches. If ahead, remove the disaster side and make them create the hero shot."],
+  ],
+  scarecrow: [
+    ["Shamble · 75%", "Do not choose a drive by distance alone. Choose the ball on the correct side for that day’s pin and approach angle."],
+    ["Singles · 80%", "Keep the opponent solving blind angles. Center-green pars and completed holes will beat emotional flag hunting."],
+    ["Scoring windows", "Use the aggression budget on 1, 5, 12, 15 and 18 after confirming the pin-dependent lane."],
+    ["Closing defense", "The boomerang 17th rewards the ground; the drivable 18th rewards commitment. Arrive there without giving away 16."],
   ],
 };
 
@@ -77,6 +87,37 @@ const NON_NEGOTIABLES = [
   ["Kill doubles", "The opponent should have to earn every point. Punch out, take medicine and keep bogey in the hole."],
 ];
 
+const RESORT_RULES = [
+  {
+    eyebrow: "Local rule",
+    title: "Sand is not a bunker",
+    copy: "All sandy areas are waste areas. Ground the club, take practice swings and remove loose impediments. Footprints or abnormal ground may be treated as ground under repair.",
+  },
+  {
+    eyebrow: "Penalty areas",
+    title: "Grass is the boundary",
+    copy: "Desert areas are red penalty areas. The edge is where maintained grass meets desert, so identify the crossing point before picking up or taking relief.",
+  },
+  {
+    eyebrow: "Surface",
+    title: "Carry is only half the number",
+    copy: "The official design brief is firm, fast fescue. Read landing slope, bounce and runout before choosing a club; a stock aerial yardage can be the wrong answer.",
+  },
+  {
+    eyebrow: "Daily variable",
+    title: "Pin sheet before club",
+    copy: "Angles and feeder slopes change with the hole location. On Scarecrow especially, front/back and left/right pins can reverse the preferred tee line.",
+  },
+];
+
+const CASCADES_PLAN = [
+  ["Find today's pace", "Roll three balls uphill and downhill from 20, 40 and 60 feet. Record the leave—not whether the putt went in."],
+  ["Calibrate the cross-slope", "Choose one severe sidehill putt and roll it both directions. The same slope will appear around the championship greens."],
+  ["Build the capture speed", "Finish ten putts from 6–10 feet with enough pace to remove late break without racing the comeback outside three feet."],
+  ["Train partner reads", "One player calls start line and pace before the other putts. Compare the read with the actual roll and update together."],
+  ["End under consequence", "Play nine changing holes at two-putt-or-better. A three-putt loses the hole; no restarts and no casual second ball."],
+];
+
 const FIRST_TEE_CARD = [
   "Know the match and who receives strokes before the first shot.",
   "Say the plan out loud: safe ball, target side, preferred miss and green-light player.",
@@ -97,9 +138,9 @@ const PACK_LIST = [
 ];
 
 const PLAN_STYLE: Record<HolePlan, string> = {
-  attack: "border-amber-300/35 bg-amber-200/10 text-amber-100",
-  swing: "border-sky-300/30 bg-sky-200/10 text-sky-100",
-  protect: "border-emerald-300/30 bg-emerald-200/10 text-emerald-100",
+  attack: "border-amber-500/25 bg-amber-50 text-amber-900",
+  swing: "border-sky-500/25 bg-sky-50 text-sky-900",
+  protect: "border-emerald-500/25 bg-emerald-50 text-emerald-900",
 };
 
 function planCount(course: ChampionshipCourseIntel, plan: HolePlan) {
@@ -108,9 +149,6 @@ function planCount(course: ChampionshipCourseIntel, plan: HolePlan) {
 
 function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
   const tee = course.tees.find((item) => item.name === course.defaultTee) ?? course.tees[0];
-  const featured = FEATURED_HOLES[course.id]
-    .map((number) => course.holes.find((hole) => hole.number === number))
-    .filter((hole): hole is NonNullable<typeof hole> => Boolean(hole));
 
   return (
     <section id={course.id} className="scroll-mt-24 border-t border-black/8 bg-[#f4f0e7] py-16 md:py-24">
@@ -151,7 +189,7 @@ function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
           </div>
         </div>
 
-        <div className="mt-10 grid gap-5 lg:grid-cols-[0.7fr_1.3fr]">
+        <div className="mt-10 grid gap-5 lg:grid-cols-[0.72fr_1.28fr]">
           <article className="rounded-[2rem] bg-[#071b18] p-6 text-white md:p-8">
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Prepare for this course</p>
             <div className="mt-6 space-y-5">
@@ -172,33 +210,120 @@ function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
             </div>
           </article>
 
-          <article>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9a6031]">Six holes to know cold</p>
-                <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] md:text-4xl">Match-deciding assignments</h3>
-              </div>
-              <Link href="/courses" className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#31594d]">Open all 18 holes →</Link>
-            </div>
-            <div className="mt-6 grid gap-3 md:grid-cols-2">
-              {featured.map((hole) => (
-                <div key={hole.number} className="rounded-[1.5rem] border border-black/8 bg-white p-5 shadow-sm">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#102a23] font-mono text-sm font-bold text-white">{hole.number}</span>
-                      <div>
-                        <div className="text-[9px] font-bold uppercase tracking-[0.15em] text-black/35">Par {hole.par} · SI {hole.strokeIndex}</div>
-                        <h4 className="text-base font-semibold">{hole.headline}</h4>
-                      </div>
-                    </div>
-                    <span className={`rounded-full border px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.14em] ${PLAN_STYLE[hole.plan]}`}>{planLabel(hole.plan)}</span>
-                  </div>
-                  <p className="mt-4 text-xs leading-5 text-black/55">{hole.strategy}</p>
-                  <div className="mt-4 rounded-xl bg-[#f4f0e7] px-3 py-3 text-xs leading-5 text-black/52"><strong className="text-black/72">Match call:</strong> {hole.matchPlay}</div>
+          <article className="rounded-[2rem] border border-black/8 bg-white p-6 md:p-8">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9a6031]">Course identity</p>
+            <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] md:text-4xl">What wins here.</h3>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {FORMAT_SCRIPT[course.id].map(([label, line], index) => (
+                <div key={label} className="rounded-2xl bg-[#f4f0e7] p-4">
+                  <span className="font-mono text-[10px] text-[#9a6031]">0{index + 1}</span>
+                  <div className="mt-2 text-[9px] font-bold uppercase tracking-[0.15em] text-[#31594d]">{label}</div>
+                  <p className="mt-2 text-sm leading-6 text-black/58">{line}</p>
                 </div>
               ))}
             </div>
+            <div className="mt-6 rounded-2xl border border-[#31594d]/12 bg-[#edf3ef] p-5">
+              <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#31594d]">On-course sequence</div>
+              <p className="mt-2 text-sm leading-6 text-black/58">
+                Confirm the pin zone, wind and match status. Pick the landing area and preferred miss. Only then choose the club and trajectory.
+              </p>
+            </div>
           </article>
+        </div>
+
+        <div className="mt-16">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9a6031]">Private 18-hole command book</p>
+              <h3 className="mt-2 max-w-3xl text-4xl font-semibold tracking-[-0.055em] md:text-6xl">Every hole. One committed plan.</h3>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-black/52">
+                Yardage is from the official {tee.name} tee. Reconfirm the day&apos;s marker, pin and wind before using the plan.
+              </p>
+            </div>
+            <div className="grid grid-cols-9 gap-1.5 sm:grid-cols-[repeat(18,minmax(0,1fr))] lg:w-[620px]">
+              {course.holes.map((hole) => (
+                <a
+                  key={hole.number}
+                  href={`#${course.id}-hole-${hole.number}`}
+                  aria-label={`${course.name} hole ${hole.number}`}
+                  className={`flex aspect-square items-center justify-center rounded-lg border font-mono text-[10px] font-bold transition hover:-translate-y-0.5 ${PLAN_STYLE[hole.plan]}`}
+                >
+                  {hole.number}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-4 xl:grid-cols-2">
+            {course.holes.map((hole) => {
+              const primaryYards = tee.holeYards[hole.number - 1];
+              return (
+                <article
+                  id={`${course.id}-hole-${hole.number}`}
+                  key={hole.number}
+                  className="scroll-mt-24 rounded-[1.6rem] border border-black/8 bg-white p-5 shadow-sm md:p-6"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#102a23] font-mono text-base font-bold text-white">{hole.number}</span>
+                      <div>
+                        <div className="text-[9px] font-bold uppercase tracking-[0.15em] text-black/35">
+                          Par {hole.par} · {primaryYards} yards · SI {hole.strokeIndex}
+                        </div>
+                        <h4 className="mt-1 text-xl font-semibold tracking-[-0.025em]">{hole.headline}</h4>
+                      </div>
+                    </div>
+                    <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.14em] ${PLAN_STYLE[hole.plan]}`}>{planLabel(hole.plan)}</span>
+                  </div>
+
+                  <div className="mt-5 border-l-2 border-[#e39a50] pl-4">
+                    <div className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#9a6031]">The play</div>
+                    <p className="mt-2 text-sm leading-6 text-black/62">{hole.strategy}</p>
+                  </div>
+
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl bg-[#f4f0e7] p-4">
+                      <div className="text-[8px] font-bold uppercase tracking-[0.18em] text-black/35">Preferred miss</div>
+                      <p className="mt-2 text-xs leading-5 text-black/58">{hole.preferredMiss}</p>
+                    </div>
+                    <div className="rounded-2xl bg-[#071b18] p-4 text-white">
+                      <div className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">Match call</div>
+                      <p className="mt-2 text-xs leading-5 text-white/62">{hole.matchPlay}</p>
+                    </div>
+                  </div>
+
+                  <details className="group mt-4 rounded-xl border border-black/8 bg-white px-4 py-3">
+                    <summary className="cursor-pointer list-none text-[9px] font-bold uppercase tracking-[0.16em] text-black/42">
+                      <span className="group-open:hidden">Show all tee yardages +</span>
+                      <span className="hidden group-open:inline">Hide tee yardages −</span>
+                    </summary>
+                    <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+                      {course.tees.map((courseTee) => (
+                        <div key={courseTee.name} className="rounded-lg bg-[#f4f0e7] px-2 py-2 text-center">
+                          <div className="text-[8px] font-bold uppercase tracking-[0.08em] text-black/32">{courseTee.name}</div>
+                          <div className="mt-1 font-mono text-xs font-semibold">{courseTee.holeYards[hole.number - 1]}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-3 border-t border-black/8 pt-6">
+            {course.sources.map((source) => (
+              <a
+                key={source.href}
+                href={source.href}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-black/10 bg-white px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#31594d]"
+              >
+                {source.label} ↗
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -229,7 +354,8 @@ export default async function CoursePrepPage() {
             <Link href="#team-metrics">Our team</Link>
             <Link href="#gamble-sands">Gamble Sands</Link>
             <Link href="#scarecrow">Scarecrow</Link>
-            <Link href="#practice">Practice</Link>
+            <Link href="#quicksands">QuickSands</Link>
+            <Link href="#cascades">Cascades</Link>
             <Link href="#first-tee">First tee</Link>
           </nav>
           <Link href="/live" className="rounded-full border border-white/12 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.17em] text-white/58">Live scoring</Link>
@@ -246,7 +372,8 @@ export default async function CoursePrepPage() {
               <h1 className="mt-7 max-w-[11ch] text-6xl font-semibold leading-[0.88] tracking-[-0.075em] sm:text-7xl md:text-8xl">Win before we arrive.</h1>
               <p className="mt-7 max-w-2xl text-base leading-7 text-white/62 md:text-lg">The complete Stud Buckets assignment: our ten-man metric board, WIX and J-BONE captain benchmark, personal strokes, 36 course decisions and the work required before Gamble Sands.</p>
               <div className="mt-9 flex flex-wrap gap-3">
-                <Link href="#team-metrics" className="rounded-full bg-[#e39a50] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#10251e]">Open our team board</Link>
+                <Link href="#gamble-sands" className="rounded-full bg-[#e39a50] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#10251e]">Open the 36-hole book</Link>
+                <Link href="#team-metrics" className="rounded-full border border-white/16 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78">Our team board</Link>
                 <Link href="#first-tee" className="rounded-full border border-white/16 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78">Save the first-tee card</Link>
               </div>
             </div>
@@ -265,11 +392,32 @@ export default async function CoursePrepPage() {
           </div>
         </section>
 
+        <section className="border-b border-black/8 bg-[#102a23] py-12 text-white md:py-16">
+          <div className="mx-auto max-w-[1440px] px-5 md:px-8">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#efbd88]">Official local intelligence</p>
+                <h2 className="mt-2 text-3xl font-semibold tracking-[-0.045em] md:text-5xl">Know the rules before they save a shot.</h2>
+              </div>
+              <a href="https://www.gamblesands.com/wp-content/uploads/2025/07/SC-Final-Proof.pdf" target="_blank" rel="noreferrer" className="text-[9px] font-bold uppercase tracking-[0.15em] text-white/55 underline decoration-white/20 underline-offset-4">Official local rules ↗</a>
+            </div>
+            <div className="mt-8 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {RESORT_RULES.map((rule) => (
+                <article key={rule.title} className="rounded-[1.5rem] border border-white/10 bg-white/[0.055] p-5">
+                  <div className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">{rule.eyebrow}</div>
+                  <h3 className="mt-3 text-xl font-semibold">{rule.title}</h3>
+                  <p className="mt-3 text-xs leading-5 text-white/55">{rule.copy}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <TeamPrepMetrics />
 
         {CHAMPIONSHIP_COURSES.map((course) => <CourseSection key={course.id} course={course} />)}
 
-        <section className="bg-[#102a23] py-16 text-white md:py-24">
+        <section id="quicksands" className="scroll-mt-24 bg-[#102a23] py-16 text-white md:py-24">
           <div className="mx-auto grid max-w-[1440px] gap-8 px-5 md:px-8 lg:grid-cols-[0.75fr_1.25fr]">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#efbd88]">Thursday · QuickSands</p>
@@ -290,6 +438,59 @@ export default async function CoursePrepPage() {
                   <h3 className="mt-3 text-xl font-semibold">{title}</h3>
                   <p className="mt-2 text-xs leading-5 text-white/48">{copy}</p>
                 </div>
+              ))}
+            </div>
+          </div>
+          <div className="mx-auto mt-12 max-w-[1440px] px-5 md:px-8">
+            <div className="flex flex-col gap-3 border-t border-white/10 pt-10 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">14-hole short-course book</p>
+                <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] md:text-5xl">Learn the bounce before points count.</h3>
+              </div>
+              <p className="max-w-xl text-xs leading-5 text-white/38">Mapped yardages are planning references. Official markers can range from roughly 60–180 yards; the landing contour is the real number.</p>
+            </div>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {QUICKSANDS_HOLES.map((hole) => (
+                <article key={hole.number} className="rounded-[1.4rem] border border-white/10 bg-white/[0.055] p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="font-mono text-3xl font-semibold">{String(hole.number).padStart(2, "0")}</div>
+                      {hole.name ? <div className="mt-1 text-[8px] font-bold uppercase tracking-[0.17em] text-[#efbd88]">{hole.name}</div> : null}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[8px] font-bold uppercase tracking-[0.14em] text-white/30">Mapped</div>
+                      <div className="mt-1 font-mono text-sm">{hole.mappedYards} yds</div>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-xs leading-5 text-white/55">{hole.plan}</p>
+                </article>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href="https://www.gamblesands.com/quicksands/" target="_blank" rel="noreferrer" className="rounded-full border border-white/12 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/65">Official QuickSands overview ↗</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="cascades" className="scroll-mt-24 border-b border-black/8 bg-white py-16 md:py-24">
+          <div className="mx-auto grid max-w-[1440px] gap-10 px-5 md:px-8 lg:grid-cols-[0.72fr_1.28fr]">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9a6031]">Cascades putting course</p>
+              <h2 className="mt-3 text-4xl font-semibold tracking-[-0.055em] md:text-6xl">Turn 100,000 square feet into an advantage.</h2>
+              <p className="mt-5 max-w-xl text-sm leading-7 text-black/55">
+                Cascades measures roughly 175 yards end to end and has no fixed routing—the resort changes hole locations daily. That makes it the ideal speed-and-break laboratory, not a place to groove one memorized line.
+              </p>
+              <a href="https://www.gamblesands.com/cascades/" target="_blank" rel="noreferrer" className="mt-7 inline-block text-[9px] font-bold uppercase tracking-[0.15em] text-[#31594d] underline decoration-black/20 underline-offset-4">Official Cascades overview ↗</a>
+            </div>
+            <div className="overflow-hidden rounded-[2rem] border border-black/8 bg-[#f4f0e7]">
+              {CASCADES_PLAN.map(([title, copy], index) => (
+                <article key={title} className="grid grid-cols-[2.5rem_1fr] gap-4 border-b border-black/8 p-5 last:border-0 md:p-6">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#102a23] font-mono text-xs font-bold text-white">{index + 1}</span>
+                  <div>
+                    <h3 className="text-lg font-semibold">{title}</h3>
+                    <p className="mt-1 text-xs leading-5 text-black/50">{copy}</p>
+                  </div>
+                </article>
               ))}
             </div>
           </div>
