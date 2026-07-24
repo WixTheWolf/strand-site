@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 
+import AccessGate from "../access-gate";
 import TeamPrepMetrics from "./team-prep-metrics";
 import {
   CHAMPIONSHIP_COURSES,
@@ -11,19 +13,19 @@ import {
   type ChampionshipCourseIntel,
   type HolePlan,
 } from "@/lib/course-intelligence";
+import {
+  STUD_BUCKETS_ACCESS_COOKIE,
+  studBucketsAccessConfigured,
+  verifyStudBucketsSession,
+} from "@/lib/stud-buckets-auth";
 
 export const metadata: Metadata = {
   title: "Stud Buckets Game Plan | The Strand 2026",
-  description:
-    "The public Stud Buckets team field guide: roster metrics, captain benchmark, personal strokes, course management and preparation for Gamble Sands and Scarecrow.",
-  robots: { index: true, follow: true },
-  openGraph: {
-    title: "Stud Buckets Game Plan | The Strand 2026",
-    description:
-      "Our ten-man roster, captain metrics, personal stroke planner and complete Gamble Sands course-management plan.",
-    type: "website",
-  },
+  description: "Private course preparation and team strategy for the Stud Buckets.",
+  robots: { index: false, follow: false, nocache: true },
 };
+
+export const dynamic = "force-dynamic";
 
 const FEATURED_HOLES: Record<ChampionshipCourseIntel["id"], number[]> = {
   "gamble-sands": [2, 8, 12, 13, 17, 18],
@@ -203,7 +205,15 @@ function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
   );
 }
 
-export default function CoursePrepPage() {
+export default async function CoursePrepPage() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get(STUD_BUCKETS_ACCESS_COOKIE)?.value;
+  const authorized = verifyStudBucketsSession(session);
+
+  if (!authorized) {
+    return <AccessGate configured={studBucketsAccessConfigured()} />;
+  }
+
   const quickMin = Math.min(...QUICKSANDS_HOLES.map((hole) => hole.mappedYards));
   const quickMax = Math.max(...QUICKSANDS_HOLES.map((hole) => hole.mappedYards));
 
@@ -211,9 +221,9 @@ export default function CoursePrepPage() {
     <div id="top" className="min-h-screen bg-[#f4f0e7] text-[#10201b]">
       <header className="sticky top-0 z-50 border-b border-white/8 bg-[#071b18]/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 md:px-8">
-          <Link href="#top" className="flex items-center gap-3">
+          <Link href="/stud-buckets" className="flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e39a50] text-sm font-black text-[#10251e]">SB</span>
-            <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">Public team field guide</span><span className="block text-sm font-semibold">Stud Buckets</span></span>
+            <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">Private team field guide</span><span className="block text-sm font-semibold">Stud Buckets</span></span>
           </Link>
           <nav className="hidden items-center gap-5 text-[9px] font-bold uppercase tracking-[0.15em] text-white/55 lg:flex">
             <Link href="#team-metrics">Our team</Link>
@@ -232,7 +242,7 @@ export default function CoursePrepPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-[#071b18] via-[#071b18]/90 to-[#071b18]/55" />
           <div className="relative mx-auto max-w-[1440px] px-5 py-20 md:px-8 md:py-28">
             <div className="max-w-4xl">
-              <div className="inline-flex rounded-full border border-[#e39a50]/30 bg-[#e39a50]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Public · one page · our ten · study this</div>
+              <div className="inline-flex rounded-full border border-[#e39a50]/30 bg-[#e39a50]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Private · Stud Buckets only · study this</div>
               <h1 className="mt-7 max-w-[11ch] text-6xl font-semibold leading-[0.88] tracking-[-0.075em] sm:text-7xl md:text-8xl">Win before we arrive.</h1>
               <p className="mt-7 max-w-2xl text-base leading-7 text-white/62 md:text-lg">The complete Stud Buckets assignment: our ten-man metric board, WIX and J-BONE captain benchmark, personal strokes, 36 course decisions and the work required before Gamble Sands.</p>
               <div className="mt-9 flex flex-wrap gap-3">
