@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
-  return NextResponse.redirect(new URL("/stud-buckets/course-prep", request.url));
+  return NextResponse.redirect(new URL("/captains-room", request.url));
 }
 
 export const config = {
@@ -11,7 +11,6 @@ export const config = {
     "/courses/:path*",
     "/draft/:path*",
     "/embed/:path*",
-    "/live/:path*",
     "/my-strand/:path*",
     "/stud-buckets",
   ],
