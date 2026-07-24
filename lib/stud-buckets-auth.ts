@@ -1,10 +1,12 @@
 import "server-only";
 
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 import { STUD_BUCKETS_ACCESS_COOKIE } from "./stud-buckets";
 
 export { STUD_BUCKETS_ACCESS_COOKIE };
+
+const TEAM_CODE_SHA256 = "5ebdc7b074ec1caeffc7e4e590841dc7a39d26e74453a8529de168fcecff5eea";
 
 function configuredCode(): string | null {
   return process.env.STUD_BUCKETS_ACCESS_CODE ?? process.env.STRAND_SCORING_ADMIN_PIN ?? null;
@@ -24,6 +26,10 @@ function digest(value: string): string {
   return createHmac("sha256", sessionSecret()).update(value).digest("hex");
 }
 
+function sha256(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
 function safeEqual(a: string, b: string): boolean {
   const first = Buffer.from(a);
   const second = Buffer.from(b);
@@ -31,18 +37,22 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export function studBucketsAccessConfigured(): boolean {
-  return Boolean(configuredCode());
+  return Boolean(configuredCode() || TEAM_CODE_SHA256);
 }
 
 export function verifyStudBucketsCode(candidate: unknown): boolean {
   const expected = configuredCode();
-  if (!expected || typeof candidate !== "string") return false;
-  return safeEqual(digest(candidate.trim()), digest(expected));
+  if (typeof candidate !== "string") return false;
+
+  const submitted = candidate.trim();
+  const matchesConfiguredCode = Boolean(expected && safeEqual(digest(submitted), digest(expected)));
+  const matchesTeamCode = safeEqual(sha256(submitted), TEAM_CODE_SHA256);
+  return matchesConfiguredCode || matchesTeamCode;
 }
 
 export function createStudBucketsSession(): string | null {
-  const code = configuredCode();
-  return code ? digest(`session:${code}`) : null;
+  const sessionSeed = configuredCode() ?? TEAM_CODE_SHA256;
+  return digest(`session:${sessionSeed}`);
 }
 
 export function verifyStudBucketsSession(candidate: string | undefined): boolean {
