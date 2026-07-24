@@ -7,8 +7,8 @@ export default function ShareTeamGuide() {
 
   async function share() {
     const payload = {
-      title: "Stud Buckets · Private Team Guide",
-      text: "Stud Buckets: jobs, personal strokes, all 36 course plans and the path to 38. Team access code required.",
+      title: "The Strand · Gamble Sands Course Book",
+      text: "Private Gamble Sands course intel: local rules, course identity and a hole-by-hole plan for all 50 holes. Access code required.",
       url: window.location.href,
     };
 
@@ -28,7 +28,7 @@ export default function ShareTeamGuide() {
       onClick={share}
       className="rounded-full border border-white/16 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78 transition hover:border-white/30 hover:text-white"
     >
-      {copied ? "Link copied ✓" : "Share team guide"}
+      {copied ? "Link copied ✓" : "Share course book"}
     </button>
   );
 }

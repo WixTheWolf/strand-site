@@ -2,7 +2,13 @@
 
 import { FormEvent, useState } from "react";
 
-export default function AccessGate({ configured }: { configured: boolean }) {
+export default function AccessGate({
+  configured,
+  scope = "hq",
+}: {
+  configured: boolean;
+  scope?: "hq" | "course";
+}) {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -15,7 +21,7 @@ export default function AccessGate({ configured }: { configured: boolean }) {
       const response = await fetch("/api/stud-buckets/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code, scope }),
       });
       const payload = (await response.json().catch(() => ({}))) as { error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Unable to open team HQ.");
@@ -49,7 +55,9 @@ export default function AccessGate({ configured }: { configured: boolean }) {
             bucket.
           </h1>
           <p className="mt-5 max-w-sm text-sm leading-6 text-white/58">
-            Ten jobs, personal strokes, pairings, 50 holes of course intel and the path to 38. Keep the link and code inside the team.
+            {scope === "course"
+              ? "A private 50-hole Gamble Sands course book: local rules, course identity and a committed plan for every hole."
+              : "Captain access to team roles, pairings, matchup intelligence and the path to 38."}
           </p>
         </div>
 

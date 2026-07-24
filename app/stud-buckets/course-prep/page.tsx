@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import AccessGate from "../access-gate";
 import ShareTeamGuide from "./share-team-guide";
-import TeamPrepMetrics from "./team-prep-metrics";
 import {
   CHAMPIONSHIP_COURSES,
   COURSE_SOURCE_NOTE,
@@ -15,15 +14,16 @@ import {
   type HolePlan,
 } from "@/lib/course-intelligence";
 import {
+  COURSE_INTEL_ACCESS_COOKIE,
+  courseIntelAccessConfigured,
   STUD_BUCKETS_ACCESS_COOKIE,
-  studBucketsAccessConfigured,
+  verifyCourseIntelSession,
   verifyStudBucketsSession,
 } from "@/lib/stud-buckets-auth";
-import { STUD_BUCKETS_GOLD } from "@/lib/stud-buckets-team";
 
 export const metadata: Metadata = {
-  title: "Stud Buckets Game Plan | The Strand 2026",
-  description: "Private course preparation and team strategy for the Stud Buckets.",
+  title: "Gamble Sands Course Book | The Strand 2026",
+  description: "Private Gamble Sands course intelligence and hole-by-hole preparation.",
   robots: { index: false, follow: false, nocache: true },
 };
 
@@ -44,49 +44,26 @@ const COURSE_PREP: Record<ChampionshipCourseIntel["id"], string[]> = {
   ],
 };
 
-const FORMAT_SCRIPT: Record<ChampionshipCourseIntel["id"], [string, string][]> = {
+const COURSE_SCRIPT: Record<ChampionshipCourseIntel["id"], [string, string][]> = {
   "gamble-sands": [
-    ["Fourball · 80%", "Lead with a playable ball, then let the second player challenge the diagonal line or feeder slope."],
-    ["Scramble · 35/15", "Order drives by volatility: establish grass first, then give the longer or hotter driver a full green light."],
-    ["Scoring windows", "Expect the clearest birdie pressure on 2, 8, 12, 13 and 18. Attack only with the correct ground line."],
-    ["Closing defense", "Holes 15–17 were designed to decide matches. If ahead, remove the disaster side and make them create the hero shot."],
+    ["Course personality", "Wide landing areas hide preferred angles. The correct side of the fairway matters more than squeezing out another ten yards."],
+    ["Best weapon", "Carry-and-release wedges plus confident long-putt speed. The floor is part of every target."],
+    ["Scoring windows", "Expect the clearest birdie chances on 2, 8, 12, 13 and 18. Attack only with the correct ground line."],
+    ["Closing stretch", "Holes 15–17 apply the pressure. Remove the disaster side, accept the proper miss and arrive at 18 with a full swing."],
   ],
   scarecrow: [
-    ["Shamble · 75%", "Do not choose a drive by distance alone. Choose the ball on the correct side for that day’s pin and approach angle."],
-    ["Singles · 80%", "Keep the opponent solving blind angles. Center-green pars and completed holes will beat emotional flag hunting."],
-    ["Scoring windows", "Use the aggression budget on 1, 5, 12, 15 and 18 after confirming the pin-dependent lane."],
-    ["Closing defense", "The boomerang 17th rewards the ground; the drivable 18th rewards commitment. Arrive there without giving away 16."],
+    ["Course personality", "Smaller targets and stronger optical deception make pin location and preferred angle essential before choosing a tee line."],
+    ["Best weapon", "Controlled approaches to the correct green section. Center-green discipline beats short-sided ambition."],
+    ["Scoring windows", "The clearest chances come on 1, 5, 12, 15 and 18 after confirming the pin-dependent lane."],
+    ["Closing stretch", "The boomerang 17th rewards the ground; the drivable 18th rewards commitment. Do not give away 16 while looking ahead."],
   ],
 };
 
-const FOUR_WEEK_PLAN = [
-  {
-    week: "Week 1",
-    title: "Build the numbers",
-    work: "Confirm driver carry, stock shape and wedge carries at 80, 100, 120, 140 and 160. Record actual carry—not range-ball optimism.",
-  },
-  {
-    week: "Week 2",
-    title: "Own the ground",
-    work: "Two sessions of putter, hybrid and low-wedge shots from tight turf. Add 30–60 foot lag putting and downhill speed control.",
-  },
-  {
-    week: "Week 3",
-    title: "Practice the formats",
-    work: "Play nine holes of best ball or shamble. Announce safe ball, green light and match status before every aggressive shot.",
-  },
-  {
-    week: "Week 4",
-    title: "Sharpen, then arrive fresh",
-    work: "Short pressure practice, no swing rebuild. Prioritize sleep, walking tolerance, hydration and pain-free mobility for 36-hole days.",
-  },
-];
-
-const NON_NEGOTIABLES = [
-  ["One ball in grass", "In partner formats, the first job is permission. Once one ball is playable, the second player can attack."],
-  ["Center is a weapon", "These greens create three-putts and impossible recoveries. Twenty-five feet is often a winning shot."],
+const COURSE_TRUTHS = [
+  ["Carry is half the number", "Read the landing slope, bounce and expected release before choosing a club."],
+  ["Center is a weapon", "These greens create three-putts and impossible recoveries. Twenty-five feet is often an excellent shot."],
   ["Use the floor", "Firm turf, feeder slopes and open entrances reward low shots. Aerial-only golf leaves shots behind."],
-  ["Kill doubles", "The opponent should have to earn every point. Punch out, take medicine and keep bogey in the hole."],
+  ["Grass before glory", "Desert sand creates awkward lies and uncertain contact. Choose the line that keeps the ball on maintained turf."],
 ];
 
 const RESORT_RULES = [
@@ -118,25 +95,6 @@ const CASCADES_PLAN = [
   ["Build the capture speed", "Finish ten putts from 6–10 feet with enough pace to remove late break without racing the comeback outside three feet."],
   ["Train partner reads", "One player calls start line and pace before the other putts. Compare the read with the actual roll and update together."],
   ["End under consequence", "Play nine changing holes at two-putt-or-better. A three-putt loses the hole; no restarts and no casual second ball."],
-];
-
-const FIRST_TEE_CARD = [
-  "Know the match and who receives strokes before the first shot.",
-  "Say the plan out loud: safe ball, target side, preferred miss and green-light player.",
-  "Commit to one start line. No steering after choosing the aggressive route.",
-  "Read landing area, wind and rollout—not only the flag and GPS number.",
-  "After every hole: confirm match status, reset and move. No emotional carryover.",
-];
-
-const PACK_LIST = [
-  "Two pairs of broken-in golf shoes",
-  "Extra socks and blister care",
-  "Electrolytes and on-course calories",
-  "Sunscreen, lip protection and sunglasses",
-  "Light rain/wind layer",
-  "Athletic tape and personal recovery gear",
-  "Rangefinder plus charged phone/power bank",
-  "One reliable ball model for the full weekend",
 ];
 
 const PLAN_STYLE: Record<HolePlan, string> = {
@@ -216,7 +174,7 @@ function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9a6031]">Course identity</p>
             <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] md:text-4xl">What wins here.</h3>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {FORMAT_SCRIPT[course.id].map(([label, line], index) => (
+              {COURSE_SCRIPT[course.id].map(([label, line], index) => (
                 <div key={label} className="rounded-2xl bg-[#f4f0e7] p-4">
                   <span className="font-mono text-[10px] text-[#9a6031]">0{index + 1}</span>
                   <div className="mt-2 text-[9px] font-bold uppercase tracking-[0.15em] text-[#31594d]">{label}</div>
@@ -227,7 +185,7 @@ function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
             <div className="mt-6 rounded-2xl border border-[#31594d]/12 bg-[#edf3ef] p-5">
               <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#31594d]">On-course sequence</div>
               <p className="mt-2 text-sm leading-6 text-black/58">
-                Confirm the pin zone, wind and match status. Pick the landing area and preferred miss. Only then choose the club and trajectory.
+                Confirm the pin zone and wind. Pick the landing area, release pattern and preferred miss. Only then choose the club and trajectory.
               </p>
             </div>
           </article>
@@ -236,7 +194,7 @@ function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
         <div className="mt-16">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9a6031]">Private 18-hole command book</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#9a6031]">18-hole field book</p>
               <h3 className="mt-2 max-w-3xl text-4xl font-semibold tracking-[-0.055em] md:text-6xl">Every hole. One committed plan.</h3>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-black/52">
                 Yardage is from the official {tee.name} tee. Reconfirm the day&apos;s marker, pin and wind before using the plan.
@@ -283,15 +241,9 @@ function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
                     <p className="mt-2 text-sm leading-6 text-black/62">{hole.strategy}</p>
                   </div>
 
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-[#f4f0e7] p-4">
-                      <div className="text-[8px] font-bold uppercase tracking-[0.18em] text-black/35">Preferred miss</div>
-                      <p className="mt-2 text-xs leading-5 text-black/58">{hole.preferredMiss}</p>
-                    </div>
-                    <div className="rounded-2xl bg-[#071b18] p-4 text-white">
-                      <div className="text-[8px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">Match call</div>
-                      <p className="mt-2 text-xs leading-5 text-white/62">{hole.matchPlay}</p>
-                    </div>
+                  <div className="mt-5 rounded-2xl bg-[#f4f0e7] p-4">
+                    <div className="text-[8px] font-bold uppercase tracking-[0.18em] text-black/35">Preferred miss</div>
+                    <p className="mt-2 text-xs leading-5 text-black/58">{hole.preferredMiss}</p>
                   </div>
 
                   <details className="group mt-4 rounded-xl border border-black/8 bg-white px-4 py-3">
@@ -334,11 +286,13 @@ function CourseSection({ course }: { course: ChampionshipCourseIntel }) {
 
 export default async function CoursePrepPage() {
   const cookieStore = await cookies();
-  const session = cookieStore.get(STUD_BUCKETS_ACCESS_COOKIE)?.value;
-  const authorized = verifyStudBucketsSession(session);
+  const captainSession = cookieStore.get(STUD_BUCKETS_ACCESS_COOKIE)?.value;
+  const courseSession = cookieStore.get(COURSE_INTEL_ACCESS_COOKIE)?.value;
+  const authorized =
+    verifyStudBucketsSession(captainSession) || verifyCourseIntelSession(courseSession);
 
   if (!authorized) {
-    return <AccessGate configured={studBucketsAccessConfigured()} />;
+    return <AccessGate configured={courseIntelAccessConfigured()} scope="course" />;
   }
 
   const quickMin = Math.min(...QUICKSANDS_HOLES.map((hole) => hole.mappedYards));
@@ -348,19 +302,17 @@ export default async function CoursePrepPage() {
     <div id="top" className="min-h-screen bg-[#f4f0e7] text-[#10201b]">
       <header className="sticky top-0 z-50 border-b border-white/8 bg-[#071b18]/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 md:px-8">
-          <Link href="/stud-buckets" className="flex items-center gap-3">
+          <Link href="#top" className="flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e39a50] text-sm font-black text-[#10251e]">SB</span>
-            <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">Private team field guide</span><span className="block text-sm font-semibold">Stud Buckets</span></span>
+            <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">Private field guide</span><span className="block text-sm font-semibold">Gamble Sands Course Book</span></span>
           </Link>
           <nav className="hidden items-center gap-5 text-[9px] font-bold uppercase tracking-[0.15em] text-white/55 lg:flex">
-            <Link href="#team-metrics">Our team</Link>
             <Link href="#gamble-sands">Gamble Sands</Link>
             <Link href="#scarecrow">Scarecrow</Link>
             <Link href="#quicksands">QuickSands</Link>
             <Link href="#cascades">Cascades</Link>
-            <Link href="#first-tee">First tee</Link>
           </nav>
-          <Link href="/live" className="rounded-full border border-white/12 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.17em] text-white/58">Live scoring</Link>
+          <span className="rounded-full border border-white/12 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.17em] text-white/58">50-hole book</span>
         </div>
       </header>
 
@@ -370,12 +322,11 @@ export default async function CoursePrepPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-[#071b18] via-[#071b18]/90 to-[#071b18]/55" />
           <div className="relative mx-auto max-w-[1440px] px-5 py-20 md:px-8 md:py-28">
             <div className="max-w-4xl">
-              <div className="inline-flex rounded-full border border-[#e39a50]/30 bg-[#e39a50]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Private · Stud Buckets only · officially overprepared</div>
-              <h1 className="mt-7 max-w-[11ch] text-6xl font-semibold leading-[0.88] tracking-[-0.075em] sm:text-7xl md:text-8xl">Win before we arrive.</h1>
-              <p className="mt-7 max-w-2xl text-base leading-7 text-white/62 md:text-lg">The complete Stud Buckets assignment: ten real jobs, personal strokes, 36 course decisions, no beer math and just enough data to become deeply annoying to play against.</p>
+              <div className="inline-flex rounded-full border border-[#e39a50]/30 bg-[#e39a50]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Private · Course intelligence only</div>
+              <h1 className="mt-7 max-w-[11ch] text-6xl font-semibold leading-[0.88] tracking-[-0.075em] sm:text-7xl md:text-8xl">Know the ground.</h1>
+              <p className="mt-7 max-w-2xl text-base leading-7 text-white/62 md:text-lg">A focused Gamble Sands course book: local rules, course identity, scoring windows and one committed plan for every hole—built to scan quickly from an iPhone.</p>
               <div className="mt-9 flex flex-wrap gap-3">
-                <Link href="#gamble-sands" className="rounded-full bg-[#e39a50] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#10251e]">Open the 36-hole book</Link>
-                <Link href="#team-metrics" className="rounded-full border border-white/16 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/78">Our team board</Link>
+                <Link href="#gamble-sands" className="rounded-full bg-[#e39a50] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#10251e]">Open the course book</Link>
                 <ShareTeamGuide />
               </div>
             </div>
@@ -384,36 +335,13 @@ export default async function CoursePrepPage() {
 
         <section className="border-b border-black/8 bg-white">
           <div className="mx-auto grid max-w-[1440px] gap-px bg-black/8 md:grid-cols-4">
-            {NON_NEGOTIABLES.map(([title, copy], index) => (
+            {COURSE_TRUTHS.map(([title, copy], index) => (
               <article key={title} className="bg-white p-6 md:p-7">
                 <div className="font-mono text-[10px] text-[#9a6031]">0{index + 1}</div>
                 <h2 className="mt-4 text-xl font-semibold">{title}</h2>
                 <p className="mt-2 text-xs leading-5 text-black/50">{copy}</p>
               </article>
             ))}
-          </div>
-        </section>
-
-        <section className="border-b border-black/8 bg-[#e39a50] py-16 md:py-24">
-          <div className="mx-auto max-w-[1440px] px-5 md:px-8">
-            <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10251e]/55">The gold</p>
-                <h2 className="mt-3 text-5xl font-semibold tracking-[-0.065em] text-[#10251e] md:text-7xl">Ten tips worth actual points.</h2>
-              </div>
-              <p className="max-w-2xl text-sm leading-7 text-[#10251e]/62">
-                Read these once sober, once after the first round and once when somebody says, “I think I can carry that.”
-              </p>
-            </div>
-            <div className="mt-10 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-              {STUD_BUCKETS_GOLD.map((item, index) => (
-                <article key={item.title} className="rounded-[1.5rem] bg-[#071b18] p-5 text-white shadow-lg">
-                  <div className="font-mono text-[10px] text-[#efbd88]">{String(index + 1).padStart(2, "0")}</div>
-                  <h3 className="mt-4 text-xl font-semibold">{item.title}</h3>
-                  <p className="mt-3 text-xs leading-5 text-white/55">{item.tip}</p>
-                </article>
-              ))}
-            </div>
           </div>
         </section>
 
@@ -437,8 +365,6 @@ export default async function CoursePrepPage() {
             </div>
           </div>
         </section>
-
-        <TeamPrepMetrics />
 
         {CHAMPIONSHIP_COURSES.map((course) => <CourseSection key={course.id} course={course} />)}
 
@@ -521,66 +447,9 @@ export default async function CoursePrepPage() {
           </div>
         </section>
 
-        <section id="practice" className="scroll-mt-24 py-16 md:py-24">
-          <div className="mx-auto max-w-[1440px] px-5 md:px-8">
-            <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9a6031]">Four-week runway</p>
-            <h2 className="mt-3 max-w-4xl text-4xl font-semibold tracking-[-0.055em] md:text-6xl">Practice what the courses will actually ask for.</h2>
-            <div className="mt-10 grid gap-4 lg:grid-cols-4">
-              {FOUR_WEEK_PLAN.map((item, index) => (
-                <article key={item.week} className="rounded-[1.75rem] border border-black/8 bg-white p-6 shadow-sm">
-                  <div className="flex items-center justify-between"><span className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#9a6031]">{item.week}</span><span className="font-mono text-[10px] text-black/25">0{index + 1}</span></div>
-                  <h3 className="mt-5 text-2xl font-semibold">{item.title}</h3>
-                  <p className="mt-4 text-sm leading-6 text-black/52">{item.work}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="border-y border-black/8 bg-white py-16 md:py-24">
-          <div className="mx-auto grid max-w-[1440px] gap-10 px-5 md:px-8 lg:grid-cols-2">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9a6031]">36-hole readiness</p>
-              <h2 className="mt-3 text-4xl font-semibold tracking-[-0.055em]">Do not lose Saturday in the hotel room.</h2>
-              <p className="mt-4 max-w-xl text-sm leading-6 text-black/52">Friday and Saturday are double-round days. Equipment, feet, food and hydration are performance variables—not housekeeping.</p>
-              <div className="mt-8 grid gap-2 sm:grid-cols-2">
-                {PACK_LIST.map((item) => <div key={item} className="flex items-start gap-3 rounded-xl bg-[#f4f0e7] px-4 py-3 text-xs leading-5 text-black/58"><span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#31594d]" />{item}</div>)}
-              </div>
-            </div>
-            <div className="rounded-[2rem] bg-[#071b18] p-7 text-white md:p-9">
-              <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Between rounds</div>
-              <div className="mt-6 space-y-5">
-                {[
-                  ["Refuel immediately", "Carbohydrate, protein, fluids and sodium before sitting down for a long lunch."],
-                  ["Change the contact points", "Dry socks, fresh shirt and a second pair of shoes prevent small problems becoming swing changes."],
-                  ["Ten-minute reset", "Hips, calves, thoracic rotation and breathing. No exhausting workout and no hour-long range rebuild."],
-                  ["Review only decisions", "Talk target, club and match communication—not every bad swing from the morning."],
-                ].map(([title, copy], index) => (
-                  <div key={title} className="flex gap-4"><span className="font-mono text-xs text-[#efbd88]">0{index + 1}</span><div><h3 className="font-semibold">{title}</h3><p className="mt-1 text-xs leading-5 text-white/48">{copy}</p></div></div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="first-tee" className="scroll-mt-24 bg-[#e39a50] py-16 md:py-24">
-          <div className="mx-auto grid max-w-[1440px] gap-10 px-5 md:px-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#10251e]/55">Screenshot this</p>
-              <h2 className="mt-3 text-5xl font-semibold tracking-[-0.065em] text-[#10251e] md:text-7xl">The first-tee card.</h2>
-              <p className="mt-5 max-w-lg text-sm leading-6 text-[#10251e]/65">Five reminders before every team match. Simple enough to remember when the wind is up and the beer math starts.</p>
-            </div>
-            <div className="overflow-hidden rounded-[2rem] bg-[#071b18] text-white shadow-2xl">
-              {FIRST_TEE_CARD.map((item, index) => (
-                <div key={item} className="flex gap-5 border-b border-white/8 p-5 last:border-0 md:p-6"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e39a50] font-mono text-xs font-bold text-[#10251e]">{index + 1}</span><p className="pt-1 text-sm leading-6 text-white/68">{item}</p></div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <footer className="bg-[#071b18] px-5 py-10 text-white md:px-8">
           <div className="mx-auto flex max-w-[1440px] flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div><div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/32">Stud Buckets</div><div className="mt-2 text-2xl font-semibold">Prepare smarter. Arrive fresh. Take 38.</div></div>
+            <div><div className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/32">Gamble Sands · 2026</div><div className="mt-2 text-2xl font-semibold">Know the landing area. Trust the ground.</div></div>
             <p className="max-w-xl text-xs leading-5 text-white/32">{COURSE_SOURCE_NOTE}</p>
           </div>
         </footer>

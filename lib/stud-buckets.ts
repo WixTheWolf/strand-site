@@ -37,6 +37,7 @@ export const JBONE_TEAM = {
 } as const;
 
 export const STUD_BUCKETS_ACCESS_COOKIE = "strand-stud-buckets-access";
+export const COURSE_INTEL_ACCESS_COOKIE = "strand-course-intel-access";
 
 export const PATH_TO_38 = [
   {
