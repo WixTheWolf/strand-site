@@ -2,20 +2,35 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { CAPTAIN_PLAYERS, READY_CHECK, TEAM_RULES } from "@/lib/captains-room";
+import { CAPTAIN_PLAYERS, READY_CHECK, TEAM_RULES, type CaptainPlayer } from "@/lib/captains-room";
 
 const EVENT_DATE = new Date("2026-08-21T08:00:00-07:00");
 const daysUntil = () => Math.max(0, Math.ceil((EVENT_DATE.getTime() - Date.now()) / 86400000));
 
 export default function CaptainsRoom() {
   const [selectedId, setSelectedId] = useState(CAPTAIN_PLAYERS[0].id);
+  const [captain, setCaptain] = useState<CaptainPlayer | null>(null);
+  const [showCaptainLogin, setShowCaptainLogin] = useState(false);
+  const [captainCode, setCaptainCode] = useState("");
+  const [captainError, setCaptainError] = useState("");
+  const [captainBusy, setCaptainBusy] = useState(false);
   const [checked, setChecked] = useState<string[]>([]);
   const [days, setDays] = useState(daysUntil());
-  const player = useMemo(() => CAPTAIN_PLAYERS.find((item) => item.id === selectedId) ?? CAPTAIN_PLAYERS[0], [selectedId]);
+  const players = useMemo(() => captain ? [captain, ...CAPTAIN_PLAYERS] : CAPTAIN_PLAYERS, [captain]);
+  const player = useMemo(() => players.find((item) => item.id === selectedId) ?? players[0], [players, selectedId]);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("strand-ready-check");
     if (saved) setChecked(JSON.parse(saved));
+    fetch("/api/captains-room/me", { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((payload) => {
+        if (payload?.authorized && payload.player) {
+          setCaptain(payload.player);
+          setSelectedId(payload.player.id);
+        }
+      })
+      .catch(() => undefined);
     const timer = window.setInterval(() => setDays(daysUntil()), 60000);
     return () => window.clearInterval(timer);
   }, []);
@@ -24,6 +39,37 @@ export default function CaptainsRoom() {
     const next = checked.includes(item) ? checked.filter((value) => value !== item) : [...checked, item];
     setChecked(next);
     window.localStorage.setItem("strand-ready-check", JSON.stringify(next));
+  }
+
+  async function unlockCaptain(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setCaptainBusy(true);
+    setCaptainError("");
+    try {
+      const response = await fetch("/api/captains-room/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: captainCode }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? "Unable to unlock captain access.");
+      const profileResponse = await fetch("/api/captains-room/me", { cache: "no-store" });
+      const profile = await profileResponse.json();
+      setCaptain(profile.player);
+      setSelectedId(profile.player.id);
+      setShowCaptainLogin(false);
+      setCaptainCode("");
+    } catch (error) {
+      setCaptainError(error instanceof Error ? error.message : "Unable to unlock captain access.");
+    } finally {
+      setCaptainBusy(false);
+    }
+  }
+
+  async function lockCaptain() {
+    await fetch("/api/captains-room/login", { method: "DELETE" });
+    setCaptain(null);
+    setSelectedId(CAPTAIN_PLAYERS[0].id);
   }
 
   async function logout() {
@@ -40,9 +86,12 @@ export default function CaptainsRoom() {
             <span><span className="block text-[9px] uppercase tracking-[.24em] text-white/40">The Strand 2026</span><span className="block text-sm font-bold">Captain’s Room</span></span>
           </Link>
           <nav className="hidden gap-5 text-[10px] font-bold uppercase tracking-[.16em] text-white/55 md:flex">
-            <Link href="#role">My role</Link><Link href="#prep">Prepare</Link><Link href="#tools">Tools</Link><Link href="#rules">Team code</Link>
+            <Link href="#role">My role</Link><Link href="#decisions">Decisions</Link><Link href="#prep">Prepare</Link><Link href="#tools">Tools</Link>
           </nav>
-          <button onClick={logout} className="rounded-full border border-white/15 px-3 py-2 text-[9px] font-bold uppercase tracking-[.16em] text-white/55">Lock</button>
+          <div className="flex items-center gap-2">
+            {captain ? <button onClick={lockCaptain} className="rounded-full border border-[#e5a15d]/35 bg-[#e5a15d]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-[.16em] text-[#f2c28e]">Lock WIX</button> : <button onClick={() => setShowCaptainLogin(true)} className="rounded-full border border-[#e5a15d]/35 px-3 py-2 text-[9px] font-bold uppercase tracking-[.16em] text-[#f2c28e]">Captain access</button>}
+            <button onClick={logout} className="rounded-full border border-white/15 px-3 py-2 text-[9px] font-bold uppercase tracking-[.16em] text-white/55">Lock</button>
+          </div>
         </div>
       </header>
 
@@ -51,9 +100,9 @@ export default function CaptainsRoom() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_15%,rgba(229,161,93,.28),transparent_30%),radial-gradient(circle_at_85%_50%,rgba(70,128,105,.28),transparent_34%)]" />
           <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 md:px-8 md:py-24 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
             <div>
-              <div className="inline-flex rounded-full border border-[#e5a15d]/35 bg-[#e5a15d]/10 px-4 py-2 text-[9px] font-black uppercase tracking-[.2em] text-[#f2c28e]">Nine players · one captain · zero donated holes</div>
+              <div className="inline-flex rounded-full border border-[#e5a15d]/35 bg-[#e5a15d]/10 px-4 py-2 text-[9px] font-black uppercase tracking-[.2em] text-[#f2c28e]">Nine teammates · one captain · zero donated holes</div>
               <h1 className="mt-7 max-w-[11ch] text-6xl font-semibold leading-[.88] tracking-[-.075em] sm:text-7xl md:text-8xl">Show up ready. Leave with the points.</h1>
-              <p className="mt-7 max-w-2xl text-base leading-7 text-white/60">Your personal role, preparation plan, match-play rules, course tools, and tournament-week checklist for August 21–22.</p>
+              <p className="mt-7 max-w-2xl text-base leading-7 text-white/60">Personal roles, preparation plans, shared captain decisions, match-play rules, and tournament tools for August 21–22.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="#role" className="rounded-full bg-[#e5a15d] px-5 py-3 text-[10px] font-black uppercase tracking-[.17em] text-[#10251e]">Find my assignment</Link>
                 <Link href="/stud-buckets/course-prep" className="rounded-full border border-white/15 px-5 py-3 text-[10px] font-black uppercase tracking-[.17em] text-white/75">Open course intel</Link>
@@ -72,7 +121,7 @@ export default function CaptainsRoom() {
         <section id="role" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-16 md:px-8 md:py-24">
           <Eyebrow>Your assignment</Eyebrow><Title>Everybody has a job.</Title>
           <div className="mt-8 flex gap-2 overflow-x-auto pb-3">
-            {CAPTAIN_PLAYERS.map((item) => <button key={item.id} onClick={() => setSelectedId(item.id)} className={`shrink-0 rounded-full px-4 py-3 text-[10px] font-black uppercase tracking-[.14em] ${selectedId === item.id ? "bg-[#0b2b23] text-white" : "border border-black/10 bg-white text-black/55"}`}>{item.nickname}</button>)}
+            {players.map((item) => <button key={item.id} onClick={() => setSelectedId(item.id)} className={`shrink-0 rounded-full px-4 py-3 text-[10px] font-black uppercase tracking-[.14em] ${selectedId === item.id ? "bg-[#0b2b23] text-white" : "border border-black/10 bg-white text-black/55"}`}>{item.nickname}{item.id === "matt-wixted" ? " · PRIVATE" : ""}</button>)}
           </div>
           <article className="mt-5 overflow-hidden rounded-[2.25rem] border border-black/8 bg-white shadow-sm">
             <div className="grid lg:grid-cols-[.8fr_1.2fr]">
@@ -90,6 +139,21 @@ export default function CaptainsRoom() {
               </div>
             </div>
           </article>
+        </section>
+
+        <section id="decisions" className="scroll-mt-24 bg-[#d9d0bf] py-16 md:py-24">
+          <div className="mx-auto max-w-7xl px-5 md:px-8">
+            <Eyebrow>Shared decisions</Eyebrow><Title>The captain is in the loop.</Title>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-black/55">Every player owns his swing and preparation. Decisions that affect the whole team stay with WIX after hearing the players involved.</p>
+            <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                ["Pairings", "WIX makes the final partner call using form, chemistry, format fit, and health."],
+                ["Shot order", "Partners discuss it. WIX sets the default order when the team needs one clear answer."],
+                ["Green light", "The player owns the shot. WIX can shut down unnecessary risk when the team situation demands it."],
+                ["Lineup changes", "No surprises. WIX speaks directly with affected players before changing a plan."],
+              ].map(([title, copy]) => <article key={title} className="rounded-[1.75rem] bg-[#eee8dc] p-6"><h3 className="text-2xl font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-black/55">{copy}</p></article>)}
+            </div>
+          </div>
         </section>
 
         <section id="prep" className="scroll-mt-24 bg-[#0b2b23] py-16 text-white md:py-24">
@@ -126,6 +190,8 @@ export default function CaptainsRoom() {
         <section id="rules" className="bg-[#d9d0bf] py-16 md:py-24"><div className="mx-auto max-w-7xl px-5 md:px-8"><Eyebrow>The team code</Eyebrow><Title>Golf that travels.</Title><div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{TEAM_RULES.map(([title, copy], index) => <article key={title} className="rounded-[1.75rem] bg-[#eee8dc] p-6"><div className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a6031]">Rule {index + 1}</div><h3 className="mt-3 text-2xl font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-black/55">{copy}</p></article>)}</div></div></section>
       </main>
       <footer className="bg-[#071b18] px-5 py-10 text-center text-white"><p className="text-xl font-semibold">The Stud Buckets</p><p className="mt-2 text-[9px] font-bold uppercase tracking-[.22em] text-white/35">Prepared by Captain Wix · Gamble Sands · August 21–22, 2026</p></footer>
+
+      {showCaptainLogin && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#071b18]/85 p-5 backdrop-blur-sm"><form onSubmit={unlockCaptain} className="w-full max-w-md rounded-[2rem] bg-[#eee8dc] p-7 shadow-2xl"><div className="text-[10px] font-black uppercase tracking-[.22em] text-[#9a6031]">Captain only</div><h2 className="mt-3 text-4xl font-semibold tracking-[-.05em]">Unlock WIX.</h2><p className="mt-3 text-sm leading-6 text-black/50">Your tab and preparation plan remain unavailable to teammates.</p><input autoFocus type="password" value={captainCode} onChange={(event) => setCaptainCode(event.target.value)} placeholder="Captain password" className="mt-6 w-full rounded-2xl border border-black/10 bg-white px-4 py-4 text-base outline-none focus:border-[#9a6031]" />{captainError && <p className="mt-3 text-sm font-semibold text-red-700">{captainError}</p>}<div className="mt-6 flex gap-3"><button type="button" onClick={() => { setShowCaptainLogin(false); setCaptainError(""); }} className="flex-1 rounded-full border border-black/10 px-5 py-3 text-[10px] font-black uppercase tracking-[.16em]">Cancel</button><button disabled={captainBusy} className="flex-1 rounded-full bg-[#0b2b23] px-5 py-3 text-[10px] font-black uppercase tracking-[.16em] text-white disabled:opacity-50">{captainBusy ? "Unlocking…" : "Unlock"}</button></div></form></div>}
     </div>
   );
 }
