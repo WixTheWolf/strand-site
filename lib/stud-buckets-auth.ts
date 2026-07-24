@@ -6,19 +6,15 @@ import { COURSE_INTEL_ACCESS_COOKIE, STUD_BUCKETS_ACCESS_COOKIE } from "./stud-b
 
 export { COURSE_INTEL_ACCESS_COOKIE, STUD_BUCKETS_ACCESS_COOKIE };
 
-const COURSE_INTEL_CODE_SHA256 = "5ebdc7b074ec1caeffc7e4e590841dc7a39d26e74453a8529de168fcecff5eea";
-
-function configuredCode(): string | null {
-  return process.env.STUD_BUCKETS_ACCESS_CODE ?? process.env.STRAND_SCORING_ADMIN_PIN ?? null;
-}
+// SHA-256 for the shared teammate access code. The plaintext password is never stored in the repository.
+const TEAM_ACCESS_CODE_SHA256 = "5ebdc7b074ec1caeffc7e4e590841dc7a39d26e74453a8529de168fcecff5eea";
 
 function sessionSecret(): string {
   return (
     process.env.STUD_BUCKETS_COOKIE_SECRET ??
     process.env.UPSTASH_REDIS_REST_TOKEN ??
     process.env.KV_REST_API_TOKEN ??
-    configuredCode() ??
-    "stud-buckets-not-configured"
+    TEAM_ACCESS_CODE_SHA256
   );
 }
 
@@ -36,38 +32,36 @@ function safeEqual(a: string, b: string): boolean {
   return first.length === second.length && timingSafeEqual(first, second);
 }
 
+function verifyTeamCode(candidate: unknown): boolean {
+  return typeof candidate === "string" && safeEqual(sha256(candidate.trim()), TEAM_ACCESS_CODE_SHA256);
+}
+
 export function studBucketsAccessConfigured(): boolean {
-  return Boolean(configuredCode());
+  return true;
 }
 
 export function courseIntelAccessConfigured(): boolean {
-  return Boolean(COURSE_INTEL_CODE_SHA256);
+  return true;
 }
 
 export function verifyStudBucketsCode(candidate: unknown): boolean {
-  const expected = configuredCode();
-  if (!expected || typeof candidate !== "string") return false;
-
-  const submitted = candidate.trim();
-  return safeEqual(digest(submitted), digest(expected));
+  return verifyTeamCode(candidate);
 }
 
 export function verifyCourseIntelCode(candidate: unknown): boolean {
-  return typeof candidate === "string" && safeEqual(sha256(candidate.trim()), COURSE_INTEL_CODE_SHA256);
+  return verifyTeamCode(candidate);
 }
 
-export function createStudBucketsSession(): string | null {
-  const code = configuredCode();
-  return code ? digest(`session:${code}`) : null;
+export function createStudBucketsSession(): string {
+  return digest(`stud-buckets:${TEAM_ACCESS_CODE_SHA256}`);
 }
 
 export function verifyStudBucketsSession(candidate: string | undefined): boolean {
-  const expected = createStudBucketsSession();
-  return Boolean(candidate && expected && safeEqual(candidate, expected));
+  return Boolean(candidate && safeEqual(candidate, createStudBucketsSession()));
 }
 
 export function createCourseIntelSession(): string {
-  return digest(`course-intel:${COURSE_INTEL_CODE_SHA256}`);
+  return digest(`course-intel:${TEAM_ACCESS_CODE_SHA256}`);
 }
 
 export function verifyCourseIntelSession(candidate: string | undefined): boolean {
