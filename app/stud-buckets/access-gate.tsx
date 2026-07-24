@@ -56,7 +56,7 @@ export default function AccessGate({
           </h1>
           <p className="mt-5 max-w-sm text-sm leading-6 text-white/58">
             {scope === "course"
-              ? "A private 50-hole Gamble Sands course book: local rules, course identity and a committed plan for every hole."
+              ? "A private on-course caddie: choose the course, hole, format and shot for one clear decision."
               : "Captain access to team roles, pairings, matchup intelligence and the path to 38."}
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function AccessGate({
         )}
 
         <p className="mt-6 text-center text-[10px] uppercase tracking-[0.18em] text-white/28">
-          Ten studs · one bucket · 38 points
+          {scope === "course" ? "Course intel only · private field guide" : "Ten studs · one bucket · 38 points"}
         </p>
       </section>
     </main>

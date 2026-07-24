@@ -7,8 +7,8 @@ export default function ShareTeamGuide() {
 
   async function share() {
     const payload = {
-      title: "The Strand · Gamble Sands Course Book",
-      text: "Private Gamble Sands course intel: local rules, course identity and a hole-by-hole plan for all 50 holes. Access code required.",
+      title: "The Strand · On-Course Caddie",
+      text: "Private Gamble Sands caddie: choose the course, hole, format and shot for an instant green/yellow/red decision. Access code required.",
       url: window.location.href,
     };
 
