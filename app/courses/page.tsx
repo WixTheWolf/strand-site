@@ -4,9 +4,9 @@ import SiteFooter from "../components/site-footer";
 import CourseCommandCenter from "./course-command-center";
 
 export const metadata: Metadata = {
-  title: "Gamble Sands Course Intel | The Strand 2026",
+  title: "Team Course Game Plan | The Strand 2026",
   description:
-    "Hole-by-hole Gamble Sands, Scarecrow and QuickSands strategy with official scorecards, tee data, course handicaps, player fit and Strand match-play calls.",
+    "One team field guide for Gamble Sands and Scarecrow: course management, personal strokes, format tactics, preparation drills and all 36 hole-by-hole decisions.",
 };
 
 export default function CoursesPage() {

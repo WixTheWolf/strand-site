@@ -15,8 +15,9 @@ import {
 } from "@/lib/course-intelligence";
 import { buildSaberBoard } from "@/lib/sabermetrics";
 import type { PlayerDraftStats } from "@/lib/types";
+import TeamCoursePlaybook from "./team-course-playbook";
 
-type CourseView = "gamble-sands" | "scarecrow" | "quicksands" | "cascades";
+type CourseView = "team-plan" | "gamble-sands" | "scarecrow" | "quicksands" | "cascades";
 type HoleFilter = "all" | "front" | "back" | "attack" | "closing";
 type CourseFormat = "fourball" | "scramble" | "shamble" | "singles";
 
@@ -25,6 +26,7 @@ interface DraftPayload {
 }
 
 const COURSE_TABS: { id: CourseView; label: string; note: string }[] = [
+  { id: "team-plan", label: "Team Game Plan", note: "Start here" },
   { id: "gamble-sands", label: "Gamble Sands", note: "R1 + R4" },
   { id: "scarecrow", label: "Scarecrow", note: "R2 + R3" },
   { id: "quicksands", label: "QuickSands", note: "Warm-up" },
@@ -476,7 +478,7 @@ function CascadesGuide() {
 }
 
 export default function CourseCommandCenter() {
-  const [view, setView] = useState<CourseView>("gamble-sands");
+  const [view, setView] = useState<CourseView>("team-plan");
   const [players, setPlayers] = useState<PlayerDraftStats[]>([]);
   const [loadingPlayers, setLoadingPlayers] = useState(true);
 
@@ -513,6 +515,16 @@ export default function CourseCommandCenter() {
         </div>
       </div>
 
+      {view === "team-plan" ? (
+        <TeamCoursePlaybook
+          players={players}
+          loadingPlayers={loadingPlayers}
+          onOpenCourse={(courseId) => {
+            setView(courseId);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
+      ) : null}
       {selectedCourse ? <ChampionshipGuide key={selectedCourse.id} course={selectedCourse} players={players} loadingPlayers={loadingPlayers} /> : null}
       {view === "quicksands" ? <QuickSandsGuide /> : null}
       {view === "cascades" ? <CascadesGuide /> : null}

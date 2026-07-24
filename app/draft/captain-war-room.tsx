@@ -19,6 +19,7 @@ import {
   type StrandFormat,
 } from "@/lib/sabermetrics";
 import { CAPTAIN_INTEL_STORAGE_KEY, officialDraftSide } from "@/lib/draft-order";
+import { buildFinalScoutCase } from "@/lib/final-scouting";
 import type { PlayerDraftStats } from "@/lib/types";
 import CaptainIntelPanel from "./captain-intel-panel";
 
@@ -131,10 +132,16 @@ function RecentLedger({ metric }: { metric: PlayerSaberMetrics }) {
       return (
         <div className="mt-4 rounded-xl border border-sky-200 bg-sky-50 p-4">
           <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-sky-800/60">Garmin Connect aggregate</div>
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
-            <DataPoint label="Sample" value={`${aggregate.sampleSize} rounds`} note="Individual cards unavailable" />
-            <DataPoint label="9-hole average" value={aggregate.averageToPar9 === undefined ? "—" : `+${aggregate.averageToPar9}`} note="Score relative to par" />
-            <DataPoint label="18-hole average" value={aggregate.averageToPar18 === undefined ? "—" : `+${aggregate.averageToPar18}`} note="Score relative to par" />
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+            <DataPoint label="Recent sample" value={`${aggregate.sampleSize} rounds`} note="Individual cards unavailable" />
+            <DataPoint label="Lifetime rounds" value={aggregate.lifetimeRounds?.toLocaleString() ?? "—"} note="Experience signal only" />
+            <DataPoint label="9-hole average" value={aggregate.averageToPar9 === undefined ? "—" : `+${aggregate.averageToPar9}`} note="Latest aggregate" />
+            <DataPoint label="18-hole average" value={aggregate.averageToPar18 === undefined ? "—" : `+${aggregate.averageToPar18}`} note="Latest aggregate" />
+            <DataPoint
+              label="Personal bests"
+              value={`${aggregate.bestToPar9 === undefined ? "—" : `+${aggregate.bestToPar9} / 9`} · ${aggregate.bestToPar18 === undefined ? "—" : `+${aggregate.bestToPar18} / 18`}`}
+              note={aggregate.badges?.join(" · ")}
+            />
           </div>
           <p className="mt-3 text-[10px] leading-4 text-sky-950/55">Used as a bounded confidence signal only. Course, tee, dates and round-level variance are unavailable, so the model does not manufacture differentials.</p>
         </div>
@@ -235,6 +242,70 @@ function PlayerIntel({ metric }: { metric: PlayerSaberMetrics }) {
         <RecentLedger metric={metric} />
       </div>
     </div>
+  );
+}
+
+function FinalScoutCard({
+  metric,
+  rank,
+}: {
+  metric: PlayerSaberMetrics;
+  rank: number;
+}) {
+  const scout = buildFinalScoutCase(metric);
+  return (
+    <article className="flex h-full flex-col rounded-[1.55rem] border border-black/[0.08] bg-white p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold ${
+              rank <= 3 ? "bg-[#102f28] text-white" : "bg-black/[0.05] text-black/45"
+            }`}
+          >
+            {rank}
+          </span>
+          <div>
+            <div className="font-semibold tracking-tight">{metric.player.nickname}</div>
+            <div className="text-[10px] text-black/40">
+              {metric.player.name} · {formatIndex(metric.player)} index
+            </div>
+          </div>
+        </div>
+        <span className={`rounded-full border px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.11em] ${confidenceTone(metric.confidence)}`}>
+          {metric.confidenceLabel}
+        </span>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        <span className="rounded-full bg-[#ece7db] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-[#102f28]">
+          {scout.role}
+        </span>
+        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-emerald-800">
+          Best: {scout.bestFormatLabel} {scout.bestFormatScore.toFixed(0)}
+        </span>
+      </div>
+
+      <p className="mt-4 text-xs leading-5 text-black/65">{scout.bestCase}</p>
+
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {scout.proof.map((item) => (
+          <span key={item} className="rounded-full border border-black/[0.07] bg-[#faf9f6] px-2 py-1 text-[9px] text-black/50">
+            {item}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-2 border-t border-black/[0.06] pt-4">
+        <div className="rounded-xl bg-emerald-50/70 p-3">
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-emerald-800/55">Winning deployment</div>
+          <p className="mt-1 text-[10px] leading-4 text-emerald-950/65">{scout.deployment}</p>
+        </div>
+        <div className="rounded-xl bg-orange-50/70 p-3">
+          <div className="text-[8px] font-semibold uppercase tracking-[0.14em] text-orange-800/55">What must be true</div>
+          <p className="mt-1 text-[10px] leading-4 text-orange-950/65">{scout.caution}</p>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -377,6 +448,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
   const draftableBoard = board.filter(
     (metric) => !isCaptain(metric.player.id) && !assignedIds.has(metric.player.id),
   );
+  const finalScoutBoard = board.filter((metric) => !isCaptain(metric.player.id));
   const valueTarget = draftableBoard[0];
   const safeAnchor = [...draftableBoard].sort(
     (a, b) => (b.consistency * 0.55 + b.confidence * 0.45) - (a.consistency * 0.55 + a.confidence * 0.45),
@@ -560,6 +632,31 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
       )}
 
       <CaptainIntelPanel board={board} intel={captainIntel} onChange={updateCaptainIntel} />
+
+      <section className="rounded-[2rem] border border-black/10 bg-[#ece7db] p-5 shadow-sm md:p-7">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/40">Final 18 · best-case dossier</div>
+            <h2 className="mt-1 text-2xl font-semibold tracking-[-0.025em]">The strongest honest case for every player.</h2>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-black/55">
+              Ranked by the same 75-point event model as the live board. Each card separates the optimistic path from the condition that must hold, then shows how to deploy the player if you draft him.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.13em] text-black/50">
+              Exact identity matches only
+            </span>
+            <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.13em] text-black/50">
+              Refreshed Jul 23
+            </span>
+          </div>
+        </div>
+        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {finalScoutBoard.map((metric, index) => (
+            <FinalScoutCard key={metric.player.id} metric={metric} rank={index + 1} />
+          ))}
+        </div>
+      </section>
 
       <div className="rounded-[1.8rem] border border-black/10 bg-white p-4 shadow-sm md:p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -799,7 +896,7 @@ export default function CaptainWarRoom({ players }: { players: PlayerDraftStats[
       </div>
 
       <div className="rounded-[1.6rem] border border-dashed border-black/15 bg-white/55 p-5 text-xs leading-5 text-black/50">
-        <b className="text-black/70">Strand Sabr v3.4:</b> all {eventHandicapCoverage} event handicaps are locked to the supplied 2026 roster sheet; GHIN, TheGrint and Garmin remain performance provenance. The model uses {roundsModeled} attributable scorecards plus {aggregateRounds} Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. Tournament weights now mirror the 75-point schedule: Fourball 20%, Shamble 20%, Singles 40% and Scramble 20%. Course fit reflects Gamble Sands&apos; ground-game choices and Scarecrow&apos;s angle-dependent smaller targets. Aggregate-only data affects confidence but never creates synthetic differentials. Missing fields stay neutral.
+        <b className="text-black/70">Strand Sabr v3.5:</b> all {eventHandicapCoverage} event handicaps are locked to the supplied 2026 roster sheet; GHIN, TheGrint and Garmin remain performance provenance. The model uses {roundsModeled} attributable scorecards plus {aggregateRounds} recent Garmin aggregate rounds across {roundCoverage} players, including {detailedRounds} rating/slope rounds and {puttingRounds} rounds with recorded putts. The Jul 23 public-source sweep accepted only exact identity matches: Kane&apos;s 120-round lifetime total improves experience confidence but never creates synthetic form, while ambiguous same-name results and login-gated data are excluded. Tournament weights mirror the 75-point schedule: Fourball 20%, Shamble 20%, Singles 40% and Scramble 20%. Course fit reflects Gamble Sands&apos; ground-game choices and Scarecrow&apos;s angle-dependent smaller targets. Missing fields stay neutral.
       </div>
     </section>
   );

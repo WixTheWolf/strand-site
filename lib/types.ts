@@ -33,9 +33,15 @@ export interface StrandPlayer {
   /** Aggregate scoring evidence when individual scorecards/course context are unavailable */
   reportedScoring?: {
     source: "garmin";
+    /** Most recent aggregate window supplied by the player/profile */
     sampleSize: number;
     averageToPar9?: number;
     averageToPar18?: number;
+    /** Public lifetime profile totals. These confirm experience, not current form. */
+    lifetimeRounds?: number;
+    bestToPar9?: number;
+    bestToPar18?: number;
+    badges?: string[];
     capturedAt: string;
   };
   estimatedIndex?: number;

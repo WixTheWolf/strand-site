@@ -146,10 +146,12 @@ function TeamRosterCard({
       </div>
 
       {player.reportedScoring && (
-        <div className={`mt-4 grid grid-cols-3 gap-2 rounded-xl p-3 text-xs ${dark ? "bg-black/20 text-white/80" : "bg-sky-50 text-sky-950/75"}`}>
-          <DataCell label="Garmin sample" value={`${player.reportedScoring.sampleSize} rounds`} />
+        <div className={`mt-4 grid grid-cols-2 gap-2 rounded-xl p-3 text-xs sm:grid-cols-5 ${dark ? "bg-black/20 text-white/80" : "bg-sky-50 text-sky-950/75"}`}>
+          <DataCell label="Recent sample" value={`${player.reportedScoring.sampleSize} rounds`} />
+          <DataCell label="Lifetime" value={player.reportedScoring.lifetimeRounds ? `${player.reportedScoring.lifetimeRounds} rounds` : "—"} />
           <DataCell label="9-hole avg" value={player.reportedScoring.averageToPar9 === undefined ? "—" : `+${player.reportedScoring.averageToPar9}`} />
           <DataCell label="18-hole avg" value={player.reportedScoring.averageToPar18 === undefined ? "—" : `+${player.reportedScoring.averageToPar18}`} />
+          <DataCell label="Best 18" value={player.reportedScoring.bestToPar18 === undefined ? "—" : `+${player.reportedScoring.bestToPar18}`} />
         </div>
       )}
 
@@ -562,7 +564,10 @@ export default function BestTeamView() {
                                 {player.reportedScoring && (
                                   <>
                                     <div>Garmin aggregate: {player.reportedScoring.sampleSize} rounds</div>
+                                    <div>Garmin lifetime: {player.reportedScoring.lifetimeRounds ?? "—"} rounds</div>
                                     <div>Average to par: +{player.reportedScoring.averageToPar9 ?? "—"} / 9 · +{player.reportedScoring.averageToPar18 ?? "—"} / 18</div>
+                                    <div>Personal best: +{player.reportedScoring.bestToPar9 ?? "—"} / 9 · +{player.reportedScoring.bestToPar18 ?? "—"} / 18</div>
+                                    <div>Badges: {player.reportedScoring.badges?.join(", ") ?? "—"}</div>
                                     <div>Aggregate captured: {player.reportedScoring.capturedAt}</div>
                                   </>
                                 )}

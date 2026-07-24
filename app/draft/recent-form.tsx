@@ -126,11 +126,24 @@ export default function RecentForm({ players }: { players: PlayerDraftStats[] })
                   </div>
                   <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-sky-800/60">Garmin aggregate</span>
                 </div>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <span className="rounded-lg bg-white px-3 py-2 font-mono text-sm font-semibold">+{aggregate.averageToPar9 ?? "—"} / 9</span>
                   <span className="rounded-lg bg-white px-3 py-2 font-mono text-sm font-semibold">+{aggregate.averageToPar18 ?? "—"} / 18</span>
                   <span className="rounded-lg bg-white px-3 py-2 text-xs text-sky-950/55">last {aggregate.sampleSize}</span>
+                  {aggregate.lifetimeRounds && (
+                    <span className="rounded-lg bg-white px-3 py-2 text-xs text-sky-950/55">
+                      {aggregate.lifetimeRounds} lifetime rounds
+                    </span>
+                  )}
+                  {aggregate.bestToPar18 !== undefined && (
+                    <span className="rounded-lg bg-white px-3 py-2 text-xs text-sky-950/55">
+                      best +{aggregate.bestToPar18} / 18
+                    </span>
+                  )}
                 </div>
+                {aggregate.badges?.length ? (
+                  <div className="mt-2 text-[10px] text-sky-950/50">{aggregate.badges.join(" · ")}</div>
+                ) : null}
               </div>
             );
           })}

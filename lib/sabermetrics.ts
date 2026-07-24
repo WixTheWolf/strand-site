@@ -207,11 +207,18 @@ function preliminaryMetrics(
   // differentials or a directional skill adjustment.
   const aggregateSampleSize = player.reportedScoring?.sampleSize ?? 0;
   const aggregateConfidence = Math.min(8, aggregateSampleSize * 0.8);
+  // A public lifetime total proves familiarity with logging/playing golf, but
+  // it does not tell us how those rounds were distributed or how recent they
+  // were. Keep its lift smaller than one detailed scorecard's full data value.
+  const lifetimeExperienceConfidence = player.reportedScoring?.lifetimeRounds
+    ? Math.min(4, Math.log2(player.reportedScoring.lifetimeRounds + 1) * 0.58)
+    : 0;
   const confidence = clamp(
     sourceConfidence(player) * 0.72 +
       performance.dataDepth * 0.48 +
       Math.min(7, (record?.appearances ?? 0) * 1.25) +
       aggregateConfidence +
+      lifetimeExperienceConfidence +
       (player.ghinRevisionDate ? 4 : 0) -
       stalenessPenalty,
     12,
@@ -320,6 +327,12 @@ function preliminaryMetrics(
       scoring.averageToPar9 !== undefined ? `+${scoring.averageToPar9} / 9` : null,
     ].filter(Boolean).join(" · ");
     evidence.push(`Garmin last ${scoring.sampleSize}: ${averages}`);
+    if (scoring.lifetimeRounds) {
+      evidence.push(`${scoring.lifetimeRounds} lifetime Garmin rounds`);
+    }
+    if (scoring.bestToPar18 !== undefined) {
+      evidence.push(`Garmin personal best +${scoring.bestToPar18} / 18`);
+    }
     evidence.push("aggregate only — course context unavailable");
   }
   if (captainRead !== 0 || captainNote) {
