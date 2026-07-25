@@ -8,7 +8,7 @@ export { COURSE_INTEL_ACCESS_COOKIE, STUD_BUCKETS_ACCESS_COOKIE };
 export const CAPTAIN_ACCESS_COOKIE = "strand-captain-access";
 
 // SHA-256 values for the teammate and captain passwords. Plaintext passwords are not stored in the repository.
-const TEAM_ACCESS_CODE_SHA256 = "5ebdc7b074ec1caeffc7e4e590841dc7a39d26e74453a8529de168fcecff5eea";
+const TEAM_ACCESS_CODE_SHA256 = "bd2555f468f3181c5632bfd3a3257b9f4a02f7dd46413a064900bc173da577c5";
 const CAPTAIN_ACCESS_CODE_SHA256 = "30a8dec28b431451be4d678466ffaae6812318730c69122bb2a7c400ed4147cf";
 
 function sessionSecret(): string {
