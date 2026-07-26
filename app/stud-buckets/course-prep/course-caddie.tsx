@@ -3,11 +3,14 @@
 import Image from "next/image";
 import { useState } from "react";
 
+import InteractiveScorecard, {
+  type ScorecardCourseId as CourseId,
+  type ScorecardFormatId as FormatId,
+  type ScorecardHole as CaddieHole,
+} from "./interactive-scorecard";
 import {
   CHAMPIONSHIP_COURSES,
   QUICKSANDS_HOLES,
-  planLabel,
-  type ChampionshipCourseIntel,
   type HolePlan,
 } from "@/lib/course-intelligence";
 import {
@@ -17,24 +20,10 @@ import {
   type VisualCourseId,
 } from "@/lib/course-humor";
 
-type TabId = "caddie" | "holes" | "prep";
-type CourseId = ChampionshipCourseIntel["id"] | "quicksands";
-type FormatId = "singles" | "fourball" | "shamble" | "scramble";
+type TabId = "caddie" | "scorecards" | "prep";
 type ShotId = "tee" | "approach" | "short-game" | "putt";
 type SituationId = "standard" | "protect" | "safe" | "must-win";
 type LightId = "green" | "yellow" | "red";
-
-interface CaddieHole {
-  number: number;
-  par: number;
-  yards: number;
-  strokeIndex?: number;
-  plan: HolePlan;
-  headline: string;
-  strategy: string;
-  preferredMiss: string;
-  matchPlay: string;
-}
 
 const FORMATS: { id: FormatId; label: string; short: string }[] = [
   { id: "singles", label: "Singles", short: "80%" },
@@ -86,12 +75,6 @@ const LIGHT_STYLE: Record<LightId, { label: string; note: string; shell: string;
     badge: "bg-rose-700 text-white",
     dot: "bg-rose-500",
   },
-};
-
-const PLAN_STYLE: Record<HolePlan, string> = {
-  attack: "border-emerald-700/20 bg-emerald-50 text-emerald-900",
-  swing: "border-amber-600/20 bg-amber-50 text-amber-900",
-  protect: "border-rose-700/20 bg-rose-50 text-rose-900",
 };
 
 function quickPlan(number: number): HolePlan {
@@ -220,13 +203,11 @@ export default function CourseCaddie() {
   const [situation, setSituation] = useState<SituationId>("standard");
 
   const championshipCourse = CHAMPIONSHIP_COURSES.find((course) => course.id === courseId);
-  const holeCount = courseId === "quicksands" ? QUICKSANDS_HOLES.length : 18;
   const tee = championshipCourse?.tees.find((item) => item.name === teeName) ?? championshipCourse?.tees.find((item) => item.name === championshipCourse.defaultTee);
 
-  const selectedHole: CaddieHole = (() => {
+  const courseHoles: CaddieHole[] = (() => {
     if (courseId === "quicksands") {
-      const quick = QUICKSANDS_HOLES.find((item) => item.number === holeNumber) ?? QUICKSANDS_HOLES[0];
-      return {
+      return QUICKSANDS_HOLES.map((quick) => ({
         number: quick.number,
         par: quick.par,
         yards: quick.mappedYards,
@@ -235,17 +216,18 @@ export default function CourseCaddie() {
         strategy: quick.plan,
         preferredMiss: "Middle of the usable green. Confirm today’s marker, wind and pin.",
         matchPlay: "One ball. Full routine. No reload.",
-      };
+      }));
     }
 
     const course = championshipCourse ?? CHAMPIONSHIP_COURSES[0];
-    const hole = course.holes.find((item) => item.number === holeNumber) ?? course.holes[0];
     const selectedTee = course.tees.find((item) => item.name === teeName) ?? course.tees.find((item) => item.name === course.defaultTee) ?? course.tees[0];
-    return {
+    return course.holes.map((hole) => ({
       ...hole,
       yards: selectedTee.holeYards[hole.number - 1],
-    };
+    }));
   })();
+  const holeCount = courseHoles.length;
+  const selectedHole = courseHoles.find((hole) => hole.number === holeNumber) ?? courseHoles[0];
 
   const difficulty = courseId === "quicksands"
     ? quickDifficulty(selectedHole.number, selectedHole.yards)
@@ -267,11 +249,12 @@ export default function CourseCaddie() {
     setSituation("standard");
   }
 
-  function openHole(nextCourse: CourseId, nextHole: number) {
-    selectCourse(nextCourse);
+  function openFullCaddie(nextHole: number) {
     setHoleNumber(nextHole);
     setTab("caddie");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.requestAnimationFrame(() => {
+      document.getElementById("caddie")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   return (
@@ -280,7 +263,7 @@ export default function CourseCaddie() {
         <div className="mx-auto flex max-w-6xl gap-1 px-4 py-2 sm:px-6">
           {([
             ["caddie", "Caddie call"],
-            ["holes", "Hole book"],
+            ["scorecards", "Scorecards"],
             ["prep", "Rules"],
           ] as [TabId, string][]).map(([id, label]) => (
             <button
@@ -511,76 +494,19 @@ export default function CourseCaddie() {
         </div>
       ) : null}
 
-      {tab === "holes" ? (
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-9">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">The 50-hole book</p>
-              <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">See it. Know the miss. Move on.</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-black/48">
-                Tap a hole for the call. The one-liner is all you should need on the tee.
-              </p>
-            </div>
-            <select
-              value={courseId}
-              onChange={(event) => selectCourse(event.target.value as CourseId)}
-              className="rounded-xl border border-black/10 bg-white px-4 py-3 text-sm font-semibold outline-none"
-            >
-              <option value="gamble-sands">Gamble Sands</option>
-              <option value="scarecrow">Scarecrow</option>
-              <option value="quicksands">QuickSands</option>
-            </select>
-          </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {(courseId === "quicksands" ? QUICKSANDS_HOLES : championshipCourse?.holes ?? []).map((rawHole) => {
-              const plan = courseId === "quicksands" ? quickPlan(rawHole.number) : (rawHole as ChampionshipCourseIntel["holes"][number]).plan;
-              const yards = courseId === "quicksands"
-                ? (rawHole as (typeof QUICKSANDS_HOLES)[number]).mappedYards
-                : (tee?.holeYards[rawHole.number - 1] ?? 0);
-              const strokeIndex = "strokeIndex" in rawHole ? rawHole.strokeIndex : undefined;
-              const holeDifficulty = courseId === "quicksands" ? quickDifficulty(rawHole.number, yards) : championshipDifficulty(strokeIndex);
-              return (
-                <button
-                  key={rawHole.number}
-                  type="button"
-                  onClick={() => openHole(courseId, rawHole.number)}
-                  className="group overflow-hidden rounded-[1.4rem] border border-black/8 bg-white text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:border-black/16 hover:shadow-[0_18px_55px_rgba(16,42,35,.13)]"
-                >
-                  <div className="relative h-44 overflow-hidden">
-                    <Image
-                      src={holeImage(courseId as VisualCourseId, rawHole.number)}
-                      alt={`${courseId === "gamble-sands" ? "Official aerial view" : "Verified view"} of ${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} hole ${rawHole.number}`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/5 to-black/10" />
-                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 text-white">
-                      <div className="flex items-end gap-3">
-                        <span className="font-mono text-5xl font-semibold leading-none tracking-[-0.07em]">{rawHole.number}</span>
-                        <div className="pb-1">
-                          <div className="text-xs font-semibold">Par {rawHole.par} · {yards} yds</div>
-                          <div className="mt-1 text-[8px] uppercase tracking-[0.13em] text-white/50">Difficulty {holeDifficulty}/5</div>
-                        </div>
-                      </div>
-                      <span className={`rounded-full border px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.12em] ${PLAN_STYLE[plan]}`}>{planLabel(plan)}</span>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <p className="min-h-10 text-sm font-semibold leading-5 text-[#102a23]">
-                      {holeMemory(courseId as VisualCourseId, rawHole.number)}
-                    </p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <RatingDots value={holeDifficulty} color="dark" />
-                    <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#31594d]">Get the call →</span>
-                  </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      {tab === "scorecards" ? (
+        <InteractiveScorecard
+          courseId={courseId}
+          courseName={courseId === "quicksands" ? "QuickSands" : championshipCourse?.name ?? "Gamble Sands"}
+          format={format}
+          holes={courseHoles}
+          teeName={championshipCourse ? tee?.name ?? championshipCourse.defaultTee : undefined}
+          teeOptions={championshipCourse?.tees}
+          onCourseChange={selectCourse}
+          onFormatChange={selectFormat}
+          onTeeChange={setTeeName}
+          onOpenFullCaddie={openFullCaddie}
+        />
       ) : null}
 
       {tab === "prep" ? (
