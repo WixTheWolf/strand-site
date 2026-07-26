@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Image from "next/image";
 
 export default function AccessGate({
   configured,
@@ -47,12 +48,19 @@ export default function AccessGate({
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/35">Gamble Sands · 2026</span>
         </div>
 
-        <div className="mt-10">
-          <div className="text-sm uppercase tracking-[0.32em] text-white/45">Stud Buckets</div>
+        <div className="mt-9">
+          <Image
+            src="/brand/brewster-boys.webp"
+            alt="Brewster Boys"
+            width={96}
+            height={96}
+            className="h-24 w-24 rounded-[1.4rem] border border-white/15 bg-white object-cover shadow-xl"
+          />
+          <div className="mt-6 text-sm uppercase tracking-[0.32em] text-white/45">Brewster Boys</div>
           <h1 className="mt-3 text-5xl font-semibold leading-[0.9] tracking-[-0.065em] sm:text-6xl">
             Enter the
             <br />
-            bucket.
+            taproom.
           </h1>
           <p className="mt-5 max-w-sm text-sm leading-6 text-white/58">
             {scope === "course"
@@ -81,7 +89,7 @@ export default function AccessGate({
               disabled={loading || !code.trim()}
               className="mt-4 w-full rounded-2xl bg-[#e39a50] px-5 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[#13231e] transition hover:bg-[#efad68] disabled:cursor-not-allowed disabled:opacity-45"
             >
-              {loading ? "Opening the bucket…" : "Open the bucket"}
+              {loading ? "Opening the taproom…" : "Open the taproom"}
             </button>
           </form>
         ) : (
@@ -91,7 +99,7 @@ export default function AccessGate({
         )}
 
         <p className="mt-6 text-center text-[10px] uppercase tracking-[0.18em] text-white/28">
-          {scope === "course" ? "Course intel only · private field guide" : "Ten studs · one bucket · 38 points"}
+          {scope === "course" ? "Course intel only · private field guide" : "Ten boys · one brew · 38 points"}
         </p>
       </section>
     </main>

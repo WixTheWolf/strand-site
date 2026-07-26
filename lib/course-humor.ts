@@ -61,26 +61,31 @@ const QUICKSANDS_MEMORY = [
   "Finish with commitment; the drinks are already judging you.",
 ] as const;
 
-const IMAGE_POSITIONS = [
-  "38% 50%",
-  "50% 42%",
-  "64% 48%",
-  "72% 56%",
-  "30% 62%",
-  "55% 66%",
-  "78% 45%",
-  "44% 58%",
-  "60% 36%",
+const COURSE_HOLE_COUNTS: Record<VisualCourseId, number> = {
+  "gamble-sands": 18,
+  scarecrow: 18,
+  quicksands: 14,
+};
+
+export const HOLE_PHOTO_SOURCES = [
+  {
+    courses: "Scarecrow",
+    label: "Patrick Koenig’s Every Hole at Scarecrow",
+    href: "https://www.pjkoenig.com/golf-blog/2025/6/30/gamble-sands-has-fully-arrived",
+  },
+  {
+    courses: "Gamble Sands + QuickSands",
+    label: "Core Four Golf numbered course tours",
+    href: "https://www.corefourgolf.com/Courses.aspx",
+  },
 ] as const;
 
-export function courseImage(courseId: VisualCourseId): string {
-  if (courseId === "scarecrow") return "/courses/scarecrow.jpg";
-  if (courseId === "quicksands") return "/courses/quicksands.jpg";
-  return "/courses/gamble-sands.jpg";
-}
-
-export function holeImagePosition(holeNumber: number): string {
-  return IMAGE_POSITIONS[(holeNumber - 1) % IMAGE_POSITIONS.length];
+export function holeImage(courseId: VisualCourseId, holeNumber: number): string {
+  const verifiedHole = Math.min(
+    Math.max(Math.trunc(holeNumber), 1),
+    COURSE_HOLE_COUNTS[courseId],
+  );
+  return `/courses/holes/${courseId}/hole-${String(verifiedHole).padStart(2, "0")}.jpg`;
 }
 
 export function holeMemory(courseId: VisualCourseId, holeNumber: number): string {
@@ -103,4 +108,3 @@ export function planTranslation(plan: HolePlan): string {
   }
   return "This hole offers two choices: golf, or a story everybody hears again at dinner.";
 }
-

@@ -74,7 +74,7 @@ function PlayerPortrait({
       {photo ? (
         <Image
           src={photo}
-          alt={`${metric.player.name}, Stud Buckets golfer`}
+          alt={`${metric.player.name}, Brewster Boys golfer`}
           fill
           sizes={large ? "96px" : "56px"}
           className="object-cover object-top"
@@ -211,7 +211,7 @@ export default function TeamPrepMetrics() {
     return (
       <section id="team-metrics" className="scroll-mt-24 bg-[#071b18] px-5 py-20 text-center text-white">
         <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#efbd88]">
-          Building the Stud Buckets metric board…
+          Building the Brewster Boys metric board…
         </div>
       </section>
     );
@@ -224,7 +224,7 @@ export default function TeamPrepMetrics() {
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Roster check</p>
           <h2 className="mt-3 text-3xl font-semibold">The team board needs a refresh.</h2>
           <p className="mt-4 text-sm leading-6 text-white/50">
-            {error ?? `Loaded ${team.length} Stud Buckets. WIX and J-BONE must both be present.`}
+            {error ?? `Loaded ${team.length} Brewster Boys. WIX and J-BONE must both be present.`}
           </p>
         </div>
       </section>
@@ -251,7 +251,7 @@ export default function TeamPrepMetrics() {
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#efbd88]">
-              The highly scientific bucket laboratory
+              The highly scientific brew laboratory
             </p>
             <h2 className="mt-3 text-4xl font-semibold tracking-[-0.055em] md:text-6xl">
               Ten men. One trophy. Several concerning swings.
@@ -265,7 +265,7 @@ export default function TeamPrepMetrics() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               [number(average(team.map((metric) => metric.index)), 1), "Average damage"],
-              [number(average(team.map((metric) => metric.tournamentScore))), "Bucket power"],
+              [number(average(team.map((metric) => metric.tournamentScore))), "Brew power"],
               [number(average(team.map((metric) => metric.consistency))), "Chaos control"],
               [String(team.filter((metric) => metric.confidenceLabel === "High").length), "Adults on file"],
             ].map(([value, label]) => (
@@ -363,7 +363,7 @@ export default function TeamPrepMetrics() {
                   value={selected.player.id}
                   onChange={(event) => setSelectedPlayerId(event.target.value)}
                   className="min-w-52 rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 text-xs text-white outline-none"
-                  aria-label="Select a Stud Buckets player"
+                  aria-label="Select a Brewster Boys player"
                 >
                   {team.map((metric) => (
                     <option key={metric.player.id} value={metric.player.id} className="text-black">

@@ -21,7 +21,15 @@ export default function CaptainsRoom() {
 
   useEffect(() => {
     const saved = window.localStorage.getItem("strand-ready-check");
-    if (saved) setChecked(JSON.parse(saved));
+    const restoreTimer = saved
+      ? window.setTimeout(() => {
+          try {
+            setChecked(JSON.parse(saved));
+          } catch {
+            window.localStorage.removeItem("strand-ready-check");
+          }
+        }, 0)
+      : undefined;
     fetch("/api/captains-room/me", { cache: "no-store" })
       .then(async (response) => response.ok ? response.json() : null)
       .then((payload) => {
@@ -32,7 +40,10 @@ export default function CaptainsRoom() {
       })
       .catch(() => undefined);
     const timer = window.setInterval(() => setDays(daysUntil()), 60000);
-    return () => window.clearInterval(timer);
+    return () => {
+      if (restoreTimer !== undefined) window.clearTimeout(restoreTimer);
+      window.clearInterval(timer);
+    };
   }, []);
 
   function toggle(item: string) {
@@ -189,7 +200,7 @@ export default function CaptainsRoom() {
 
         <section id="rules" className="bg-[#d9d0bf] py-16 md:py-24"><div className="mx-auto max-w-7xl px-5 md:px-8"><Eyebrow>The team code</Eyebrow><Title>Golf that travels.</Title><div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{TEAM_RULES.map(([title, copy], index) => <article key={title} className="rounded-[1.75rem] bg-[#eee8dc] p-6"><div className="text-[10px] font-black uppercase tracking-[.2em] text-[#9a6031]">Rule {index + 1}</div><h3 className="mt-3 text-2xl font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-black/55">{copy}</p></article>)}</div></div></section>
       </main>
-      <footer className="bg-[#071b18] px-5 py-10 text-center text-white"><p className="text-xl font-semibold">The Stud Buckets</p><p className="mt-2 text-[9px] font-bold uppercase tracking-[.22em] text-white/35">Prepared by Captain Wix · Gamble Sands · August 21–22, 2026</p></footer>
+      <footer className="bg-[#071b18] px-5 py-10 text-center text-white"><p className="text-xl font-semibold">The Brewster Boys</p><p className="mt-2 text-[9px] font-bold uppercase tracking-[.22em] text-white/35">Prepared by Captain Wix · Gamble Sands · August 21–22, 2026</p></footer>
 
       {showCaptainLogin && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#071b18]/85 p-5 backdrop-blur-sm"><form onSubmit={unlockCaptain} className="w-full max-w-md rounded-[2rem] bg-[#eee8dc] p-7 shadow-2xl"><div className="text-[10px] font-black uppercase tracking-[.22em] text-[#9a6031]">Captain only</div><h2 className="mt-3 text-4xl font-semibold tracking-[-.05em]">Unlock WIX.</h2><p className="mt-3 text-sm leading-6 text-black/50">Your tab and preparation plan remain unavailable to teammates.</p><input autoFocus type="password" value={captainCode} onChange={(event) => setCaptainCode(event.target.value)} placeholder="Captain password" className="mt-6 w-full rounded-2xl border border-black/10 bg-white px-4 py-4 text-base outline-none focus:border-[#9a6031]" />{captainError && <p className="mt-3 text-sm font-semibold text-red-700">{captainError}</p>}<div className="mt-6 flex gap-3"><button type="button" onClick={() => { setShowCaptainLogin(false); setCaptainError(""); }} className="flex-1 rounded-full border border-black/10 px-5 py-3 text-[10px] font-black uppercase tracking-[.16em]">Cancel</button><button disabled={captainBusy} className="flex-1 rounded-full bg-[#0b2b23] px-5 py-3 text-[10px] font-black uppercase tracking-[.16em] text-white disabled:opacity-50">{captainBusy ? "Unlocking…" : "Unlock"}</button></div></form></div>}
     </div>

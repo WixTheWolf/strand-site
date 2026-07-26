@@ -11,8 +11,7 @@ import {
   type HolePlan,
 } from "@/lib/course-intelligence";
 import {
-  courseImage,
-  holeImagePosition,
+  holeImage,
   holeMemory,
   planTranslation,
   type VisualCourseId,
@@ -421,18 +420,17 @@ export default function CourseCaddie() {
           <section className={`mt-4 overflow-hidden rounded-[1.75rem] border shadow-sm ${lightStyle.shell}`}>
             <div className="relative h-64 overflow-hidden sm:h-80">
               <Image
-                src={courseImage(courseId as VisualCourseId)}
-                alt={`${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} course landscape for hole ${selectedHole.number}`}
+                src={holeImage(courseId as VisualCourseId, selectedHole.number)}
+                alt={`Verified view of ${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} hole ${selectedHole.number}`}
                 fill
                 sizes="(max-width: 768px) 100vw, 1152px"
                 className="object-cover"
-                style={{ objectPosition: holeImagePosition(selectedHole.number) }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/18 to-black/10" />
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-white sm:p-7">
                 <div>
                   <div className="text-[9px] font-black uppercase tracking-[0.18em] text-[#efbd88]">
-                    {courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} · classified visual
+                    {courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} · verified hole view
                   </div>
                   <div className="mt-2 flex items-end gap-3">
                     <span className="font-mono text-7xl font-semibold leading-none tracking-[-0.08em] sm:text-8xl">
@@ -551,12 +549,11 @@ export default function CourseCaddie() {
                 >
                   <div className="relative h-44 overflow-hidden">
                     <Image
-                      src={courseImage(courseId as VisualCourseId)}
-                      alt={`${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} landscape for hole ${rawHole.number}`}
+                      src={holeImage(courseId as VisualCourseId, rawHole.number)}
+                      alt={`Verified view of ${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} hole ${rawHole.number}`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover transition duration-700 group-hover:scale-105"
-                      style={{ objectPosition: holeImagePosition(rawHole.number) }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/5 to-black/10" />
                     <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 text-white">

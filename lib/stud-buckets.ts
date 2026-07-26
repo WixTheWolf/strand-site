@@ -1,7 +1,7 @@
 export const STUD_BUCKETS_TEAM = {
   id: "wix",
-  name: "Stud Buckets",
-  shortName: "BUCKETS",
+  name: "Brewster Boys",
+  shortName: "BREW CREW",
   captainId: "matt-wixted",
   playerIds: [
     "matt-wixted",

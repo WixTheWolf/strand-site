@@ -22,7 +22,7 @@ export const CAPTAIN_PLAYERS: CaptainPlayer[] = [
     note: "You are the seatbelt. Nobody celebrates a seatbelt until the cart is airborne and Kane is still holding a breakfast burrito."
   },
   {
-    id: "jordan-brodbeck", name: "Jordan Brodbeck", nickname: "Jordan", role: "The Swiss Army Bucket",
+    id: "jordan-brodbeck", name: "Jordan Brodbeck", nickname: "Jordan", role: "The Swiss Army Brewer",
     headline: "Useful everywhere, dangerous when opened, and somehow carrying three shots nobody knew we needed.",
     mission: "Bring complete mid-cap golf to every format, stabilize a high-stroke partner, and own a meaningful Singles match without turning every recovery shot into an episode of MythBusters.",
     strengths: ["Format flexibility", "Balanced scoring", "Singles value"],
@@ -105,7 +105,7 @@ export const TEAM_RULES = [
   ["The flag is a suggestion", "Aim where a normal miss survives. The pin did not insult your family."],
   ["Make them finish", "A visible par changes decisions. Keep the ball alive and let the opponent manufacture his own collapse."],
   ["No parking-lot coaching", "Do not rebuild a teammate's swing between rounds because you watched one YouTube Short in the cart."],
-  ["Win without apologizing", "Nobody asks whether a 1-up victory was aesthetically pleasing. Put the point in the bucket and keep walking."]
+  ["Win without apologizing", "Nobody asks whether a 1-up victory was aesthetically pleasing. Put the point on ice and keep walking."]
 ] as const;
 
 export const READY_CHECK = [

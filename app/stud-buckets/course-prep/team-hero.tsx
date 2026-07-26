@@ -24,9 +24,22 @@ export default function TeamHero() {
 
       <div className="relative mx-auto flex min-h-[760px] max-w-7xl flex-col justify-between px-5 pb-8 pt-24 sm:min-h-[820px] sm:px-8 sm:pb-12 sm:pt-32">
         <div className="max-w-4xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/16 bg-black/20 px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] backdrop-blur-md">
-            <span className="h-2 w-2 rounded-full bg-[#e39a50]" />
-            Stud Buckets eyes only
+          <div className="inline-flex items-center gap-3 rounded-2xl border border-white/16 bg-black/25 p-2 pr-4 backdrop-blur-md">
+            <Image
+              src="/brand/brewster-boys.webp"
+              alt="Brewster Boys"
+              width={52}
+              height={52}
+              className="h-[52px] w-[52px] rounded-xl bg-white object-cover"
+            />
+            <span>
+              <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#efbd88]">
+                Brewster Boys eyes only
+              </span>
+              <span className="mt-1 block text-[8px] font-bold uppercase tracking-[0.15em] text-white/38">
+                Private tournament field manual
+              </span>
+            </span>
           </div>
           <h1 className="mt-7 max-w-4xl text-[clamp(3.7rem,10vw,8.6rem)] font-semibold leading-[0.82] tracking-[-0.075em]">
             Win the trip
@@ -56,7 +69,7 @@ export default function TeamHero() {
         <div className="mt-14">
           <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/12 bg-white/12 sm:grid-cols-4">
             {[
-              ["10", "Buckets"],
+              ["10", "Brewster Boys"],
               ["50", "Holes decoded"],
               ["38", "Points to glory"],
               ["0", "Hero doubles allowed"],

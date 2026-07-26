@@ -16,7 +16,7 @@ export const STUD_BUCKETS_JOBS: Record<string, TeammateJob> = {
     lockerRoom: "Every group needs one scorecard that does not look like a Wi‑Fi password. Drew has been issued the clipboard.",
   },
   "jordan-brodbeck": {
-    title: "The Swiss Army Bucket",
+    title: "The Swiss Army Brewer",
     mission: "Bring complete mid-cap golf to any format, stabilize a high-stroke partner and own a meaningful Singles match.",
     lockerRoom: "Useful everywhere, dangerous when opened and somehow carrying three tools airport security should have found.",
   },
@@ -96,7 +96,7 @@ export const STUD_BUCKETS_GOLD = [
   },
   {
     title: "Win without apologizing",
-    tip: "Nobody asks whether a 1-up victory was aesthetically pleasing. Put the point in the bucket and keep walking.",
+    tip: "Nobody asks whether a 1-up victory was aesthetically pleasing. Put the point on ice and keep walking.",
   },
 ] as const;
 

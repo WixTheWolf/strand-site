@@ -11,7 +11,7 @@ import CaptainsRoom from "./captains-room";
 
 export const metadata: Metadata = {
   title: "Captain's Room | The Strand 2026",
-  description: "The Stud Buckets teammate preparation headquarters for The Strand at Gamble Sands.",
+  description: "The Brewster Boys teammate preparation headquarters for The Strand at Gamble Sands.",
   robots: { index: false, follow: false },
 };
 

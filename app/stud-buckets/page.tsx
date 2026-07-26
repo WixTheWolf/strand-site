@@ -11,8 +11,8 @@ import {
 } from "@/lib/stud-buckets-auth";
 
 export const metadata: Metadata = {
-  title: "Stud Buckets HQ | The Strand 2026",
-  description: "Private team strategy, pairings and opponent intelligence for the Stud Buckets.",
+  title: "Brewster Boys HQ | The Strand 2026",
+  description: "Private team strategy, pairings and opponent intelligence for the Brewster Boys.",
   robots: { index: false, follow: false },
 };
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -74,7 +75,7 @@ export default function StudBucketsDashboard() {
         <div className="max-w-lg rounded-[2rem] border border-white/10 bg-white/[0.06] p-8 text-center">
           <p className="text-[10px] uppercase tracking-[0.24em] text-[#efbd88]">Roster check</p>
           <h1 className="mt-3 text-3xl font-semibold">The team data did not load cleanly.</h1>
-          <p className="mt-4 text-sm leading-6 text-white/55">{error ?? `Loaded ${team.length} Stud Buckets and ${opponent.length} opponents.`}</p>
+          <p className="mt-4 text-sm leading-6 text-white/55">{error ?? `Loaded ${team.length} Brewster Boys and ${opponent.length} opponents.`}</p>
         </div>
       </main>
     );
@@ -85,8 +86,14 @@ export default function StudBucketsDashboard() {
       <header className="sticky top-0 z-50 border-b border-white/8 bg-[#071b18]/95 text-white backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 md:px-8">
           <Link href="#top" className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e39a50] text-sm font-black text-[#10251e]">SB</span>
-            <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">The Strand 2026</span><span className="block text-sm font-semibold">Stud Buckets HQ</span></span>
+            <Image
+              src="/brand/brewster-boys.webp"
+              alt=""
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-full border border-white/15 bg-white object-cover"
+            />
+            <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">The Strand 2026</span><span className="block text-sm font-semibold">Brewster Boys HQ</span></span>
           </Link>
           <nav className="hidden gap-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/55 lg:flex">
             <Link href="#mission">Mission 38</Link><Link href="#pairings">Pairings</Link><Link href="#roster">Roster</Link><Link href="#opponent">Opponent</Link>
@@ -102,7 +109,7 @@ export default function StudBucketsDashboard() {
             <div>
               <div className="inline-flex rounded-full border border-[#e39a50]/30 bg-[#e39a50]/10 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Rosters locked · team only</div>
               <h1 className="mt-7 max-w-[10ch] text-6xl font-semibold leading-[0.88] tracking-[-0.075em] sm:text-7xl md:text-8xl">Fill the card.<br />Take the points.</h1>
-              <p className="mt-7 max-w-2xl text-base leading-7 text-white/58">The operating plan for all ten Stud Buckets: player roles, format pairings, opponent pressure points and the cleanest path to 38.</p>
+              <p className="mt-7 max-w-2xl text-base leading-7 text-white/58">The operating plan for all ten Brewster Boys: player roles, format pairings, opponent pressure points and the cleanest path to 38.</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="#pairings" className="rounded-full bg-[#e39a50] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#10251e]">Recommended pairs</Link>
                 <Link href="/stud-buckets/course-prep" className="rounded-full border border-white/14 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/75">Team course intel</Link>
@@ -204,7 +211,7 @@ export default function StudBucketsDashboard() {
         <section className="mx-auto max-w-[1440px] px-5 py-16 md:px-8 md:py-24">
           <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9a6031]">Team standards</p><h2 className="mt-3 text-4xl font-semibold tracking-[-0.055em] md:text-6xl">Simple rules under pressure.</h2>
           <div className="mt-10 grid gap-px overflow-hidden rounded-[2rem] bg-black/8 md:grid-cols-2">{TEAM_STANDARDS.map((standard, index) => <div key={standard} className="flex gap-4 bg-white p-6"><span className="font-mono text-sm text-[#9a6031]">0{index + 1}</span><p className="text-sm leading-6 text-black/58">{standard}</p></div>)}</div>
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-[2rem] bg-[#071b18] p-7 text-white"><div><div className="text-[10px] uppercase tracking-[0.22em] text-white/38">Stud Buckets</div><div className="mt-2 text-3xl font-semibold tracking-[-0.045em]">Ten studs. One bucket. Thirty-eight points.</div></div><div className="text-right text-[10px] uppercase tracking-[0.17em] text-white/35">Updated {new Date(data!.updatedAt).toLocaleString()}<br />Source: {data!.source}</div></div>
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-[2rem] bg-[#071b18] p-7 text-white"><div><div className="text-[10px] uppercase tracking-[0.22em] text-white/38">Brewster Boys</div><div className="mt-2 text-3xl font-semibold tracking-[-0.045em]">Ten boys. One brew. Thirty-eight points.</div></div><div className="text-right text-[10px] uppercase tracking-[0.17em] text-white/35">Updated {new Date(data!.updatedAt).toLocaleString()}<br />Source: {data!.source}</div></div>
         </section>
       </main>
     </div>
