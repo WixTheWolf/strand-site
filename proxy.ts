@@ -8,10 +8,11 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
-    "/courses/:path*",
+    "/courses",
     "/draft/:path*",
     "/embed/:path*",
     "/my-strand/:path*",
     "/stud-buckets",
   ],
 };
+
