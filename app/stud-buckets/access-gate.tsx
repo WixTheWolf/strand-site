@@ -50,11 +50,12 @@ export default function AccessGate({
 
         <div className="mt-9">
           <Image
-            src="/brand/brewster-boys.webp"
+            src="/brand/brewster-boys-cutout.png"
             alt="Brewster Boys"
-            width={96}
-            height={96}
-            className="h-24 w-24 rounded-[1.4rem] border border-white/15 bg-white object-cover shadow-xl"
+            width={176}
+            height={176}
+            loading="eager"
+            className="h-40 w-40 object-contain drop-shadow-[0_24px_32px_rgba(0,0,0,.42)] sm:h-44 sm:w-44"
           />
           <div className="mt-6 text-sm uppercase tracking-[0.32em] text-white/45">Brewster Boys</div>
           <h1 className="mt-3 text-5xl font-semibold leading-[0.9] tracking-[-0.065em] sm:text-6xl">

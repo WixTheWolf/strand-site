@@ -87,11 +87,11 @@ export default function StudBucketsDashboard() {
         <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 md:px-8">
           <Link href="#top" className="flex items-center gap-3">
             <Image
-              src="/brand/brewster-boys.webp"
+              src="/brand/brewster-boys-cutout.png"
               alt=""
-              width={36}
-              height={36}
-              className="h-9 w-9 rounded-full border border-white/15 bg-white object-cover"
+              width={48}
+              height={48}
+              className="h-12 w-12 object-contain drop-shadow-[0_7px_10px_rgba(0,0,0,.35)]"
             />
             <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">The Strand 2026</span><span className="block text-sm font-semibold">Brewster Boys HQ</span></span>
           </Link>

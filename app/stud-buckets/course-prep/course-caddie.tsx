@@ -421,7 +421,7 @@ export default function CourseCaddie() {
             <div className="relative h-64 overflow-hidden sm:h-80">
               <Image
                 src={holeImage(courseId as VisualCourseId, selectedHole.number)}
-                alt={`Verified view of ${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} hole ${selectedHole.number}`}
+                alt={`${courseId === "gamble-sands" ? "Official aerial view" : "Verified view"} of ${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} hole ${selectedHole.number}`}
                 fill
                 sizes="(max-width: 768px) 100vw, 1152px"
                 className="object-cover"
@@ -430,7 +430,7 @@ export default function CourseCaddie() {
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-white sm:p-7">
                 <div>
                   <div className="text-[9px] font-black uppercase tracking-[0.18em] text-[#efbd88]">
-                    {courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} · verified hole view
+                    {courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} · {courseId === "gamble-sands" ? "official aerial" : "verified hole view"}
                   </div>
                   <div className="mt-2 flex items-end gap-3">
                     <span className="font-mono text-7xl font-semibold leading-none tracking-[-0.08em] sm:text-8xl">
@@ -550,7 +550,7 @@ export default function CourseCaddie() {
                   <div className="relative h-44 overflow-hidden">
                     <Image
                       src={holeImage(courseId as VisualCourseId, rawHole.number)}
-                      alt={`Verified view of ${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} hole ${rawHole.number}`}
+                      alt={`${courseId === "gamble-sands" ? "Official aerial view" : "Verified view"} of ${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} hole ${rawHole.number}`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover transition duration-700 group-hover:scale-105"

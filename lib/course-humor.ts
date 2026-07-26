@@ -69,13 +69,18 @@ const COURSE_HOLE_COUNTS: Record<VisualCourseId, number> = {
 
 export const HOLE_PHOTO_SOURCES = [
   {
+    courses: "Gamble Sands",
+    label: "Official Gamble Sands hole-by-hole aerial tour",
+    href: "https://www.youtube.com/playlist?list=PLJmCz9IET2S59tTFoHY_QTAtTEm0RJRuE",
+  },
+  {
     courses: "Scarecrow",
     label: "Patrick Koenig’s Every Hole at Scarecrow",
     href: "https://www.pjkoenig.com/golf-blog/2025/6/30/gamble-sands-has-fully-arrived",
   },
   {
-    courses: "Gamble Sands + QuickSands",
-    label: "Core Four Golf numbered course tours",
+    courses: "QuickSands",
+    label: "Core Four Golf numbered course tour",
     href: "https://www.corefourgolf.com/Courses.aspx",
   },
 ] as const;

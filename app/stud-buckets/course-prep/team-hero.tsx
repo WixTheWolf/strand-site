@@ -10,63 +10,85 @@ const TEAM = STUD_BUCKETS_TEAM.playerIds
 
 export default function TeamHero() {
   return (
-    <section className="relative isolate min-h-[760px] overflow-hidden bg-[#071b18] text-white sm:min-h-[820px]">
+    <section className="relative isolate min-h-[900px] overflow-hidden bg-[#071b18] text-white lg:min-h-[840px]">
       <Image
-        src="/courses/scarecrow.jpg"
+        src="/courses/holes/gamble-sands/hole-02.jpg"
         alt=""
         fill
         preload
         sizes="100vw"
         className="object-cover object-center"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,19,16,.2)_0%,rgba(4,19,16,.56)_42%,#071b18_100%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(227,154,80,.18),transparent_34%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,19,16,.48)_0%,rgba(4,19,16,.72)_48%,#071b18_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_28%,rgba(227,154,80,.24),transparent_34%)]" />
 
-      <div className="relative mx-auto flex min-h-[760px] max-w-7xl flex-col justify-between px-5 pb-8 pt-24 sm:min-h-[820px] sm:px-8 sm:pb-12 sm:pt-32">
-        <div className="max-w-4xl">
-          <div className="inline-flex items-center gap-3 rounded-2xl border border-white/16 bg-black/25 p-2 pr-4 backdrop-blur-md">
-            <Image
-              src="/brand/brewster-boys.webp"
-              alt="Brewster Boys"
-              width={52}
-              height={52}
-              className="h-[52px] w-[52px] rounded-xl bg-white object-cover"
-            />
-            <span>
-              <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#efbd88]">
-                Brewster Boys eyes only
+      <div className="relative mx-auto flex min-h-[900px] max-w-7xl flex-col justify-between px-5 pb-8 pt-10 sm:px-8 sm:pb-12 sm:pt-14 lg:min-h-[840px] lg:pt-20">
+        <div className="grid items-center gap-4 lg:grid-cols-[1.08fr_.72fr] lg:gap-8">
+          <div className="order-2 max-w-4xl lg:order-1">
+            <div className="inline-flex items-center gap-3 rounded-full border border-white/16 bg-black/25 px-4 py-2.5 backdrop-blur-md">
+              <span className="h-2 w-2 rounded-full bg-[#efbd88] shadow-[0_0_18px_rgba(239,189,136,.8)]" />
+              <span>
+                <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#efbd88]">
+                  Brewster Boys eyes only
+                </span>
+                <span className="mt-1 block text-[8px] font-bold uppercase tracking-[0.15em] text-white/38">
+                  Private tournament field manual
+                </span>
               </span>
-              <span className="mt-1 block text-[8px] font-bold uppercase tracking-[0.15em] text-white/38">
-                Private tournament field manual
-              </span>
-            </span>
+            </div>
+            <h1 className="mt-7 max-w-4xl text-[clamp(3.45rem,8vw,7.4rem)] font-semibold leading-[0.84] tracking-[-0.075em]">
+              Win the trip
+              <span className="block text-[#efbd88]">before J‑BONE</span>
+              finds the snacks.
+            </h1>
+            <p className="mt-7 max-w-2xl text-base leading-7 text-white/66 sm:text-lg sm:leading-8">
+              A private 50-hole caddie, ten-man field manual and scientifically irresponsible amount
+              of confidence. The golf advice is real. The emotional stability is still being tested.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#caddie"
+                className="rounded-full bg-[#e39a50] px-6 py-3 text-[10px] font-black uppercase tracking-[0.17em] text-[#10251e] transition hover:-translate-y-0.5 hover:bg-[#efbd88]"
+              >
+                Open the caddie
+              </a>
+              <a
+                href="#team-metrics"
+                className="rounded-full border border-white/22 bg-white/8 px-6 py-3 text-[10px] font-black uppercase tracking-[0.17em] text-white backdrop-blur transition hover:bg-white/14"
+              >
+                Meet the questionable experts
+              </a>
+            </div>
           </div>
-          <h1 className="mt-7 max-w-4xl text-[clamp(3.7rem,10vw,8.6rem)] font-semibold leading-[0.82] tracking-[-0.075em]">
-            Win the trip
-            <span className="block text-[#efbd88]">before J‑BONE</span>
-            finds the snacks.
-          </h1>
-          <p className="mt-7 max-w-2xl text-base leading-7 text-white/66 sm:text-lg sm:leading-8">
-            A private 50-hole caddie, ten-man field manual and scientifically irresponsible amount
-            of confidence. The golf advice is real. The emotional stability is still being tested.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href="#caddie"
-              className="rounded-full bg-[#e39a50] px-6 py-3 text-[10px] font-black uppercase tracking-[0.17em] text-[#10251e] transition hover:-translate-y-0.5 hover:bg-[#efbd88]"
-            >
-              Open the caddie
-            </a>
-            <a
-              href="#team-metrics"
-              className="rounded-full border border-white/22 bg-white/8 px-6 py-3 text-[10px] font-black uppercase tracking-[0.17em] text-white backdrop-blur transition hover:bg-white/14"
-            >
-              Meet the questionable experts
-            </a>
+
+          <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
+            <div className="relative">
+              <div className="absolute inset-[12%] rounded-full bg-[#e39a50]/20 blur-3xl" />
+              <Image
+                src="/brand/brewster-boys-cutout.png"
+                alt="Brewster Boys team logo"
+                width={768}
+                height={768}
+                loading="eager"
+                sizes="(max-width: 640px) 68vw, (max-width: 1024px) 360px, 35vw"
+                className="relative h-auto w-[min(68vw,300px)] drop-shadow-[0_28px_50px_rgba(0,0,0,.42)] sm:w-[360px] lg:w-full lg:max-w-[470px]"
+              />
+              <span className="relative mx-auto -mt-2 block w-fit rounded-full border border-white/14 bg-[#071b18]/82 px-3 py-2 text-[8px] font-bold uppercase tracking-[0.16em] text-white/48 backdrop-blur-md">
+                Est. somewhere near the first cooler
+              </span>
+            </div>
           </div>
         </div>
 
         <div className="mt-14">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <span className="text-[8px] font-bold uppercase tracking-[0.18em] text-white/34">
+              Official Gamble Sands aerial · Hole 2
+            </span>
+            <span className="hidden text-[8px] font-bold uppercase tracking-[0.18em] text-white/26 sm:block">
+              Ten golfers · several adults
+            </span>
+          </div>
           <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/12 bg-white/12 sm:grid-cols-4">
             {[
               ["10", "Brewster Boys"],
