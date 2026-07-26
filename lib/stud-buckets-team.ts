@@ -7,53 +7,53 @@ export interface TeammateJob {
 export const STUD_BUCKETS_JOBS: Record<string, TeammateJob> = {
   "matt-wixted": {
     title: "The Air-Traffic Controller",
-    mission: "Keep the match state loud, the pairings clear and the team emotionally out of the trees.",
-    lockerRoom: "WIX does the beer math so nobody else has to. This is both leadership and public safety.",
+    mission: "Keep the match state loud, the pairings clear and ten emotionally complicated aircraft out of the trees.",
+    lockerRoom: "WIX does the beer math so nobody else has to. This is leadership, arithmetic and a public-safety initiative.",
   },
   "andrew-mager": {
     title: "The Adult in the Room",
     mission: "Supply gross pars, cover aggressive partners and make the other team beat real golf—not donated holes.",
-    lockerRoom: "Every group needs one person whose scorecard does not look like a Wi-Fi password.",
+    lockerRoom: "Every group needs one scorecard that does not look like a Wi‑Fi password. Drew has been issued the clipboard.",
   },
   "jordan-brodbeck": {
     title: "The Swiss Army Bucket",
     mission: "Bring complete mid-cap golf to any format, stabilize a high-stroke partner and own a meaningful Singles match.",
-    lockerRoom: "Useful everywhere, dangerous when opened, and somehow carrying three tools nobody knew we needed.",
+    lockerRoom: "Useful everywhere, dangerous when opened and somehow carrying three tools airport security should have found.",
   },
   "nick-sprowls": {
     title: "The Sleeping Giant",
     mission: "Turn a 16.9 event number into net pressure by finding the lower-differential gear already proven in his history.",
-    lockerRoom: "If vintage Nick wakes up, please do not make sudden movements. Just hand him the scorecard.",
+    lockerRoom: "If vintage Nick wakes up, avoid eye contact and quietly hand him the scorecard. Wildlife protocol applies.",
   },
   "jack-groot": {
-    title: "The Passport",
+    title: "The International Man of Fairway",
     mission: "Use destination-course experience to stay patient when firm turf, wind and unfamiliar sightlines get weird.",
-    lockerRoom: "Jack has seen enough strange golf holes to know the correct response is rarely ‘swing harder.’",
+    lockerRoom: "Jack has seen enough strange golf holes to know the correct response is rarely “swing harder,” though it remains everyone’s favorite proposal.",
   },
   "sam-blonski": {
     title: "The Net ATM",
     mission: "Convert steady bogey golf and a 24.5 allowance into a pile of uncomfortable net pars.",
-    lockerRoom: "Bogey is legal tender when it comes with a stroke. Please insert opponent and withdraw point.",
+    lockerRoom: "Bogey is legal tender when it comes with a stroke. Insert opponent, enter PIN and withdraw one deeply annoying point.",
   },
   "nick-kane": {
-    title: "The Wild Card",
+    title: "The Garmin Witness Protection Program",
     mission: "Use 120 rounds of experience, stroke value and hot-putter upside beside a dependable gross ball.",
-    lockerRoom: "Garmin confirms he golfs a lot. Garmin has declined further comment on the grounds it may incriminate him.",
+    lockerRoom: "Garmin confirms he golfs constantly. Garmin has declined further comment on the grounds it may incriminate both parties.",
   },
   "pat-morse": {
     title: "The Stroke-Hole Bandit",
     mission: "Bring the fresh low-to-mid-90s form, take every available pop and turn ordinary bogeys into match-play robbery.",
-    lockerRoom: "A bogey with a stroke is basically a tax-free birdie. P-MO understands finance.",
+    lockerRoom: "A bogey with a stroke is basically a tax-free birdie. P‑MO understands finance and is prepared to commit light accounting fraud.",
   },
   "tim-hummel": {
     title: "The Veteran Thief",
     mission: "Use Strand experience, calm decisions and mid-teen ceiling rounds to steal the holes opponents assume they own.",
-    lockerRoom: "Tim has seen this movie before. The ending usually involves somebody else wondering how they lost 2-and-1.",
+    lockerRoom: "Tim has seen this movie before. The ending usually features someone on the other team whispering, “How the hell are we two down?”",
   },
   "rhett-fahrney": {
     title: "The Undefeated Mystery",
     mission: "Lean on championship pedigree, keep the assignment simple and make limited scouting information work against the opponent.",
-    lockerRoom: "Three trips, three wins and almost no current film. Rhett is less a player profile than a weather event.",
+    lockerRoom: "Three trips, three wins and almost no current film. Rhett is less a player profile than an unidentified weather system.",
   },
 };
 

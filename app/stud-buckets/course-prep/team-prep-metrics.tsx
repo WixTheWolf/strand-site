@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -16,6 +17,7 @@ import {
 } from "@/lib/sabermetrics";
 import { JBONE_TEAM, STUD_BUCKETS_TEAM } from "@/lib/stud-buckets";
 import { teammateJob } from "@/lib/stud-buckets-team";
+import { getPlayerPhoto } from "@/lib/player-assets";
 import type { PlayerDraftStats } from "@/lib/types";
 
 type DraftPayload = {
@@ -50,20 +52,38 @@ function strokeHoles(course: ChampionshipCourseIntel, allowance: number) {
     .map((hole) => hole.number);
 }
 
-function Initials({
+function PlayerPortrait({
   metric,
   captain = false,
+  large = false,
 }: {
   metric: PlayerSaberMetrics;
   captain?: boolean;
+  large?: boolean;
 }) {
+  const photo = getPlayerPhoto(metric.player.id);
+
   return (
     <span
-      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
-        captain ? "bg-[#e39a50] text-[#10251e]" : "bg-[#31594d] text-white"
+      className={`relative shrink-0 overflow-hidden border ${
+        large ? "h-28 w-24 rounded-[1.4rem]" : "h-14 w-14 rounded-2xl"
+      } ${
+        captain ? "border-[#e39a50]/65 bg-[#e39a50]" : "border-white/14 bg-[#31594d]"
       }`}
     >
-      {metric.player.initials}
+      {photo ? (
+        <Image
+          src={photo}
+          alt={`${metric.player.name}, Stud Buckets golfer`}
+          fill
+          sizes={large ? "96px" : "56px"}
+          className="object-cover object-top"
+        />
+      ) : (
+        <span className="flex h-full w-full items-center justify-center text-[10px] font-black text-white">
+          {metric.player.initials}
+        </span>
+      )}
     </span>
   );
 }
@@ -80,45 +100,51 @@ function CaptainCard({
 
   return (
     <article
-      className={`rounded-[1.75rem] border p-5 md:p-6 ${
+      className={`relative overflow-hidden rounded-[1.75rem] border p-5 md:p-6 ${
         ours
-          ? "border-[#e39a50]/35 bg-[#102a23] text-white"
-          : "border-black/8 bg-[#f4f0e7] text-[#10201b]"
+          ? "border-[#e39a50]/35 bg-[#102a23] text-white shadow-[0_24px_80px_rgba(0,0,0,.22)]"
+          : "border-white/10 bg-white/[0.055] text-white"
       }`}
     >
+      <div className={`absolute -right-14 -top-20 h-52 w-52 rounded-full blur-3xl ${ours ? "bg-[#e39a50]/18" : "bg-white/5"}`} />
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Initials metric={metric} captain={ours} />
+          <PlayerPortrait metric={metric} captain={ours} large />
           <div>
             <div
               className={`text-[9px] font-bold uppercase tracking-[0.18em] ${
-                ours ? "text-[#efbd88]" : "text-[#9a6031]"
+                ours ? "text-[#efbd88]" : "text-white/40"
               }`}
             >
-              {ours ? "Our captain" : "Opposing captain benchmark"}
+              {ours ? "Our fearless administrative burden" : "The man we are politely ruining"}
             </div>
             <h3 className="mt-1 text-2xl font-semibold">{metric.player.nickname}</h3>
-            <p className={`text-xs ${ours ? "text-white/42" : "text-black/42"}`}>
+            <p className="text-xs text-white/42">
               {metric.player.name}
+            </p>
+            <p className="mt-3 max-w-xs text-[10px] leading-4 text-white/45">
+              {ours
+                ? "Calls the pairings, tracks the points and accepts full blame for everybody else’s three-putts."
+                : "Excellent golfer. Fine person. Unfortunately standing between us and the trophy."}
             </p>
           </div>
         </div>
         <div className="text-right">
           <div className="font-mono text-3xl font-semibold">{number(metric.index, 1)}</div>
-          <div className={`text-[8px] uppercase tracking-[0.14em] ${ours ? "text-white/30" : "text-black/30"}`}>
+          <div className="text-[8px] uppercase tracking-[0.14em] text-white/30">
             Event index
           </div>
         </div>
       </div>
 
-      <div className={`mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl ${ours ? "bg-white/10" : "bg-black/8"}`}>
+      <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-white/10">
         {[
           [gamble.handicap, "Gamble course HC"],
           [scarecrow.handicap, "Scarecrow course HC"],
         ].map(([value, label]) => (
-          <div key={label} className={ours ? "bg-[#102a23] p-4" : "bg-white p-4"}>
+          <div key={label} className="bg-[#0c241e] p-4">
             <div className="font-mono text-2xl font-semibold">{value}</div>
-            <div className={`mt-1 text-[8px] uppercase tracking-[0.13em] ${ours ? "text-white/32" : "text-black/32"}`}>
+            <div className="mt-1 text-[8px] uppercase tracking-[0.13em] text-white/32">
               {label}
             </div>
           </div>
@@ -127,9 +153,9 @@ function CaptainCard({
 
       <div className="mt-5 grid grid-cols-4 gap-2">
         {FORMAT_ORDER.map((format) => (
-          <div key={format} className={`rounded-xl p-3 text-center ${ours ? "bg-white/[0.06]" : "bg-white"}`}>
+          <div key={format} className="rounded-xl bg-white/[0.06] p-3 text-center">
             <div className="font-mono text-sm font-semibold">{number(metric.format[format])}</div>
-            <div className={`mt-1 text-[7px] font-bold uppercase tracking-[0.1em] ${ours ? "text-white/30" : "text-black/30"}`}>
+            <div className="mt-1 text-[7px] font-bold uppercase tracking-[0.1em] text-white/30">
               {format === "scramble" ? "Scram." : FORMAT_META[format].label}
             </div>
           </div>
@@ -225,23 +251,23 @@ export default function TeamPrepMetrics() {
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#efbd88]">
-              Stud Buckets metric room
+              The highly scientific bucket laboratory
             </p>
             <h2 className="mt-3 text-4xl font-semibold tracking-[-0.055em] md:text-6xl">
-              Know our ten. Know their captain.
+              Ten men. One trophy. Several concerning swings.
             </h2>
             <p className="mt-5 max-w-xl text-sm leading-7 text-white/55">
-              WIX is included as a full member of the ten-man roster. J-BONE appears only as the
-              opposing-captain benchmark; the rest of his roster is intentionally excluded from
-              this team preparation page.
+              WIX is in the ten-man model because captains still have to hit the shots—deeply
+              inconvenient, but technically fair. J‑BONE is here as the lone enemy benchmark.
+              Everybody else on his team can remain a rumor.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              [number(average(team.map((metric) => metric.index)), 1), "Team index"],
-              [number(average(team.map((metric) => metric.tournamentScore))), "Team power"],
-              [number(average(team.map((metric) => metric.consistency))), "Consistency"],
-              [String(team.filter((metric) => metric.confidenceLabel === "High").length), "High confidence"],
+              [number(average(team.map((metric) => metric.index)), 1), "Average damage"],
+              [number(average(team.map((metric) => metric.tournamentScore))), "Bucket power"],
+              [number(average(team.map((metric) => metric.consistency))), "Chaos control"],
+              [String(team.filter((metric) => metric.confidenceLabel === "High").length), "Adults on file"],
             ].map(([value, label]) => (
               <article key={label} className="rounded-[1.4rem] border border-white/10 bg-white/[0.055] p-4">
                 <div className="text-3xl font-semibold tracking-[-0.04em] text-[#efbd88]">{value}</div>
@@ -262,7 +288,9 @@ export default function TeamPrepMetrics() {
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Our roster only</p>
                 <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em]">Everyone has a job.</h3>
-                <p className="mt-2 max-w-xl text-xs leading-5 text-white/40">Specific assignments, zero interchangeable human components.</p>
+                <p className="mt-2 max-w-xl text-xs leading-5 text-white/40">
+                  Ten specialists. Zero passengers. P‑MO is present, accounted for and legally permitted to steal net holes.
+                </p>
               </div>
               <div className="text-[9px] uppercase tracking-[0.14em] text-white/28">10 players · captain included</div>
             </div>
@@ -270,26 +298,37 @@ export default function TeamPrepMetrics() {
               {team.map((metric) => {
                 const format = bestFormat(metric);
                 const job = teammateJob(metric.player.id);
+                const photo = getPlayerPhoto(metric.player.id);
                 return (
-                  <article key={metric.player.id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.055] p-5">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <Initials metric={metric} captain={metric.player.id === STUD_BUCKETS_TEAM.captainId} />
+                  <article key={metric.player.id} className="group overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/[0.055] transition duration-300 hover:-translate-y-1 hover:border-[#e39a50]/40">
+                    <div className="relative aspect-[16/10] overflow-hidden bg-[#102a23]">
+                      {photo ? (
+                        <Image
+                          src={photo}
+                          alt={`${metric.player.name}, ${job.title}`}
+                          fill
+                          sizes="(max-width: 640px) 100vw, 50vw"
+                          className="object-cover object-top transition duration-700 group-hover:scale-[1.04]"
+                        />
+                      ) : null}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#071b18] via-[#071b18]/15 to-transparent" />
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
                         <div>
-                          <h4 className="font-semibold">{metric.player.nickname}</h4>
-                          <p className="text-[8px] text-white/30">{metric.player.name}</p>
-                          <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.13em] text-[#efbd88]">{job.title}</p>
+                          <p className="text-[8px] font-black uppercase tracking-[0.16em] text-[#efbd88]">{job.title}</p>
+                          <h4 className="mt-1 text-2xl font-semibold">{metric.player.nickname}</h4>
+                          <p className="text-[8px] text-white/42">{metric.player.name}</p>
+                        </div>
+                        <div className="rounded-xl border border-white/15 bg-black/25 px-3 py-2 text-right backdrop-blur">
+                          <div className="font-mono text-xl font-semibold">{number(metric.index, 1)}</div>
+                          <div className="text-[7px] uppercase tracking-[0.12em] text-white/38">Index</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-mono text-xl font-semibold">{number(metric.index, 1)}</div>
-                        <div className="text-[7px] uppercase tracking-[0.12em] text-white/28">Index</div>
-                      </div>
                     </div>
-                    <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+                    <div className="p-5">
+                    <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="rounded-xl bg-black/15 p-3">
                         <div className="font-mono font-semibold">{number(metric.format[format])}</div>
-                        <div className="mt-1 text-[7px] uppercase text-white/28">Best format</div>
+                        <div className="mt-1 text-[7px] uppercase text-white/28">{FORMAT_META[format].label}</div>
                       </div>
                       <div className="rounded-xl bg-black/15 p-3">
                         <div className="font-mono font-semibold">{number(metric.gambleFit)}</div>
@@ -301,11 +340,12 @@ export default function TeamPrepMetrics() {
                       </div>
                     </div>
                     <div className="mt-4 flex items-center justify-between gap-3 text-xs">
-                      <span className="text-white/38">Best deployment</span>
+                      <span className="text-white/38">Deploy when we need</span>
                       <span className="font-semibold text-white/78">{FORMAT_META[format].label}</span>
                     </div>
-                    <p className="mt-4 text-xs leading-5 text-white/48">{job.mission}</p>
-                    <p className="mt-4 border-l-2 border-[#e39a50] pl-3 text-[10px] italic leading-4 text-white/35">{job.lockerRoom}</p>
+                    <p className="mt-4 text-xs leading-5 text-white/58">{job.mission}</p>
+                    <p className="mt-4 rounded-xl bg-[#e39a50]/10 p-3 text-[10px] italic leading-4 text-[#f1c99f]">{job.lockerRoom}</p>
+                    </div>
                   </article>
                 );
               })}
@@ -316,8 +356,8 @@ export default function TeamPrepMetrics() {
             <article className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-5 md:p-6">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">Personal stroke planner</p>
-                  <h3 className="mt-2 text-2xl font-semibold">Find your number.</h3>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">Free strokes, legally acquired</p>
+                  <h3 className="mt-2 text-2xl font-semibold">Know your pops or donate them.</h3>
                 </div>
                 <select
                   value={selected.player.id}
@@ -385,12 +425,13 @@ export default function TeamPrepMetrics() {
               </div>
               <p className="mt-4 text-[9px] leading-4 text-white/30">
                 Planning estimate. The lowest allowance in each match plays from zero; all other
-                players receive the difference. The live scorecard remains authoritative.
+                players receive the difference. The live scorecard remains authoritative because
+                group-chat math has repeatedly failed peer review.
               </p>
             </article>
 
             <article className="rounded-[1.75rem] bg-[#e39a50] p-5 text-[#10251e] md:p-6">
-              <div className="text-[9px] font-black uppercase tracking-[0.18em] text-[#10251e]/48">Team course-fit leaders</div>
+              <div className="text-[9px] font-black uppercase tracking-[0.18em] text-[#10251e]/48">Who should be released into the wild</div>
               <div className="mt-5 grid grid-cols-2 gap-5">
                 {[
                   ["Gamble", gambleLeaders, "gambleFit" as const],
@@ -416,7 +457,7 @@ export default function TeamPrepMetrics() {
         <p className="mt-10 text-[9px] leading-5 text-white/28">
           Updated {new Date(data.updatedAt).toLocaleString()} · {data.source}. Metrics are
           decision support, not guarantees. Missing shot-level evidence stays neutral rather than
-          being invented.
+          being invented. Confidence is encouraged; perjury is not.
         </p>
       </div>
     </section>

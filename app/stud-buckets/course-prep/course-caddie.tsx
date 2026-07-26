@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 import {
@@ -9,6 +10,13 @@ import {
   type ChampionshipCourseIntel,
   type HolePlan,
 } from "@/lib/course-intelligence";
+import {
+  courseImage,
+  holeImagePosition,
+  holeMemory,
+  planTranslation,
+  type VisualCourseId,
+} from "@/lib/course-humor";
 
 type TabId = "caddie" | "holes" | "prep";
 type CourseId = ChampionshipCourseIntel["id"] | "quicksands";
@@ -44,17 +52,17 @@ const SHOTS: { id: ShotId; label: string }[] = [
 ];
 
 const RESORT_RULES = [
-  ["Sand is not a bunker", "All sandy areas are waste areas. Ground the club, take practice swings and remove loose impediments."],
-  ["Grass marks the boundary", "Desert areas are red penalty areas. The edge is where maintained grass meets desert."],
-  ["Carry is half the number", "Firm, fast fescue makes landing slope, bounce and runout part of every club choice."],
-  ["Pin sheet before club", "Front/back and left/right pins can reverse the correct tee line—especially on Scarecrow."],
+  ["Sand is not a bunker", "All sandy areas are waste areas. Ground the club, take practice swings and remove loose impediments. The desert has rules; it is not asking for interpretive dance."],
+  ["Grass marks the boundary", "Desert areas are red penalty areas. The edge is where maintained grass meets desert. If it looks like a rattlesnake owns it, take the relief."],
+  ["Carry is half the number", "Firm, fast fescue makes landing slope, bounce and runout part of every club choice. Your rangefinder knows distance; it does not understand consequences."],
+  ["Pin sheet before club", "Front/back and left/right pins can reverse the correct tee line—especially on Scarecrow. “Somewhere over there” is not a pin location."],
 ];
 
 const COURSE_KEYS = [
-  ["Gamble Sands", "Wide is not random. Choose the side that creates the angle, use the floor, and save aggression for 2, 8, 12, 13 and 18."],
-  ["Scarecrow", "Smaller targets and visual deception reward center-green discipline. The pin location decides the preferred lane."],
-  ["QuickSands", "Calibrate true carry, release and wind. The landing contour is more useful than the number painted on the marker."],
-  ["Cascades", "Use the putting course as a speed lab: 20-, 40- and 60-foot pace, sidehill reads, then 6–10 footers under consequence."],
+  ["Gamble Sands", "Wide is not random. Choose the side that creates the angle, use the floor and save aggression for 2, 8, 12, 13 and 18. The course is generous; do not respond by becoming an idiot."],
+  ["Scarecrow", "Smaller targets and visual deception reward center-green discipline. The pin decides the lane. Your eyeballs may submit several fraudulent claims."],
+  ["QuickSands", "Calibrate true carry, release and wind. The landing contour is more useful than the number on the marker—and considerably less interested in your excuses."],
+  ["Cascades", "Use the putting course as a speed lab: 20-, 40- and 60-foot pace, sidehill reads, then 6–10 footers under consequence. Beers may serve as stakes, never as green-reading devices."],
 ];
 
 const LIGHT_STYLE: Record<LightId, { label: string; note: string; shell: string; badge: string; dot: string }> = {
@@ -268,13 +276,13 @@ export default function CourseCaddie() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-64px)] bg-[#f4f0e7]">
+    <main id="caddie" className="min-h-[calc(100vh-64px)] scroll-mt-20 bg-[#f4f0e7]">
       <div className="sticky top-[61px] z-40 border-b border-black/8 bg-[#f4f0e7]/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl gap-1 px-4 py-2 sm:px-6">
           {([
             ["caddie", "Caddie"],
-            ["holes", "All holes"],
-            ["prep", "Rules & prep"],
+            ["holes", "Hole book"],
+            ["prep", "Rules before beers"],
           ] as [TabId, string][]).map(([id, label]) => (
             <button
               key={id}
@@ -295,10 +303,13 @@ export default function CourseCaddie() {
           <section className="rounded-[1.75rem] border border-black/8 bg-white p-4 shadow-sm sm:p-6">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">On-course answer</p>
-                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">What shot are we hitting?</h1>
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">The anti-double-bogey machine</p>
+                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">Tell us what chaos we’re facing.</h1>
+                <p className="mt-2 max-w-xl text-xs leading-5 text-black/45">
+                  Four inputs. One clear call. Zero opportunities for the cart to hold a forty-minute committee meeting.
+                </p>
               </div>
-              <span className="hidden rounded-full bg-[#edf3ef] px-3 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#31594d] sm:block">Four inputs · one call</span>
+              <span className="hidden rounded-full bg-[#edf3ef] px-3 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#31594d] sm:block">Caddie fee · one cold beer</span>
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -408,6 +419,35 @@ export default function CourseCaddie() {
           </section>
 
           <section className={`mt-4 overflow-hidden rounded-[1.75rem] border shadow-sm ${lightStyle.shell}`}>
+            <div className="relative h-64 overflow-hidden sm:h-80">
+              <Image
+                src={courseImage(courseId as VisualCourseId)}
+                alt={`${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} course landscape for hole ${selectedHole.number}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 1152px"
+                className="object-cover"
+                style={{ objectPosition: holeImagePosition(selectedHole.number) }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/18 to-black/10" />
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-white sm:p-7">
+                <div>
+                  <div className="text-[9px] font-black uppercase tracking-[0.18em] text-[#efbd88]">
+                    {courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} · classified visual
+                  </div>
+                  <div className="mt-2 flex items-end gap-3">
+                    <span className="font-mono text-7xl font-semibold leading-none tracking-[-0.08em] sm:text-8xl">
+                      {selectedHole.number}
+                    </span>
+                    <span className="pb-2 font-mono text-xs text-white/56">
+                      Par {selectedHole.par} · {selectedHole.yards} yds
+                    </span>
+                  </div>
+                </div>
+                <div className={`rounded-full px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.17em] ${lightStyle.badge}`}>
+                  {lightStyle.label}
+                </div>
+              </div>
+            </div>
             <div className="p-5 sm:p-7">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -416,19 +456,17 @@ export default function CourseCaddie() {
                     {courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} · Hole {selectedHole.number}
                   </div>
                   <h2 className="mt-2 text-3xl font-semibold tracking-[-0.05em] sm:text-5xl">{selectedHole.headline}</h2>
-                  <p className="mt-2 font-mono text-xs text-black/48">
-                    Par {selectedHole.par} · {selectedHole.yards} yds{selectedHole.strokeIndex ? ` · SI ${selectedHole.strokeIndex}` : ""}
+                  <p className="mt-3 max-w-2xl text-sm font-semibold leading-6 text-[#9a6031]">
+                    {holeMemory(courseId as VisualCourseId, selectedHole.number)}
                   </p>
                 </div>
-                <div className={`rounded-full px-4 py-2.5 text-[10px] font-black uppercase tracking-[0.17em] ${lightStyle.badge}`}>
-                  {lightStyle.label}
-                </div>
+                {selectedHole.strokeIndex ? <div className="rounded-full border border-black/10 px-3 py-2 font-mono text-[9px] text-black/42">SI {selectedHole.strokeIndex}</div> : null}
               </div>
 
               <div className="mt-6 rounded-2xl bg-white/72 p-5">
-                <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-black/38">The call · {SHOTS.find((item) => item.id === shot)?.label}</div>
+                <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-black/38">The grown-up answer · {SHOTS.find((item) => item.id === shot)?.label}</div>
                 <p className="mt-2 text-lg font-semibold leading-7 text-[#102a23]">{shotCall(selectedHole, shot, light)}</p>
-                <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-black/38">{lightStyle.note}</p>
+                <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-black/38">{lightStyle.note} No second opinion from the loudest guy in the cart.</p>
               </div>
 
               <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -443,8 +481,11 @@ export default function CourseCaddie() {
               </div>
 
               <article className="mt-3 rounded-2xl bg-[#102a23] p-5 text-white">
-                <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">{FORMATS.find((item) => item.id === format)?.label} cue</div>
+                <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">{FORMATS.find((item) => item.id === format)?.label} · translation for degenerates</div>
                 <p className="mt-2 text-sm leading-6 text-white/72">{formatCall(format, situation, selectedHole)}</p>
+                <p className="mt-3 border-t border-white/10 pt-3 text-xs font-semibold leading-5 text-[#efbd88]">
+                  {planTranslation(selectedHole.plan)}
+                </p>
               </article>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
@@ -467,7 +508,7 @@ export default function CourseCaddie() {
           </section>
 
           <p className="mt-4 px-2 text-center text-[10px] leading-5 text-black/38">
-            Reconfirm today&apos;s marker, wind, lie and pin. This tool makes the decision smaller; it does not overrule what your eyes see.
+            Reconfirm today&apos;s marker, wind, lie and pin. This tool makes the decision smaller; it cannot stop you from ignoring it and immediately proving why it exists.
           </p>
         </div>
       ) : null}
@@ -476,9 +517,11 @@ export default function CourseCaddie() {
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-9">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">Fast scan</p>
-              <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">Rate every hole.</h1>
-              <p className="mt-2 text-sm text-black/48">Tap any hole to load it into the Caddie with the current format.</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">The 50-hole survival catalog</p>
+              <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">Every hole gets a face and a warning label.</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-black/48">
+                Tap a card to load the real strategy into the Caddie. The memory line is there because nobody has ever recalled “favor the preferred angle” after three Transfusions.
+              </p>
             </div>
             <select
               value={courseId}
@@ -504,21 +547,37 @@ export default function CourseCaddie() {
                   key={rawHole.number}
                   type="button"
                   onClick={() => openHole(courseId, rawHole.number)}
-                  className="rounded-2xl border border-black/8 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-black/16"
+                  className="group overflow-hidden rounded-[1.4rem] border border-black/8 bg-white text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:border-black/16 hover:shadow-[0_18px_55px_rgba(16,42,35,.13)]"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#102a23] font-mono text-sm font-bold text-white">{rawHole.number}</span>
-                      <div>
-                        <div className="text-sm font-semibold">Par {rawHole.par} · {yards} yds</div>
-                        <div className="mt-1 text-[9px] uppercase tracking-[0.13em] text-black/35">Difficulty {holeDifficulty}/5</div>
+                  <div className="relative h-44 overflow-hidden">
+                    <Image
+                      src={courseImage(courseId as VisualCourseId)}
+                      alt={`${courseId === "quicksands" ? "QuickSands" : championshipCourse?.name} landscape for hole ${rawHole.number}`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition duration-700 group-hover:scale-105"
+                      style={{ objectPosition: holeImagePosition(rawHole.number) }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/5 to-black/10" />
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4 text-white">
+                      <div className="flex items-end gap-3">
+                        <span className="font-mono text-5xl font-semibold leading-none tracking-[-0.07em]">{rawHole.number}</span>
+                        <div className="pb-1">
+                          <div className="text-xs font-semibold">Par {rawHole.par} · {yards} yds</div>
+                          <div className="mt-1 text-[8px] uppercase tracking-[0.13em] text-white/50">Difficulty {holeDifficulty}/5</div>
+                        </div>
                       </div>
+                      <span className={`rounded-full border px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.12em] ${PLAN_STYLE[plan]}`}>{planLabel(plan)}</span>
                     </div>
-                    <span className={`rounded-full border px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.12em] ${PLAN_STYLE[plan]}`}>{planLabel(plan)}</span>
                   </div>
+                  <div className="p-4">
+                    <p className="min-h-10 text-sm font-semibold leading-5 text-[#102a23]">
+                      {holeMemory(courseId as VisualCourseId, rawHole.number)}
+                    </p>
                   <div className="mt-4 flex items-center justify-between">
                     <RatingDots value={holeDifficulty} color="dark" />
-                    <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#31594d]">Open caddie →</span>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#31594d]">See the adult answer →</span>
+                  </div>
                   </div>
                 </button>
               );
@@ -530,8 +589,8 @@ export default function CourseCaddie() {
       {tab === "prep" ? (
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-9">
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">Remember four things</p>
-            <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">Rules that save shots.</h1>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">Read before becoming content</p>
+            <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">Rules that prevent sixes and documentaries.</h1>
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -557,13 +616,13 @@ export default function CourseCaddie() {
           </div>
 
           <div className="mt-8 rounded-[1.75rem] bg-[#102a23] p-6 text-white">
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#efbd88]">Thirty-second decision</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#efbd88]">Thirty-second decision · because 31 becomes overthinking</p>
             <ol className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                "Confirm pin, wind and lie.",
-                "Choose landing area and release.",
-                "Name the best miss.",
-                "Pick club, flight and commit.",
+                "Confirm pin, wind and lie. Reality first.",
+                "Choose landing area and release. Physics remains undefeated.",
+                "Name the best miss. “I don’t miss” is not admissible.",
+                "Pick club, flight and commit. The committee is adjourned.",
               ].map((item, index) => (
                 <li key={item} className="rounded-xl border border-white/10 bg-white/[0.055] p-4">
                   <span className="font-mono text-[10px] text-[#efbd88]">0{index + 1}</span>
