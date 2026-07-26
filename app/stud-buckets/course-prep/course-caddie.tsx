@@ -51,37 +51,37 @@ const SHOTS: { id: ShotId; label: string }[] = [
 ];
 
 const RESORT_RULES = [
-  ["Sand is not a bunker", "All sandy areas are waste areas. Ground the club, take practice swings and remove loose impediments. The desert has rules; it is not asking for interpretive dance."],
-  ["Grass marks the boundary", "Desert areas are red penalty areas. The edge is where maintained grass meets desert. If it looks like a rattlesnake owns it, take the relief."],
-  ["Carry is half the number", "Firm, fast fescue makes landing slope, bounce and runout part of every club choice. Your rangefinder knows distance; it does not understand consequences."],
-  ["Pin sheet before club", "Front/back and left/right pins can reverse the correct tee line—especially on Scarecrow. “Somewhere over there” is not a pin location."],
+  ["Sand is waste", "Ground the club, rehearse the swing and move loose stuff. Easy."],
+  ["Grass is the line", "The desert is a red penalty area. Maintained grass marks the edge. Take relief and keep moving."],
+  ["Carry is half the number", "This turf runs. Pick a landing spot and rollout—not just a laser number."],
+  ["Pin sheet first", "The pin can change the tee line, especially on Scarecrow. Check it before choosing a club."],
 ];
 
 const COURSE_KEYS = [
-  ["Gamble Sands", "Wide is not random. Choose the side that creates the angle, use the floor and save aggression for 2, 8, 12, 13 and 18. The course is generous; do not respond by becoming an idiot."],
-  ["Scarecrow", "Smaller targets and visual deception reward center-green discipline. The pin decides the lane. Your eyeballs may submit several fraudulent claims."],
-  ["QuickSands", "Calibrate true carry, release and wind. The landing contour is more useful than the number on the marker—and considerably less interested in your excuses."],
-  ["Cascades", "Use the putting course as a speed lab: 20-, 40- and 60-foot pace, sidehill reads, then 6–10 footers under consequence. Beers may serve as stakes, never as green-reading devices."],
+  ["Gamble Sands", "Use the floor. Play for angles. Attack 2, 8, 12, 13 and 18—after one ball finds grass."],
+  ["Scarecrow", "The pin picks the lane. Favor center green, use the slopes and keep doubles off the card."],
+  ["QuickSands", "Calibrate carry, rollout and wind. The same wedge number can play three different ways."],
+  ["Cascades", "Dial 20-, 40- and 60-foot speed, then finish with 6–10 footers under pressure."],
 ];
 
 const LIGHT_STYLE: Record<LightId, { label: string; note: string; shell: string; badge: string; dot: string }> = {
   green: {
     label: "Green light",
-    note: "Commit to the scoring line.",
+    note: "Go. No steering.",
     shell: "border-emerald-700/20 bg-emerald-50",
     badge: "bg-emerald-700 text-white",
     dot: "bg-emerald-500",
   },
   yellow: {
     label: "Yellow light",
-    note: "Attack only when the condition is met.",
+    note: "Go only if the number and lie agree.",
     shell: "border-amber-600/20 bg-amber-50",
     badge: "bg-amber-500 text-[#281b08]",
     dot: "bg-amber-400",
   },
   red: {
     label: "Red light",
-    note: "No hero shot. Protect the hole.",
+    note: "Take the big number off the card.",
     shell: "border-rose-700/20 bg-rose-50",
     badge: "bg-rose-700 text-white",
     dot: "bg-rose-500",
@@ -131,53 +131,53 @@ function getLight(plan: HolePlan, format: FormatId, situation: SituationId, shot
 
 function shotCall(hole: CaddieHole, shot: ShotId, light: LightId) {
   if (shot === "tee" && hole.par === 3) {
-    return "Choose the landing number, flight and expected release before choosing the club. The flag is not automatically the target.";
+    return "Play the landing number, not the flag. Pick the flight, allow for release and commit.";
   }
 
   if (shot === "tee") {
-    if (light === "green") return "Take the scoring lane with one committed shape. Confirm the carry and runout; then swing without steering it.";
-    if (light === "yellow") return "Choose the side that creates the next angle. Take the aggressive lane only if carry, wind and landing width all agree.";
-    return "Find maintained grass first. Distance is secondary; the next shot must stay playable.";
+    if (light === "green") return "Take the scoring line. Confirm carry and rollout, then send it.";
+    if (light === "yellow") return "Choose the side that opens the next shot. Challenge only if carry and wind agree.";
+    return "Find grass. The next shot matters more than ten extra yards.";
   }
 
   if (shot === "approach") {
-    if (light === "green") return "Attack through the fattest usable part of the target and let the feeder slope or release move the ball toward the hole.";
-    if (light === "yellow") return "Use the center line unless the pin and ground contour clearly create a safe feeder. Do not short-side the team.";
-    return "Play for the correct green section or a full layup number. A routine next shot beats a spectacular recovery.";
+    if (light === "green") return "Attack through the fat side and let the slope feed it in.";
+    if (light === "yellow") return "Center line unless a feeder is obvious. Do not short-side us.";
+    return "Hit the safe section or lay up to a number. No miracle auditions.";
   }
 
   if (shot === "short-game") {
-    if (light === "green") return "Use the simplest scoring route. If the entrance is open, putter, hybrid or a low runner removes strike and wind variance.";
-    if (light === "yellow") return "Get the ball onto the correct shelf with predictable rollout. Choose landing spot before loft.";
-    return "Take double bogey out of play: use the widest landing area and accept a longer putt.";
+    if (light === "green") return "Front open? Use putter, hybrid or a low runner.";
+    if (light === "yellow") return "Land it on the right shelf and let it run. Add loft only if you need it.";
+    return "Use the widest landing area. A long putt beats another chip.";
   }
 
-  if (light === "green") return "Give the make a chance, but keep the comeback inside three feet. Start line plus capture speed—no timid swipe.";
-  if (light === "yellow") return "Pace first. Read the final third, choose a start line, and finish the stroke.";
-  return "Two-putt is the win. Die it into a three-foot circle and refuse the three-putt.";
+  if (light === "green") return "Give it a chance. Good speed, committed line, tap-in coming back.";
+  if (light === "yellow") return "Pace first. Read the last third and roll it.";
+  return "Two-putt wins. Leave it inside three feet and walk.";
 }
 
 function formatCall(format: FormatId, situation: SituationId, hole: CaddieHole) {
   if (format === "singles") {
-    if (situation === "protect") return `You own the advantage. Make the opponent beat par. ${hole.matchPlay}`;
-    if (situation === "must-win") return `You need the hole, not a highlight. Expand the target one level—but keep the big miss off the card. ${hole.matchPlay}`;
-    return `No partner rescue: choose the shot you can repeat under pressure. ${hole.matchPlay}`;
+    if (situation === "protect") return `You’re ahead. Fairways, greens, hand him the problem. ${hole.matchPlay}`;
+    if (situation === "must-win") return `Need the hole. Widen the target one step—never two. ${hole.matchPlay}`;
+    return `No rescue ball. Hit the shot you own. ${hole.matchPlay}`;
   }
 
   if (format === "fourball") {
-    if (situation === "safe") return `Partner is alive. You have permission to take the scoring line. ${hole.matchPlay}`;
-    if (situation === "must-win") return `One ball finishes the hole; the other attacks the point. ${hole.matchPlay}`;
-    return `Do not send both balls to the same trouble. Establish a score before increasing risk. ${hole.matchPlay}`;
+    if (situation === "safe") return `Partner’s alive. Now you can hunt. ${hole.matchPlay}`;
+    if (situation === "must-win") return `One ball finishes. One ball hunts. ${hole.matchPlay}`;
+    return `Do not miss together. Put a score on the board first. ${hole.matchPlay}`;
   }
 
   if (format === "shamble") {
-    if (situation === "safe") return `A playable drive is banked. Use the second tee ball to improve angle or distance. ${hole.matchPlay}`;
-    return `The first job is a usable team drive. Once it exists, the next player can challenge the aggressive lane. ${hole.matchPlay}`;
+    if (situation === "safe") return `Drive is banked. Now improve the angle or distance. ${hole.matchPlay}`;
+    return `First ball finds grass. Second ball gets aggressive. ${hole.matchPlay}`;
   }
 
-  if (situation === "safe") return `The first ball created permission. The second player attacks with full commitment. ${hole.matchPlay}`;
-  if (situation === "must-win") return `Choose roles before the shot: one ball establishes the next position, one ball chases the ceiling. ${hole.matchPlay}`;
-  return `First ball creates permission; second ball spends it. Never hit two half-aggressive shots. ${hole.matchPlay}`;
+  if (situation === "safe") return `Ball is safe. Next swing is full green light. ${hole.matchPlay}`;
+  if (situation === "must-win") return `Pick roles: one secures the next shot, one chases it. ${hole.matchPlay}`;
+  return `First ball earns permission. Second ball spends it. ${hole.matchPlay}`;
 }
 
 function situationOptions(format: FormatId) {
@@ -231,10 +231,10 @@ export default function CourseCaddie() {
         par: quick.par,
         yards: quick.mappedYards,
         plan: quickPlan(quick.number),
-        headline: quick.name ? `${quick.name}: read the contour` : "One number, one committed flight",
+        headline: quick.name ? `${quick.name}: use the contour` : "One number. One swing.",
         strategy: quick.plan,
-        preferredMiss: "Center of the usable putting surface. Confirm the daily marker, wind and pin before choosing the club.",
-        matchPlay: "Treat the rep like points count: one routine, one ball and no casual reload.",
+        preferredMiss: "Middle of the usable green. Confirm today’s marker, wind and pin.",
+        matchPlay: "One ball. Full routine. No reload.",
       };
     }
 
@@ -279,9 +279,9 @@ export default function CourseCaddie() {
       <div className="sticky top-[61px] z-40 border-b border-black/8 bg-[#f4f0e7]/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl gap-1 px-4 py-2 sm:px-6">
           {([
-            ["caddie", "Caddie"],
+            ["caddie", "Caddie call"],
             ["holes", "Hole book"],
-            ["prep", "Rules before beers"],
+            ["prep", "Rules"],
           ] as [TabId, string][]).map(([id, label]) => (
             <button
               key={id}
@@ -302,13 +302,13 @@ export default function CourseCaddie() {
           <section className="rounded-[1.75rem] border border-black/8 bg-white p-4 shadow-sm sm:p-6">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">The anti-double-bogey machine</p>
-                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">Tell us what chaos we’re facing.</h1>
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">On-course caddie</p>
+                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">Give me the shot. I’ll give you the call.</h1>
                 <p className="mt-2 max-w-xl text-xs leading-5 text-black/45">
-                  Four inputs. One clear call. Zero opportunities for the cart to hold a forty-minute committee meeting.
+                  Pick the hole, format and situation. Then stop scrolling and hit it.
                 </p>
               </div>
-              <span className="hidden rounded-full bg-[#edf3ef] px-3 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#31594d] sm:block">Caddie fee · one cold beer</span>
+              <span className="hidden rounded-full bg-[#edf3ef] px-3 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#31594d] sm:block">Fee · one cold beer</span>
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -462,24 +462,24 @@ export default function CourseCaddie() {
               </div>
 
               <div className="mt-6 rounded-2xl bg-white/72 p-5">
-                <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-black/38">The grown-up answer · {SHOTS.find((item) => item.id === shot)?.label}</div>
+                <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-black/38">The call · {SHOTS.find((item) => item.id === shot)?.label}</div>
                 <p className="mt-2 text-lg font-semibold leading-7 text-[#102a23]">{shotCall(selectedHole, shot, light)}</p>
-                <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-black/38">{lightStyle.note} No second opinion from the loudest guy in the cart.</p>
+                <p className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-black/38">{lightStyle.note}</p>
               </div>
 
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 <article className="rounded-2xl bg-white/62 p-5">
-                  <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#9a6031]">Hole truth</div>
+                  <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#9a6031]">Hole plan</div>
                   <p className="mt-2 text-sm leading-6 text-black/62">{selectedHole.strategy}</p>
                 </article>
                 <article className="rounded-2xl bg-white/62 p-5">
-                  <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#31594d]">Best miss</div>
+                  <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#31594d]">Good miss</div>
                   <p className="mt-2 text-sm leading-6 text-black/62">{selectedHole.preferredMiss}</p>
                 </article>
               </div>
 
               <article className="mt-3 rounded-2xl bg-[#102a23] p-5 text-white">
-                <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">{FORMATS.find((item) => item.id === format)?.label} · translation for degenerates</div>
+                <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">{FORMATS.find((item) => item.id === format)?.label} · format note</div>
                 <p className="mt-2 text-sm leading-6 text-white/72">{formatCall(format, situation, selectedHole)}</p>
                 <p className="mt-3 border-t border-white/10 pt-3 text-xs font-semibold leading-5 text-[#efbd88]">
                   {planTranslation(selectedHole.plan)}
@@ -506,7 +506,7 @@ export default function CourseCaddie() {
           </section>
 
           <p className="mt-4 px-2 text-center text-[10px] leading-5 text-black/38">
-            Reconfirm today&apos;s marker, wind, lie and pin. This tool makes the decision smaller; it cannot stop you from ignoring it and immediately proving why it exists.
+            Recheck wind, lie and pin. Then trust the call and swing.
           </p>
         </div>
       ) : null}
@@ -515,10 +515,10 @@ export default function CourseCaddie() {
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-9">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">The 50-hole survival catalog</p>
-              <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">Every hole gets a face and a warning label.</h1>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">The 50-hole book</p>
+              <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">See it. Know the miss. Move on.</h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-black/48">
-                Tap a card to load the real strategy into the Caddie. The memory line is there because nobody has ever recalled “favor the preferred angle” after three Transfusions.
+                Tap a hole for the call. The one-liner is all you should need on the tee.
               </p>
             </div>
             <select
@@ -573,7 +573,7 @@ export default function CourseCaddie() {
                     </p>
                   <div className="mt-4 flex items-center justify-between">
                     <RatingDots value={holeDifficulty} color="dark" />
-                    <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#31594d]">See the adult answer →</span>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#31594d]">Get the call →</span>
                   </div>
                   </div>
                 </button>
@@ -586,8 +586,8 @@ export default function CourseCaddie() {
       {tab === "prep" ? (
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-9">
           <div>
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">Read before becoming content</p>
-            <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">Rules that prevent sixes and documentaries.</h1>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a6031]">Four things worth knowing</p>
+            <h1 className="mt-1 text-4xl font-semibold tracking-[-0.055em]">Read this once. Save a couple doubles.</h1>
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -613,13 +613,13 @@ export default function CourseCaddie() {
           </div>
 
           <div className="mt-8 rounded-[1.75rem] bg-[#102a23] p-6 text-white">
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#efbd88]">Thirty-second decision · because 31 becomes overthinking</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#efbd88]">The 15-second caddie check</p>
             <ol className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                "Confirm pin, wind and lie. Reality first.",
-                "Choose landing area and release. Physics remains undefeated.",
-                "Name the best miss. “I don’t miss” is not admissible.",
-                "Pick club, flight and commit. The committee is adjourned.",
+                "Wind, lie, pin.",
+                "Landing spot and rollout.",
+                "Name the good miss.",
+                "Club, picture, swing.",
               ].map((item, index) => (
                 <li key={item} className="rounded-xl border border-white/10 bg-white/[0.055] p-4">
                   <span className="font-mono text-[10px] text-[#efbd88]">0{index + 1}</span>

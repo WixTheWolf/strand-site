@@ -7,96 +7,96 @@ export interface TeammateJob {
 export const STUD_BUCKETS_JOBS: Record<string, TeammateJob> = {
   "matt-wixted": {
     title: "The Air-Traffic Controller",
-    mission: "Keep the match state loud, the pairings clear and ten emotionally complicated aircraft out of the trees.",
-    lockerRoom: "WIX does the beer math so nobody else has to. This is leadership, arithmetic and a public-safety initiative.",
+    mission: "Keep the match clear, the boys loose and the pairings sharp. Then go win your own ball.",
+    lockerRoom: "Captain, caddie, accountant. The blame department opens after the round.",
   },
   "andrew-mager": {
     title: "The Adult in the Room",
-    mission: "Supply gross pars, cover aggressive partners and make the other team beat real golf—not donated holes.",
-    lockerRoom: "Every group needs one scorecard that does not look like a Wi‑Fi password. Drew has been issued the clipboard.",
+    mission: "Be the gross-par anchor. Cover the attack ball and make them earn everything.",
+    lockerRoom: "Every group needs one scorecard that doesn’t look like a Wi‑Fi password.",
   },
   "jordan-brodbeck": {
     title: "The Swiss Army Brewer",
-    mission: "Bring complete mid-cap golf to any format, stabilize a high-stroke partner and own a meaningful Singles match.",
-    lockerRoom: "Useful everywhere, dangerous when opened and somehow carrying three tools airport security should have found.",
+    mission: "Fit anywhere. Steady the pairing and own a middle-board Singles match.",
+    lockerRoom: "Useful everywhere—and probably carrying something TSA should have found.",
   },
   "nick-sprowls": {
     title: "The Sleeping Giant",
-    mission: "Turn a 16.9 event number into net pressure by finding the lower-differential gear already proven in his history.",
-    lockerRoom: "If vintage Nick wakes up, avoid eye contact and quietly hand him the scorecard. Wildlife protocol applies.",
+    mission: "Find the vintage gear. Turn 16.9 into net pressure all weekend.",
+    lockerRoom: "If old Nick wakes up, hand him the scorecard and back away slowly.",
   },
   "jack-groot": {
     title: "The International Man of Fairway",
-    mission: "Use destination-course experience to stay patient when firm turf, wind and unfamiliar sightlines get weird.",
-    lockerRoom: "Jack has seen enough strange golf holes to know the correct response is rarely “swing harder,” though it remains everyone’s favorite proposal.",
+    mission: "Stay patient when firm turf, wind and strange sightlines get weird.",
+    lockerRoom: "He knows “swing harder” is rarely the answer. Rare maturity.",
   },
   "sam-blonski": {
     title: "The Net ATM",
-    mission: "Convert steady bogey golf and a 24.5 allowance into a pile of uncomfortable net pars.",
-    lockerRoom: "Bogey is legal tender when it comes with a stroke. Insert opponent, enter PIN and withdraw one deeply annoying point.",
+    mission: "Make bogey golf expensive. A stroke turns steady into infuriating.",
+    lockerRoom: "Bogey plus a pop: the least glamorous birdie in golf.",
   },
   "nick-kane": {
-    title: "The Garmin Witness Protection Program",
-    mission: "Use 120 rounds of experience, stroke value and hot-putter upside beside a dependable gross ball.",
-    lockerRoom: "Garmin confirms he golfs constantly. Garmin has declined further comment on the grounds it may incriminate both parties.",
+    title: "The Garmin Workhorse",
+    mission: "Bring 120 rounds of reps and hot-putter upside beside a steady ball.",
+    lockerRoom: "Garmin confirms he is always golfing. His family may confirm the same.",
   },
   "pat-morse": {
     title: "The Stroke-Hole Bandit",
-    mission: "Bring the fresh low-to-mid-90s form, take every available pop and turn ordinary bogeys into match-play robbery.",
-    lockerRoom: "A bogey with a stroke is basically a tax-free birdie. P‑MO understands finance and is prepared to commit light accounting fraud.",
+    mission: "Use every pop. Turn bogeys into net pars and mid-90s form into stolen holes.",
+    lockerRoom: "P‑MO is here to commit legal robbery, one stroke hole at a time.",
   },
   "tim-hummel": {
     title: "The Veteran Thief",
-    mission: "Use Strand experience, calm decisions and mid-teen ceiling rounds to steal the holes opponents assume they own.",
-    lockerRoom: "Tim has seen this movie before. The ending usually features someone on the other team whispering, “How the hell are we two down?”",
+    mission: "Stay calm. Use experience to steal holes they already counted.",
+    lockerRoom: "The quietest way to get two up is letting the other team beat itself.",
   },
   "rhett-fahrney": {
     title: "The Undefeated Mystery",
-    mission: "Lean on championship pedigree, keep the assignment simple and make limited scouting information work against the opponent.",
-    lockerRoom: "Three trips, three wins and almost no current film. Rhett is less a player profile than an unidentified weather system.",
+    mission: "Keep it simple. Trust the three-trip, three-win DNA.",
+    lockerRoom: "No current film. Three wins. Scouting report: let him cook.",
   },
 };
 
 export const STUD_BUCKETS_GOLD = [
   {
     title: "Grass before glory",
-    tip: "In every partner format, put one ball in play before anyone auditions for a YouTube thumbnail.",
+    tip: "One ball in play. Then somebody can get brave.",
   },
   {
     title: "The flag is a suggestion",
-    tip: "Center green pays rent. Short-sided hero golf is an expensive hobby and we already paid for the trip.",
+    tip: "Center green pays. Short-sided hero golf does not.",
   },
   {
     title: "Use the floor",
-    tip: "Putter, hybrid and low iron are real short-game clubs here. Ego adds loft; firm fescue adds strokes.",
+    tip: "Front open? Use putter, hybrid or low iron. The ground is free.",
   },
   {
     title: "Know your pops",
-    tip: "If you do not know where you receive strokes, you are donating the only free thing at Gamble Sands.",
+    tip: "Know every stroke hole before you tee off.",
   },
   {
     title: "Say the match out loud",
-    tip: "Confirm front, back and overall status every three holes. Beer math is undefeated and consistently wrong.",
+    tip: "Confirm front, back and overall every three holes. No beer math.",
   },
   {
-    title: "Waste sand, not panic",
-    tip: "The sandy areas are waste areas. Ground the club, take a practice swing and save the dramatic bunker face for photos.",
+    title: "Sand is waste",
+    tip: "Ground the club, rehearse the swing and get on with it.",
   },
   {
     title: "Make them finish",
-    tip: "A visible par changes decisions. Keep the ball alive and let the opponent manufacture the disaster.",
+    tip: "A visible par changes their decisions. Keep the ball alive.",
   },
   {
-    title: "No emotional carryover",
-    tip: "A lost hole is one point. Do not turn it into a limited-series documentary spanning the next four holes.",
+    title: "Leave it there",
+    tip: "A bad hole ends at the next tee.",
   },
   {
-    title: "Hydrate before ugly",
-    tip: "Drink and eat before the swing starts resembling a folding chair falling down stairs.",
+    title: "Fuel before ugly",
+    tip: "Eat and drink before your swing gets weird.",
   },
   {
-    title: "Win without apologizing",
-    tip: "Nobody asks whether a 1-up victory was aesthetically pleasing. Put the point on ice and keep walking.",
+    title: "Pretty is optional",
+    tip: "One-up is beautiful. Put the point away.",
   },
 ] as const;
 

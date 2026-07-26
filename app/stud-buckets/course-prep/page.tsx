@@ -49,7 +49,7 @@ export default async function CoursePrepPage() {
               height={48}
               className="h-12 w-12 object-contain drop-shadow-[0_7px_10px_rgba(0,0,0,.35)]"
             />
-            <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">Private · hide from J-BONE</span><span className="block text-sm font-semibold">Brewster Boys Field Manual</span></span>
+            <span><span className="block text-[9px] uppercase tracking-[0.2em] text-white/38">Play smart · stay loose</span><span className="block text-sm font-semibold">Brewster Boys Field Manual</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <nav className="hidden items-center gap-1 md:flex" aria-label="Field manual sections">
@@ -69,7 +69,7 @@ export default async function CoursePrepPage() {
         <div className="mx-auto max-w-6xl">
           <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Brewster Boys · Gamble Sands · 2026</div>
           <p className="mt-3 max-w-xl text-sm font-semibold text-white/70">
-            If J‑BONE asks, this is a craft-beer blog with an unusually aggressive yardage section.
+            Ten boys. One brew. Bring the damn thing home.
           </p>
           <p className="mt-2 max-w-3xl text-xs leading-5 text-white/32">{COURSE_SOURCE_NOTE}</p>
           <p className="mt-2 max-w-3xl text-xs leading-5 text-white/32">

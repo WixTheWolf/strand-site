@@ -116,7 +116,7 @@ function CaptainCard({
                 ours ? "text-[#efbd88]" : "text-white/40"
               }`}
             >
-              {ours ? "Our fearless administrative burden" : "The man we are politely ruining"}
+              {ours ? "Captain WIX" : "Opponent benchmark"}
             </div>
             <h3 className="mt-1 text-2xl font-semibold">{metric.player.nickname}</h3>
             <p className="text-xs text-white/42">
@@ -124,8 +124,8 @@ function CaptainCard({
             </p>
             <p className="mt-3 max-w-xs text-[10px] leading-4 text-white/45">
               {ours
-                ? "Calls the pairings, tracks the points and accepts full blame for everybody else’s three-putts."
-                : "Excellent golfer. Fine person. Unfortunately standing between us and the trophy."}
+                ? "Set the plan. Keep us loose. Go win your match."
+                : "Good player. Make him earn every hole."}
             </p>
           </div>
         </div>
@@ -251,23 +251,22 @@ export default function TeamPrepMetrics() {
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#efbd88]">
-              The highly scientific brew laboratory
+              The Brewster Boys game plan
             </p>
             <h2 className="mt-3 text-4xl font-semibold tracking-[-0.055em] md:text-6xl">
-              Ten men. One trophy. Several concerning swings.
+              Know your job. Trust your partner.
             </h2>
             <p className="mt-5 max-w-xl text-sm leading-7 text-white/55">
-              WIX is in the ten-man model because captains still have to hit the shots—deeply
-              inconvenient, but technically fair. J‑BONE is here as the lone enemy benchmark.
-              Everybody else on his team can remain a rumor.
+              Ten different games, one plan: put a ball in play, use every stroke and make
+              each point miserable to win.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              [number(average(team.map((metric) => metric.index)), 1), "Average damage"],
-              [number(average(team.map((metric) => metric.tournamentScore))), "Brew power"],
-              [number(average(team.map((metric) => metric.consistency))), "Chaos control"],
-              [String(team.filter((metric) => metric.confidenceLabel === "High").length), "Adults on file"],
+              [number(average(team.map((metric) => metric.index)), 1), "Average index"],
+              [number(average(team.map((metric) => metric.tournamentScore))), "Team power"],
+              [number(average(team.map((metric) => metric.consistency))), "Consistency"],
+              [String(team.filter((metric) => metric.confidenceLabel === "High").length), "Deep data"],
             ].map(([value, label]) => (
               <article key={label} className="rounded-[1.4rem] border border-white/10 bg-white/[0.055] p-4">
                 <div className="text-3xl font-semibold tracking-[-0.04em] text-[#efbd88]">{value}</div>
@@ -289,7 +288,7 @@ export default function TeamPrepMetrics() {
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#efbd88]">Our roster only</p>
                 <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em]">Everyone has a job.</h3>
                 <p className="mt-2 max-w-xl text-xs leading-5 text-white/40">
-                  Ten specialists. Zero passengers. P‑MO is present, accounted for and legally permitted to steal net holes.
+                  Ten players. Ten clear jobs. No passengers.
                 </p>
               </div>
               <div className="text-[9px] uppercase tracking-[0.14em] text-white/28">10 players · captain included</div>
@@ -340,7 +339,7 @@ export default function TeamPrepMetrics() {
                       </div>
                     </div>
                     <div className="mt-4 flex items-center justify-between gap-3 text-xs">
-                      <span className="text-white/38">Deploy when we need</span>
+                      <span className="text-white/38">Best fit</span>
                       <span className="font-semibold text-white/78">{FORMAT_META[format].label}</span>
                     </div>
                     <p className="mt-4 text-xs leading-5 text-white/58">{job.mission}</p>
@@ -356,8 +355,8 @@ export default function TeamPrepMetrics() {
             <article className="rounded-[1.75rem] border border-white/10 bg-white/[0.055] p-5 md:p-6">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">Free strokes, legally acquired</p>
-                  <h3 className="mt-2 text-2xl font-semibold">Know your pops or donate them.</h3>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#efbd88]">Free strokes</p>
+                  <h3 className="mt-2 text-2xl font-semibold">Know your pops. Free is a great price.</h3>
                 </div>
                 <select
                   value={selected.player.id}
@@ -425,13 +424,12 @@ export default function TeamPrepMetrics() {
               </div>
               <p className="mt-4 text-[9px] leading-4 text-white/30">
                 Planning estimate. The lowest allowance in each match plays from zero; all other
-                players receive the difference. The live scorecard remains authoritative because
-                group-chat math has repeatedly failed peer review.
+                players get the difference. The live scorecard wins every argument.
               </p>
             </article>
 
             <article className="rounded-[1.75rem] bg-[#e39a50] p-5 text-[#10251e] md:p-6">
-              <div className="text-[9px] font-black uppercase tracking-[0.18em] text-[#10251e]/48">Who should be released into the wild</div>
+              <div className="text-[9px] font-black uppercase tracking-[0.18em] text-[#10251e]/48">Best course fits</div>
               <div className="mt-5 grid grid-cols-2 gap-5">
                 {[
                   ["Gamble", gambleLeaders, "gambleFit" as const],
@@ -456,8 +454,7 @@ export default function TeamPrepMetrics() {
 
         <p className="mt-10 text-[9px] leading-5 text-white/28">
           Updated {new Date(data.updatedAt).toLocaleString()} · {data.source}. Metrics are
-          decision support, not guarantees. Missing shot-level evidence stays neutral rather than
-          being invented. Confidence is encouraged; perjury is not.
+          decision support, not guarantees. Missing evidence stays neutral. We do not invent golf.
         </p>
       </div>
     </section>

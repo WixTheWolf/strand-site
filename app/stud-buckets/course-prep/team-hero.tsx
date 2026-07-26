@@ -29,34 +29,34 @@ export default function TeamHero() {
               <span className="h-2 w-2 rounded-full bg-[#efbd88] shadow-[0_0_18px_rgba(239,189,136,.8)]" />
               <span>
                 <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-[#efbd88]">
-                  Brewster Boys eyes only
+                  Brewster Boys only
                 </span>
                 <span className="mt-1 block text-[8px] font-bold uppercase tracking-[0.15em] text-white/38">
-                  Private tournament field manual
+                  The Strand · Gamble Sands · 2026
                 </span>
               </span>
             </div>
             <h1 className="mt-7 max-w-4xl text-[clamp(3.45rem,8vw,7.4rem)] font-semibold leading-[0.84] tracking-[-0.075em]">
-              Win the trip
-              <span className="block text-[#efbd88]">before J‑BONE</span>
-              finds the snacks.
+              Ten boys. One job.
+              <span className="block text-[#efbd88]">Bring the damn</span>
+              thing home.
             </h1>
             <p className="mt-7 max-w-2xl text-base leading-7 text-white/66 sm:text-lg sm:leading-8">
-              A private 50-hole caddie, ten-man field manual and scientifically irresponsible amount
-              of confidence. The golf advice is real. The emotional stability is still being tested.
+              Play the smart shot. Back your partner. Make them earn every point.
+              That&apos;s the whole plan.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="#caddie"
                 className="rounded-full bg-[#e39a50] px-6 py-3 text-[10px] font-black uppercase tracking-[0.17em] text-[#10251e] transition hover:-translate-y-0.5 hover:bg-[#efbd88]"
               >
-                Open the caddie
+                Get the call
               </a>
               <a
                 href="#team-metrics"
                 className="rounded-full border border-white/22 bg-white/8 px-6 py-3 text-[10px] font-black uppercase tracking-[0.17em] text-white backdrop-blur transition hover:bg-white/14"
               >
-                Meet the questionable experts
+                Know your job
               </a>
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function TeamHero() {
                 className="relative h-auto w-[min(68vw,300px)] drop-shadow-[0_28px_50px_rgba(0,0,0,.42)] sm:w-[360px] lg:w-full lg:max-w-[470px]"
               />
               <span className="relative mx-auto -mt-2 block w-fit rounded-full border border-white/14 bg-[#071b18]/82 px-3 py-2 text-[8px] font-bold uppercase tracking-[0.16em] text-white/48 backdrop-blur-md">
-                Est. somewhere near the first cooler
+                Est. near the first cooler
               </span>
             </div>
           </div>
@@ -86,15 +86,15 @@ export default function TeamHero() {
               Official Gamble Sands aerial · Hole 2
             </span>
             <span className="hidden text-[8px] font-bold uppercase tracking-[0.18em] text-white/26 sm:block">
-              Ten golfers · several adults
+              Play loose · finish strong
             </span>
           </div>
           <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/12 bg-white/12 sm:grid-cols-4">
             {[
-              ["10", "Brewster Boys"],
-              ["50", "Holes decoded"],
-              ["38", "Points to glory"],
-              ["0", "Hero doubles allowed"],
+              ["10", "Boys"],
+              ["50", "Holes mapped"],
+              ["38", "Wins the cup"],
+              ["1", "Team"],
             ].map(([value, label]) => (
               <div key={label} className="bg-[#071b18]/82 p-4 backdrop-blur-xl sm:p-5">
                 <div className="font-mono text-3xl font-semibold text-[#efbd88]">{value}</div>

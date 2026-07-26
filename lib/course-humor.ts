@@ -3,62 +3,62 @@ import type { HolePlan } from "./course-intelligence";
 export type VisualCourseId = "gamble-sands" | "scarecrow" | "quicksands";
 
 const GAMBLE_SANDS_MEMORY = [
-  "Your carry number has already filed for partial unemployment.",
-  "A short par 4 and a long chance to invent a preventable six.",
-  "Patience and testosterone are currently in arbitration.",
-  "Small number. Enormous opportunity to insult yourself.",
-  "The fairway is wider than your alibi. Use it.",
-  "Your long iron may become emotionally unavailable.",
-  "Cut the corner only if your driver signed the waiver.",
-  "Drivable—golf architecture’s favorite way to say “please ruin this.”",
-  "Make the turn with dignity. Witnesses are present.",
-  "A short par 3 with full authority to embarrass a grown man.",
-  "Center turf: boring, legal and suspiciously effective.",
-  "Just enough sand to bait the entire group chat.",
-  "The green is reachable. Your common sense remains day-to-day.",
-  "Two fairways, one brain. Pick a lane before the backswing.",
-  "Par is available without submitting a trick-shot audition.",
-  "The slope works for free and gives better advice than your friends.",
-  "Late-round decisions: where electrolytes become character references.",
-  "Last chance to be a hero—or at least look competent near the clubhouse.",
+  "Wide fairway. Pick a window and let it run.",
+  "Pick a lane. Half-committed is how sixes hatch.",
+  "Three-shot par. The green rejects almost-heroes.",
+  "Yes, putter. No, we’re not joking.",
+  "Left opens the green. Long-right opens a tab.",
+  "Use the right bank. Gravity is on payroll.",
+  "Grass first. The second shot is where we gamble.",
+  "One ball right. Then somebody can get stupid.",
+  "Play left of the pinch. Par is stealing here.",
+  "Center green. The short club already did its part.",
+  "Safe is wide left. Scoring is through the gap.",
+  "Aim right and let the ground bring it back.",
+  "Cover the ridge. The bowl does the rest.",
+  "Wide right works. Make them try the hero carry.",
+  "Center cut. The gauntlet starts now.",
+  "Green first. Front-right is a trap.",
+  "Choose your bite. Deep sand eats seconds.",
+  "One ball safe. One ball finds the speed slot.",
 ] as const;
 
 const SCARECROW_MEMORY = [
-  "The fairway is hiding, not missing. Aim like an adult.",
-  "Left is death. Right is golf. Analysis complete.",
-  "The par 5 is flirting with you. Stay respectful.",
-  "A low runner is acceptable. A shank into another ZIP code is not.",
-  "Driveable green. Triple-tier putting surface. Zero refunds.",
-  "Gravity is your longest club. Stop trying to out-swing geology.",
-  "There is more room right. Your eyes are drama queens.",
-  "Two large shots required. Please arrive with both.",
-  "Look at the river after the shot. The river cannot help you make par.",
-  "Snack shack behind you. Consequences ahead.",
-  "Chicken Point: swing committed, cluck privately.",
-  "The canyon edge offers a shorter second and a longer obituary.",
-  "Enjoy the view, then carry the right bunker like you meant it.",
-  "Five hundred yards on the card; amusement park on the ground.",
-  "Blind ridge. Pick a line and stop hosting a committee meeting.",
-  "Downhill ace chance. The hole-in-one speech remains premature.",
-  "Pin first, tee line second. No vibes-based navigation.",
-  "Driveable cliff-edge finisher. Apparently there is a final exam.",
+  "Pin left, play left. Otherwise use the right speed slot.",
+  "Right slope saves. Left wash collects souvenirs.",
+  "Tee ball right. Approach from left-center.",
+  "Know the pin section. The trench is not a shortcut.",
+  "Bank the layup. Then somebody can cover the pot.",
+  "Right side owns the angle. Left only owns distance.",
+  "Front pin, challenge right. Back pin, stay left.",
+  "High right gives a view. Low left gives a prayer.",
+  "Center green. Back-left is a sucker flag with scenery.",
+  "Use the downhill. Stop it before the point.",
+  "Center saddle. Wedge does not mean automatic.",
+  "Safe ball left. Attack ball hugs the canyon.",
+  "Right off the tee. Take enough club into the bowl.",
+  "Right-center, then respect the shallow green.",
+  "Pick a layup shelf. “Somewhere up there” is not a number.",
+  "Front pin rides the left bank. Back pin needs the carry.",
+  "Middle of the boomerang. Let it run right.",
+  "Bite off only what you can carry. Then finish it.",
 ] as const;
 
 const QUICKSANDS_MEMORY = [
-  "First wedge. First chance to start lying about how close it was.",
-  "Short enough to attack; evil enough to remember.",
-  "The yardage says wedge. The contour says read the terms.",
-  "A bank shot is golf when the architect says so.",
-  "Green light. Your ego is not the yardage device.",
-  "Flight it. The wind has been waiting all morning to meet you.",
-  "Middle green: unsexy, solvent and still alive.",
-  "This tiny hole has a fully developed personality disorder.",
-  "Longer than it looks, meaner than it needs to be.",
-  "Stock swing. Center target. Boring brilliance.",
-  "Do not turn a wedge into a recovery montage.",
-  "Aceable. Also triple-able. Golf is a beautiful illness.",
-  "One clean number. No committee meetings.",
-  "Finish with commitment; the drinks are already judging you.",
+  "Read the banks. Plinko is the whole point.",
+  "Stock wedge, middle. Do not short-side an 85-yarder.",
+  "Take enough club. The crater has no sympathy.",
+  "Land front half and let it chase.",
+  "Favorite wedge. Ignore the edge pin.",
+  "Front open? Keep it on the ground.",
+  "Flight first, club second. Wind owns the number.",
+  "Front-edge number. Long is expensive.",
+  "Use the sideboard. Straight at it is the sucker line.",
+  "Stock swing. This is your weekend calibration.",
+  "Middle shelf. Fancy is optional.",
+  "Green light through the center. Ace-chase responsibly.",
+  "Keep it low if the door is open.",
+  "Best 100-yard swing. Finish like it counts.",
 ] as const;
 
 const COURSE_HOLE_COUNTS: Record<VisualCourseId, number> = {
@@ -106,10 +106,10 @@ export function holeMemory(courseId: VisualCourseId, holeNumber: number): string
 
 export function planTranslation(plan: HolePlan): string {
   if (plan === "attack") {
-    return "The drawbridge is down. Enter confidently without firing your ball into the moat.";
+    return "Scoring hole. Pick a line and commit.";
   }
   if (plan === "protect") {
-    return "Par is wearing a tuxedo. Bogey may still get into the club. Double is denied at the rope.";
+    return "Par is excellent. Bogey may survive. Double cannot.";
   }
-  return "This hole offers two choices: golf, or a story everybody hears again at dinner.";
+  return "Good decision wins this hole. Hero golf usually loses it.";
 }
