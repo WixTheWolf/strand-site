@@ -16,10 +16,10 @@ export function isCaptain(playerId: string): boolean {
  * locations, and personal profile copy belong in server-side configuration,
  * never in the public repository or client payload.
  *
- * Tournament handicap refresh: 2026-08-17. Exact current values replace stale
- * draft-week locks only when the source is trustworthy enough for tournament use.
- * Range-only or conflicting feeds retain the last verified tournament number rather
- * than inventing precision. The Strand playing-index ceiling remains 25.
+ * Tournament handicap refresh: 2026-08-17. Exact GHIN indexes supplied by the
+ * captain replace stale draft-week locks. Players not present in the supplied
+ * GHIN snapshot retain their last verified tournament number. The Strand
+ * playing-index ceiling remains 25.
  */
 export const STRAND_PLAYERS: StrandPlayer[] = [
   {
@@ -30,8 +30,9 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 5.6,
-    eventIndex2026: 5.6,
+    manualIndex: 6.0,
+    eventIndex2026: 6.0,
+    ghinClub: "CS Southern California Golf Club",
   },
   {
     id: "brett-comfort",
@@ -41,8 +42,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 24.8,
-    eventIndex2026: 24.8,
+    manualIndex: 24.2,
+    eventIndex2026: 24.2,
     ghinClub: "USGA/SCGA GC",
   },
   {
@@ -65,8 +66,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 7.7,
-    eventIndex2026: 7.7,
+    manualIndex: 7.6,
+    eventIndex2026: 7.6,
     ghinClub: "Point Sebago Golf Club",
   },
   {
@@ -77,8 +78,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 15.8,
-    eventIndex2026: 15.8,
+    manualIndex: 13.6,
+    eventIndex2026: 13.6,
     ghinClub: "USGA/Chicago District GC",
   },
   {
@@ -89,8 +90,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 20.5,
-    eventIndex2026: 20.5,
+    manualIndex: 20.2,
+    eventIndex2026: 20.2,
     ghinClub: "Knollwood Men's Golf Club",
   },
   {
@@ -101,8 +102,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 14.4,
-    eventIndex2026: 14.4,
+    manualIndex: 14.6,
+    eventIndex2026: 14.6,
     ghinClub: "Westside Golf Collective",
   },
   {
@@ -113,8 +114,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 8.4,
-    eventIndex2026: 8.4,
+    manualIndex: 9.2,
+    eventIndex2026: 9.2,
     ghinClub: "Griffith Park GC",
   },
   {
@@ -125,7 +126,9 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    eventIndex2026: 19.5,
+    manualIndex: 21.8,
+    eventIndex2026: 21.8,
+    ghinClub: "EClub North Bay",
   },
   {
     id: "matt-onorato",
@@ -135,7 +138,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 28,
+    manualIndex: 28.0,
     eventIndex2026: 25,
     eventIndexCapped: true,
     ghinClub: "Carolinas eClub NC Foothills",
@@ -148,8 +151,9 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 13.3,
-    eventIndex2026: 13.3,
+    manualIndex: 12.6,
+    eventIndex2026: 12.6,
+    ghinClub: "USGA/SCGA GC",
   },
   {
     id: "matt-wixted",
@@ -159,9 +163,10 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 12.4,
-    eventIndex2026: 12.4,
+    manualIndex: 12.9,
+    eventIndex2026: 12.9,
     manualLowest: 12.4,
+    ghinClub: "Silverhart Golf",
   },
   {
     id: "nick-kane",
@@ -192,8 +197,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 12.9,
-    eventIndex2026: 16.9,
+    manualIndex: 16.6,
+    eventIndex2026: 16.6,
     ghinClub: "Westside Golf Collective",
   },
   {
@@ -204,8 +209,8 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 24.8,
-    eventIndex2026: 24.8,
+    manualIndex: 24.3,
+    eventIndex2026: 24.3,
     ghinClub: "USGA/SCGA GC",
   },
   {
@@ -226,8 +231,9 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    manualIndex: 12.4,
-    eventIndex2026: 12.4,
+    manualIndex: 11.9,
+    eventIndex2026: 11.9,
+    ghinClub: "Westside Golf Collective",
   },
   {
     id: "sam-blonski",
@@ -237,7 +243,9 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     blurb: "",
     grintId: null,
     tags: [],
-    eventIndex2026: 24.5,
+    manualIndex: 24.2,
+    eventIndex2026: 24.2,
+    ghinClub: "USGA/GAM GC",
   },
   {
     id: "shaun-eipper",
