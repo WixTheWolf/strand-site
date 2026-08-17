@@ -8,6 +8,7 @@ import CourseCaddie from "./course-caddie";
 import ShareTeamGuide from "./share-team-guide";
 import TeamHero from "./team-hero";
 import TeamPrepMetrics from "./team-prep-metrics";
+import WinningBlueprint from "./winning-blueprint";
 import { COURSE_SOURCE_NOTE } from "@/lib/course-intelligence";
 import { HOLE_PHOTO_SOURCES } from "@/lib/course-humor";
 import {
@@ -53,6 +54,7 @@ export default async function CoursePrepPage() {
           </Link>
           <div className="flex items-center gap-2">
             <nav className="hidden items-center gap-1 md:flex" aria-label="Field manual sections">
+              <Link href="#win-plan" className="rounded-full bg-[#efbd88]/12 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#efbd88] hover:bg-[#efbd88]/20">Win plan</Link>
               <Link href="#caddie" className="rounded-full px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/52 hover:bg-white/8 hover:text-white">Caddie</Link>
               <Link href="#team-metrics" className="rounded-full px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/52 hover:bg-white/8 hover:text-white">The Boys</Link>
             </nav>
@@ -62,6 +64,7 @@ export default async function CoursePrepPage() {
       </header>
 
       <TeamHero />
+      <WinningBlueprint />
       <CourseCaddie />
       <TeamPrepMetrics />
 
