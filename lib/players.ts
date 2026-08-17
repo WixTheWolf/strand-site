@@ -17,9 +17,9 @@ export function isCaptain(playerId: string): boolean {
  * never in the public repository or client payload.
  *
  * Tournament handicap refresh: 2026-08-17. Exact current values replace stale
- * draft-week locks when we have trustworthy evidence. Range-only or low-confidence
- * feeds retain the last verified tournament number rather than inventing precision.
- * The Strand playing-index ceiling remains 25.
+ * draft-week locks only when the source is trustworthy enough for tournament use.
+ * Range-only or conflicting feeds retain the last verified tournament number rather
+ * than inventing precision. The Strand playing-index ceiling remains 25.
  */
 export const STRAND_PLAYERS: StrandPlayer[] = [
   {
@@ -193,7 +193,7 @@ export const STRAND_PLAYERS: StrandPlayer[] = [
     grintId: null,
     tags: [],
     manualIndex: 12.9,
-    eventIndex2026: 12.9,
+    eventIndex2026: 16.9,
     ghinClub: "Westside Golf Collective",
   },
   {
