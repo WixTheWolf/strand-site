@@ -4,261 +4,211 @@ import {
   interpolate,
   useCurrentFrame,
 } from "remotion";
-import { Ball } from "./Ball";
-import { COLORS } from "./palette";
+import { CineBall, DUSK, Dunes, DuskSky, Grain, Tracer, Vignette } from "./Cinematic";
 
-const IMPACT = 38;
+const IMPACT = 48;
+const W = 1920;
+const H = 640;
+const TEE_X = 430;
+const TEE_Y = 452;
 
-type Chunk = {
-  vx: number;
-  vy: number;
-  spin: number;
-  color: string;
-  w: number;
-  h: number;
-};
-
-const TURF_CHUNKS: Chunk[] = [
-  { vx: -3.2, vy: -5.4, spin: -9, color: COLORS.turf, w: 26, h: 8 },
-  { vx: -1.5, vy: -7.2, spin: 7, color: COLORS.deepGreen, w: 18, h: 7 },
-  { vx: 0.7, vy: -8.0, spin: -12, color: COLORS.turfBright, w: 24, h: 8 },
-  { vx: 2.3, vy: -6.4, spin: 11, color: COLORS.turf, w: 15, h: 6 },
-  { vx: 3.9, vy: -4.3, spin: -6, color: COLORS.dirt, w: 21, h: 8 },
-  { vx: -4.3, vy: -3.1, spin: 5, color: COLORS.dirt, w: 15, h: 6 },
-  { vx: 1.4, vy: -5.2, spin: 14, color: COLORS.turfBright, w: 12, h: 5 },
+// Quadratic bezier for the ball flight / tracer.
+const P0 = [TEE_X + 2, TEE_Y - 2] as const;
+const P1 = [1150, 120] as const;
+const P2 = [1890, 96] as const;
+const bez = (t: number): [number, number] => [
+  (1 - t) * (1 - t) * P0[0] + 2 * (1 - t) * t * P1[0] + t * t * P2[0],
+  (1 - t) * (1 - t) * P0[1] + 2 * (1 - t) * t * P1[1] + t * t * P2[1],
 ];
+const PATH_POINTS = Array.from({ length: 48 }, (_, i) => bez(i / 47));
 
-/** Parabolic position for a launched fragment, in slo-mo time. */
-const fling = (t: number, v: number, gravity = 0) => v * t + 0.5 * gravity * t * t;
-
-const TEE_X = 500;
-const GROUND_Y = 530;
+const MOTES = [
+  { dx: -26, vy: -0.8, vx: -0.22, r: 4, o: 0.3 },
+  { dx: -8, vy: -1.1, vx: 0.1, r: 3, o: 0.4 },
+  { dx: 10, vy: -0.9, vx: 0.3, r: 5, o: 0.25 },
+  { dx: 26, vy: -0.6, vx: 0.5, r: 3, o: 0.35 },
+  { dx: -40, vy: -0.5, vx: -0.4, r: 3, o: 0.2 },
+  { dx: 42, vy: -1.0, vx: 0.7, r: 4, o: 0.28 },
+];
 
 export const TeeStrike: React.FC = () => {
   const frame = useCurrentFrame();
-  const t = Math.max(0, frame - IMPACT); // slo-mo clock, starts at impact
+  const t = Math.max(0, frame - IMPACT);
 
-  // Ball flight: shallow rising line with slight arc, slow (it's slo-mo).
-  const ballX = TEE_X - 14 + fling(t, 11.5);
-  const ballY = GROUND_Y - 92 - fling(t, 3.4, -0.012);
+  // Slo-mo flight progress along the bezier.
+  const flight = interpolate(frame, [IMPACT, 150], [0, 0.96], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.quad),
+  });
+  const [bx, by] = bez(flight);
   const launched = frame >= IMPACT;
 
+  // Club silhouette sweep: slow address, fast strike, slow follow-through.
+  const clubAngle = interpolate(
+    frame,
+    [0, 10, 34, IMPACT, IMPACT + 56],
+    [4, 4, 56, 0, -42],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.bezier(0.65, 0, 0.35, 1) },
+  );
+  const sweeping = frame > IMPACT - 8 && frame < IMPACT + 14;
+
+  // Impact bloom + decaying shake.
+  const bloom = interpolate(frame, [IMPACT, IMPACT + 3, IMPACT + 26], [0, 0.5, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const shake = frame >= IMPACT ? Math.sin(t * 2.1) * 3 * Math.exp(-t * 0.22) : 0;
+
   return (
-    <AbsoluteFill style={{ backgroundColor: COLORS.cream, overflow: "hidden" }}>
-      {/* subtle camera push-in */}
+    <AbsoluteFill style={{ backgroundColor: DUSK.skyTop, overflow: "hidden" }}>
       <AbsoluteFill
         style={{
+          translate: `${shake}px ${-shake * 0.6}px`,
           scale: String(
-            interpolate(frame, [0, 150], [1, 1.07], {
+            interpolate(frame, [0, 150], [1.0, 1.045], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
-              easing: Easing.bezier(0.3, 0, 0.7, 1),
             }),
           ),
-          transformOrigin: "30% 72%",
+          transformOrigin: "26% 70%",
         }}
       >
-        {/* ground */}
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 110,
-            background: COLORS.turf,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 106,
-            height: 6,
-            background: "rgba(26,60,52,0.35)",
-          }}
-        />
-        {/* blades of rough near the tee */}
-        {[-120, -74, 66, 128, 196].map((dx, i) => (
+        <DuskSky horizonY={72} />
+        <Dunes horizonY={68} drift={frame * 0.08} />
+
+        {/* near turf ridge, in silhouette */}
+        <svg
+          viewBox="0 0 1920 160"
+          preserveAspectRatio="none"
+          style={{ position: "absolute", left: 0, bottom: 0, width: "100%", height: 160 }}
+        >
+          <path d="M0 70 C 300 40, 560 86, 900 64 C 1280 40, 1560 84, 1920 58 L 1920 160 L 0 160 Z" fill="#06120e" />
+        </svg>
+        {/* a few blades near the tee */}
+        {[-70, -38, 48, 86].map((dx, i) => (
           <div
             key={dx}
             style={{
               position: "absolute",
               left: TEE_X + dx,
-              bottom: 104,
-              width: 5,
-              height: 26 + (i % 3) * 8,
-              borderRadius: 4,
-              background: COLORS.deepGreen,
-              opacity: 0.5,
-              rotate: `${(i % 2 === 0 ? -1 : 1) * (6 + i * 2)}deg`,
+              top: TEE_Y + 26 - (14 + (i % 2) * 8),
+              width: 3,
+              height: 14 + (i % 2) * 8,
+              borderRadius: 3,
+              background: "#0c201a",
+              rotate: `${(i % 2 === 0 ? -1 : 1) * (8 + i * 3)}deg`,
             }}
           />
         ))}
 
-        {/* tee */}
+        {/* tee silhouette */}
         <div
           style={{
             position: "absolute",
-            left: TEE_X - 8,
-            bottom: 104,
-            width: 16,
-            height: 54,
-            borderRadius: "0 0 8px 8px",
-            background: COLORS.gold,
+            left: TEE_X - 5,
+            top: TEE_Y + 16,
+            width: 10,
+            height: 30,
+            borderRadius: "0 0 5px 5px",
+            background: "#0a1a15",
+            boxShadow: "1px 0 0 rgba(232,200,106,0.25)",
           }}
         />
 
-        {/* motion trail ghosts behind the launched ball */}
-        {launched &&
-          [10, 20, 30].map((lag, i) => {
-            const lt = Math.max(0, t - lag);
-            return (
-              <div
-                key={lag}
-                style={{
-                  position: "absolute",
-                  left: TEE_X - 14 + fling(lt, 11.5),
-                  top: GROUND_Y - 92 - fling(lt, 3.4, -0.012),
-                  opacity: t > lag ? 0.22 - i * 0.06 : 0,
-                }}
-              >
-                <Ball size={56} />
-              </div>
-            );
-          })}
-
-        {/* the ball */}
-        <div style={{ position: "absolute", left: ballX, top: ballY }}>
-          <Ball size={56} rotate={launched ? t * 26 : 0} />
+        {/* tracer + ball */}
+        {launched && (
+          <Tracer points={[...PATH_POINTS]} progress={flight} width={W} height={H} />
+        )}
+        <div
+          style={{
+            position: "absolute",
+            left: (launched ? bx : P0[0]) - 20,
+            top: (launched ? by : P0[1]) - 20,
+          }}
+        >
+          <CineBall size={40} />
         </div>
 
-        {/* speed lines chasing the ball */}
-        {launched &&
-          [0, 26, 52].map((dy, i) => (
+        {/* club: shaft + blade in silhouette, ghosted during the sweep */}
+        {[0, 13, 26].map((lag, i) => (
+          <div
+            key={lag}
+            style={{
+              position: "absolute",
+              left: TEE_X - 5,
+              top: TEE_Y - 342,
+              width: 10,
+              height: 352,
+              transformOrigin: "50% 0%",
+              rotate: `${clubAngle + (sweeping ? lag : 0)}deg`,
+              opacity: i === 0 ? 1 : sweeping ? 0.3 - i * 0.1 : 0,
+            }}
+          >
             <div
-              key={dy}
               style={{
-                position: "absolute",
-                left: ballX - 150 - i * 40,
-                top: ballY + 6 + dy * 0.5,
-                width: interpolate(t, [4 + i * 3, 26 + i * 3], [0, 170], {
-                  extrapolateLeft: "clamp",
-                  extrapolateRight: "clamp",
-                  easing: Easing.out(Easing.quad),
-                }),
-                height: 4,
-                borderRadius: 4,
-                background: "rgba(26,60,52,0.28)",
-                opacity: interpolate(t, [4, 30, 90], [0, 1, 0], {
-                  extrapolateLeft: "clamp",
-                  extrapolateRight: "clamp",
-                }),
+                width: "100%",
+                height: "100%",
+                borderRadius: 5,
+                background: "#050f0c",
+                boxShadow: i === 0 ? "1.5px 0 0 rgba(232,200,106,0.3)" : "none",
               }}
             />
-          ))}
+            <div
+              style={{
+                position: "absolute",
+                left: -30,
+                bottom: -16,
+                width: 56,
+                height: 32,
+                borderRadius: "18px 24px 20px 6px",
+                background: "#050f0c",
+                boxShadow: i === 0 ? "0 1.5px 0 rgba(232,200,106,0.3)" : "none",
+              }}
+            />
+          </div>
+        ))}
 
-        {/* turf chunks exploding off the tee in slo-mo */}
+        {/* dust motes lifting off the strike */}
         {launched &&
-          TURF_CHUNKS.map((c, i) => (
+          MOTES.map((m, i) => (
             <div
               key={i}
               style={{
                 position: "absolute",
-                left: TEE_X + fling(t, c.vx, 0.028) * 2.4,
-                top: GROUND_Y - 44 + fling(t, c.vy, 0.062) * 2.4,
-                width: c.w,
-                height: c.h,
-                borderRadius: 3,
-                background: c.color,
-                rotate: `${t * c.spin * 0.45}deg`,
-                opacity: interpolate(t, [0, 80, 112], [1, 1, 0], {
-                  extrapolateLeft: "clamp",
-                  extrapolateRight: "clamp",
-                }),
+                left: TEE_X + m.dx + m.vx * t * 2,
+                top: TEE_Y + 8 + m.vy * t * 1.6,
+                width: m.r,
+                height: m.r,
+                borderRadius: "50%",
+                background: DUSK.goldSoft,
+                opacity:
+                  m.o *
+                  interpolate(t, [0, 14, 80], [0, 1, 0], {
+                    extrapolateLeft: "clamp",
+                    extrapolateRight: "clamp",
+                  }),
               }}
             />
           ))}
 
-        {/* impact ring + flash */}
+        {/* impact bloom */}
         <div
           style={{
             position: "absolute",
-            left: TEE_X - 60,
-            top: GROUND_Y - 120,
-            width: 120,
-            height: 120,
+            left: TEE_X - 160,
+            top: TEE_Y - 160,
+            width: 320,
+            height: 320,
             borderRadius: "50%",
-            border: `5px solid ${COLORS.gold}`,
-            scale: String(
-              interpolate(frame, [IMPACT, IMPACT + 42], [0.2, 3.4], {
-                extrapolateLeft: "clamp",
-                extrapolateRight: "clamp",
-                easing: Easing.out(Easing.cubic),
-              }),
-            ),
-            opacity: interpolate(frame, [IMPACT, IMPACT + 3, IMPACT + 42], [0, 0.95, 0], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            }),
+            background: `radial-gradient(circle, rgba(255,250,235,${bloom}) 0%, rgba(232,200,106,${bloom * 0.5}) 30%, rgba(232,200,106,0) 70%)`,
+            pointerEvents: "none",
           }}
         />
-
-        {/* club: shaft from top, swings through, then slow follow-through */}
-        <div
-          style={{
-            position: "absolute",
-            left: TEE_X - 6,
-            top: GROUND_Y - 92 - 330,
-            width: 12,
-            height: 360,
-            transformOrigin: "50% 0%",
-            rotate: `${interpolate(
-              frame,
-              [6, IMPACT, IMPACT + 70],
-              [112, 0, -38],
-              {
-                extrapolateLeft: "clamp",
-                extrapolateRight: "clamp",
-                easing: Easing.bezier(0.7, 0, 0.55, 1),
-              },
-            )}deg`,
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              borderRadius: 6,
-              background: "rgba(17,17,17,0.85)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              left: -34,
-              bottom: -20,
-              width: 62,
-              height: 38,
-              borderRadius: "20px 28px 24px 8px",
-              background: COLORS.deepGreen,
-            }}
-          />
-        </div>
       </AbsoluteFill>
 
-      {/* impact flash over everything */}
-      <AbsoluteFill
-        style={{
-          background: "#ffffff",
-          opacity: interpolate(frame, [IMPACT, IMPACT + 2, IMPACT + 8], [0, 0.55, 0], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          }),
-          pointerEvents: "none",
-        }}
-      />
+      <Grain />
+      <Vignette strength={0.55} />
     </AbsoluteFill>
   );
 };

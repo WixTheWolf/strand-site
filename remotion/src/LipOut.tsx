@@ -4,105 +4,85 @@ import {
   interpolate,
   useCurrentFrame,
 } from "remotion";
-import { Ball } from "./Ball";
-import { COLORS } from "./palette";
+import { CineBall, DUSK, Dunes, DuskSky, Grain, Vignette } from "./Cinematic";
 
-const CUP_X = 1200;
-const SURFACE = 510; // y of the green's top edge
-const BALL = 44;
-const REST_Y = SURFACE - BALL + 8;
+const CUP_X = 1210;
+const SURFACE = 408; // y of the green's top edge
+const BALL = 38;
+const REST_Y = SURFACE + 56; // ball-top resting line on the green
 
-const ORBIT_START = 125;
-const ORBIT_END = 168;
-const EJECT_END = 184;
+const HOP_END = 30;
+const ROLL_END = 126;
+const ORBIT_END = 170;
+const EJECT_END = 186;
 
 export const LipOut: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // --- Ball position, phase by phase ---
-  const orbitP = interpolate(frame, [ORBIT_START, ORBIT_END], [0, 1], {
+  const orbitP = interpolate(frame, [ROLL_END, ORBIT_END], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   const angle = ((180 + 560 * orbitP) * Math.PI) / 180;
-  const radX = interpolate(orbitP, [0, 1], [38, 30]);
-  const radY = interpolate(orbitP, [0, 1], [13, 10]);
-  const orbitX = CUP_X + Math.cos(angle) * radX - BALL / 2;
-  const orbitY = SURFACE + 4 + Math.sin(angle) * radY - BALL / 2 - 10;
+  const radX = interpolate(orbitP, [0, 1], [36, 29]);
+  const radY = interpolate(orbitP, [0, 1], [12, 9]);
+  const cupCY = REST_Y + BALL / 2 + 4;
+  const orbitX = (a: number, rx: number) => CUP_X + Math.cos(a) * rx - BALL / 2;
+  const orbitY = (a: number, ry: number) => cupCY + Math.sin(a) * ry - BALL / 2 - 8;
 
   let x: number;
   let y: number;
-  if (frame < 45) {
-    // incoming arc from off-screen left
-    const s = frame / 45;
-    x = interpolate(s, [0, 1], [-90, 520]);
-    y = interpolate(s, [0, 1], [40, REST_Y], { easing: Easing.in(Easing.quad) });
-  } else if (frame < 95) {
-    // three diminishing bounces while tracking right
-    x = interpolate(frame, [45, 95], [520, 1080]);
-    const seg =
-      frame < 66
-        ? { a: 45, b: 66, h: 150 }
-        : frame < 82
-          ? { a: 66, b: 82, h: 72 }
-          : { a: 82, b: 95, h: 30 };
-    const u = (frame - seg.a) / (seg.b - seg.a);
-    y = REST_Y - seg.h * 4 * u * (1 - u);
-  } else if (frame < ORBIT_START) {
-    // the roll — dying pace, straight at the cup
-    x = interpolate(frame, [95, ORBIT_START], [1080, orbitXAt0()], {
-      easing: Easing.out(Easing.quad),
+  if (frame < HOP_END) {
+    // low chip flight in from the left
+    const s = frame / HOP_END;
+    x = interpolate(s, [0, 1], [-70, 470]);
+    y = REST_Y - 190 * (1 - s) * (1 - s) - 46 * 4 * s * (1 - s);
+  } else if (frame < ROLL_END) {
+    // the runout — long, dying roll at the cup
+    x = interpolate(frame, [HOP_END, ROLL_END], [470, orbitX(Math.PI, 36)], {
+      easing: Easing.out(Easing.cubic),
     });
     y = REST_Y;
   } else if (frame < ORBIT_END) {
-    x = orbitX;
-    y = orbitY;
+    x = orbitX(angle, radX);
+    y = orbitY(angle, radY);
   } else if (frame < EJECT_END) {
-    // spat back out — one indignant little hop
     const u = (frame - ORBIT_END) / (EJECT_END - ORBIT_END);
-    x = interpolate(u, [0, 1], [orbitXAtEnd(), 1322], { easing: Easing.out(Easing.quad) });
-    y = REST_Y - 46 * 4 * u * (1 - u) * (1 - u);
+    const endA = ((180 + 560) * Math.PI) / 180;
+    x = interpolate(u, [0, 1], [orbitX(endA, 29), 1318], { easing: Easing.out(Easing.quad) });
+    y = REST_Y - 30 * 4 * u * (1 - u) * (1 - u);
   } else {
-    x = 1322;
+    x = 1318;
     y = REST_Y;
   }
 
-  function orbitXAt0() {
-    return CUP_X + Math.cos(Math.PI) * 38 - BALL / 2;
-  }
-  function orbitXAtEnd() {
-    const a = ((180 + 560) * Math.PI) / 180;
-    return CUP_X + Math.cos(a) * 30 - BALL / 2;
-  }
+  // Roll trail: a fading line on the surface behind the ball.
+  const trailW = frame >= HOP_END && frame < ROLL_END + 10
+    ? interpolate(frame, [HOP_END, HOP_END + 20, ROLL_END + 10], [0, 220, 40], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    : 0;
 
-  const spin =
-    frame < ORBIT_START
-      ? frame * 16
-      : frame < ORBIT_END
-        ? ORBIT_START * 16 + (frame - ORBIT_START) * 26
-        : ORBIT_START * 16 + (ORBIT_END - ORBIT_START) * 26 + Math.min(frame - ORBIT_END, 10) * 8;
-
-  // Flag: idle sway, leans in during the orbit, shakes when it stays out.
+  // Flag: idle breath, lean during orbit, shiver on the eject.
   const flagLean =
-    Math.sin(frame * 0.12) * 1.4 +
-    interpolate(frame, [ORBIT_START, ORBIT_START + 10], [0, -4], {
+    Math.sin(frame * 0.1) * 1.2 +
+    interpolate(frame, [ROLL_END, ROLL_END + 12], [0, -3], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     }) +
     (frame > ORBIT_END
-      ? Math.sin((frame - ORBIT_END) * 1.3) * 7 * Math.exp(-(frame - ORBIT_END) * 0.12)
+      ? Math.sin((frame - ORBIT_END) * 1.2) * 5 * Math.exp(-(frame - ORBIT_END) * 0.12)
       : 0);
 
-  const inCupDip = frame >= ORBIT_START && frame < ORBIT_END;
+  // One slow gold ripple from the cup after the lip-out.
+  const rippleT = frame - (ORBIT_END + 2);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: COLORS.deepGreen, overflow: "hidden" }}>
-      {/* dusk gradient */}
-      <AbsoluteFill
-        style={{
-          background: `linear-gradient(180deg, ${COLORS.deepGreenDark} 0%, ${COLORS.deepGreen} 70%)`,
-        }}
-      />
+    <AbsoluteFill style={{ backgroundColor: DUSK.skyTop, overflow: "hidden" }}>
+      <DuskSky horizonY={58} />
+      <Dunes horizonY={52} drift={frame * 0.06} />
+
       {/* the green */}
       <div
         style={{
@@ -111,137 +91,132 @@ export const LipOut: React.FC = () => {
           right: 0,
           top: SURFACE,
           bottom: 0,
-          background: "rgba(46,139,100,0.72)",
+          background: "linear-gradient(180deg, #17382e 0%, #0e2721 100%)",
         }}
       />
+      {/* mow stripes */}
+      {[0, 1, 2, 3].map((i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: SURFACE + 36 + i * 52,
+            height: 26,
+            background: "rgba(255,255,255,0.025)",
+          }}
+        />
+      ))}
       <div
         style={{
           position: "absolute",
           left: 0,
           right: 0,
-          top: SURFACE - 3,
-          height: 4,
-          background: "rgba(16,39,33,0.5)",
+          top: SURFACE - 2,
+          height: 3,
+          background: "rgba(5,15,12,0.7)",
         }}
       />
-      {/* mow lines */}
-      {[260, 640, 1500, 1800].map((mx, i) => (
-        <div
-          key={mx}
-          style={{
-            position: "absolute",
-            left: mx,
-            top: SURFACE + 14,
-            width: 150 + (i % 2) * 70,
-            height: 7,
-            borderRadius: 7,
-            background: "rgba(255,255,255,0.07)",
-          }}
-        />
-      ))}
 
       {/* cup */}
       <div
         style={{
           position: "absolute",
-          left: CUP_X - 40,
-          top: SURFACE - 4,
-          width: 80,
-          height: 24,
+          left: CUP_X - 38,
+          top: cupCY - 11,
+          width: 76,
+          height: 23,
           borderRadius: "50%",
-          background: "#0d2019",
-          boxShadow: "inset 0 -4px 6px rgba(0,0,0,0.6)",
+          background: "#040c09",
+          boxShadow: "inset 0 -5px 7px rgba(0,0,0,0.75), 0 1px 0 rgba(232,200,106,0.18)",
         }}
       />
-      <div
-        style={{
-          position: "absolute",
-          left: CUP_X - 40,
-          top: SURFACE - 6,
-          width: 80,
-          height: 10,
-          borderRadius: "50%",
-          background: "rgba(255,255,255,0.12)",
-        }}
-      />
+
+      {/* lip-out ripple */}
+      {rippleT > 0 && rippleT < 46 && (
+        <div
+          style={{
+            position: "absolute",
+            left: CUP_X - 38,
+            top: cupCY - 11,
+            width: 76,
+            height: 23,
+            borderRadius: "50%",
+            border: "1.6px solid rgba(232,200,106,0.5)",
+            scale: String(1 + rippleT * 0.045),
+            opacity: interpolate(rippleT, [0, 8, 46], [0, 0.6, 0], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            }),
+          }}
+        />
+      )}
 
       {/* flagstick */}
       <div
         style={{
           position: "absolute",
-          left: CUP_X - 4,
-          top: SURFACE - 196,
-          width: 8,
-          height: 200,
-          borderRadius: 6,
-          background: "rgba(255,255,255,0.92)",
+          left: CUP_X - 3,
+          top: cupCY - 232,
+          width: 6,
+          height: 232,
+          borderRadius: 4,
+          background: "linear-gradient(180deg, rgba(244,242,234,0.95), rgba(244,242,234,0.55))",
           transformOrigin: "50% 100%",
           rotate: `${flagLean}deg`,
         }}
       >
         <svg
-          viewBox="0 0 64 36"
-          width={78}
+          viewBox="0 0 64 34"
+          width={82}
           height={44}
           style={{
             position: "absolute",
-            left: 7,
-            top: 0,
+            left: 5,
+            top: 2,
             transformOrigin: "0% 50%",
-            scale: `${1 + Math.sin(frame * 0.32) * 0.06} 1`,
+            scale: `${1 + Math.sin(frame * 0.22) * 0.05} 1`,
           }}
         >
-          <path
-            d={`M0 0 L60 ${10 + Math.sin(frame * 0.32) * 4} L0 32 Z`}
-            fill={COLORS.gold}
-          />
+          <path d={`M0 0 L58 ${9 + Math.sin(frame * 0.22) * 3.4} L0 30 Z`} fill={DUSK.gold} />
+          <path d={`M0 0 L58 ${9 + Math.sin(frame * 0.22) * 3.4} L0 6 Z`} fill={DUSK.goldSoft} opacity="0.6" />
         </svg>
       </div>
 
-      {/* NOT TODAY */}
-      <div
-        style={{
-          position: "absolute",
-          left: CUP_X - 160,
-          top: SURFACE - 268,
-          width: 320,
-          textAlign: "center",
-          fontFamily: "Arial, Helvetica, sans-serif",
-          fontSize: 34,
-          fontWeight: 700,
-          letterSpacing: "0.24em",
-          color: COLORS.goldSoft,
-          scale: String(
-            interpolate(frame, [ORBIT_END, ORBIT_END + 12], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-              easing: Easing.out(Easing.back(2.2)),
-            }),
-          ),
-          opacity: interpolate(frame, [ORBIT_END, ORBIT_END + 6], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          }),
-        }}
-      >
-        NOT&nbsp;TODAY
-      </div>
+      {/* roll trail */}
+      {trailW > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            left: x - trailW + 8,
+            top: y + BALL - 6,
+            width: trailW,
+            height: 2,
+            borderRadius: 2,
+            background: "linear-gradient(90deg, rgba(232,200,106,0) 0%, rgba(232,200,106,0.3) 100%)",
+          }}
+        />
+      )}
 
       {/* ball shadow */}
       <div
         style={{
           position: "absolute",
-          left: x + 4,
-          top: SURFACE + 10,
-          width: 40,
-          height: 10,
+          left: x + 3,
+          top: REST_Y + BALL - 4,
+          width: 34,
+          height: 9,
           borderRadius: "50%",
-          background: "rgba(0,0,0,0.35)",
-          scale: String(interpolate(REST_Y - y, [0, 420], [1, 0.4], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          })),
-          opacity: interpolate(REST_Y - y, [0, 420], [0.8, 0.2], {
+          background: "rgba(0,0,0,0.45)",
+          filter: "blur(2px)",
+          scale: String(
+            interpolate(REST_Y - y, [0, 240], [1, 0.5], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            }),
+          ),
+          opacity: interpolate(REST_Y - y, [0, 240], [0.7, 0.25], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           }),
@@ -254,11 +229,14 @@ export const LipOut: React.FC = () => {
           position: "absolute",
           left: x,
           top: y,
-          scale: inCupDip ? "0.93" : "1",
+          scale: frame >= ROLL_END && frame < ORBIT_END ? "0.94" : "1",
         }}
       >
-        <Ball size={BALL} rotate={spin} />
+        <CineBall size={BALL} />
       </div>
+
+      <Grain />
+      <Vignette strength={0.52} />
     </AbsoluteFill>
   );
 };
