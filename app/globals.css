@@ -397,3 +397,93 @@ section[id] {
     scroll-behavior: auto;
   }
 }
+
+/* ---------------- 2026 Champions / 10-Year era ---------------- */
+
+:root {
+  --gold: #c9a227;
+  --gold-soft: #e8c86a;
+}
+
+/* Gold shimmer sweep across display text */
+@keyframes gold-sweep {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.gold-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--gold) 0%,
+    var(--gold) 38%,
+    #f6e8bb 50%,
+    var(--gold) 62%,
+    var(--gold) 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gold-sweep 4.5s linear infinite;
+}
+
+/* Giant outlined anniversary numeral */
+.ten-outline {
+  font-weight: 650;
+  line-height: 0.78;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.28);
+  user-select: none;
+}
+@media (min-width: 768px) {
+  .ten-outline { -webkit-text-stroke-width: 3px; }
+}
+
+/* Waving pennant on the pin */
+@keyframes flag-wave {
+  0%, 100% { transform: skewY(0deg) scaleX(1); }
+  30% { transform: skewY(-4deg) scaleX(0.96); }
+  60% { transform: skewY(3deg) scaleX(1.02); }
+}
+.flag-wave {
+  transform-origin: left center;
+  animation: flag-wave 2.6s ease-in-out infinite;
+}
+
+/* Ball rolling across a section divider toward the cup */
+@keyframes ball-roll-x {
+  0% { transform: translateX(0) rotate(0deg); }
+  78% { transform: translateX(var(--roll, 78vw)) rotate(1080deg); }
+  86% { transform: translateX(calc(var(--roll, 78vw) - 6px)) rotate(1040deg); }
+  100% { transform: translateX(var(--roll, 78vw)) rotate(1080deg); opacity: 0; }
+}
+.ball-roll { animation: ball-roll-x 5.2s cubic-bezier(0.2, 0.7, 0.3, 1) infinite; }
+
+/* Soft repeating dimple texture for empty states and panels */
+.dimples {
+  background-image: radial-gradient(rgba(17, 17, 17, 0.07) 1.3px, transparent 1.4px);
+  background-size: 14px 14px;
+}
+.dimples-light {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1.3px, transparent 1.4px);
+  background-size: 14px 14px;
+}
+
+/* Champion pulse ring behind the trophy chip */
+@keyframes champ-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.45); }
+  70% { box-shadow: 0 0 0 14px rgba(201, 162, 39, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0); }
+}
+.champ-ring { animation: champ-pulse 2.8s ease-out infinite; border-radius: 1rem; }
+
+/* Timeline chip hover lift on the anniversary rail */
+.era-chip { transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.35s; }
+.era-chip:hover { transform: translateY(-4px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gold-shimmer { animation: none; }
+  .flag-wave { animation: none; }
+  .ball-roll { animation: none; opacity: 0.6; }
+  .champ-ring { animation: none; }
+}

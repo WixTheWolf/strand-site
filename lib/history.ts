@@ -53,7 +53,7 @@ export const STRAND_TOURNAMENTS: StrandTournament[] = [
     ],
     summary:
       "J-BONE's Team Justin captured the cup in the Strand's first Pacific Northwest edition — four rounds of 3-point matches across Gamble Sands and Scarecrow.",
-    sourceUrl: "https://www.strandinvitational.life/the-strand",
+    sourceUrl: "/the-strand/gamble-sands-2026",
   },
   {
     year: 2025,
