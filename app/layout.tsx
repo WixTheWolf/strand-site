@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "The Strand Invitational",
   description:
-    "Team Justin won the 2026 Strand Invitational at Gamble Sands. Results, the archive since 2018, and details on the 10th edition coming in 2027.",
+    "Team J-Bone won the 2026 Strand Invitational at Gamble Sands. Results, the archive since 2018, and details on the 10th edition coming in 2027.",
 };
 
 export const viewport: Viewport = {

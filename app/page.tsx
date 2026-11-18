@@ -20,7 +20,7 @@ const HERO_IMAGE = "/courses/gamble-sands.jpg";
 
 const TICKER_ITEMS = [
   "The Strand Invitational",
-  "2026 Champions · Team Justin",
+  "2026 Champions · Team J-Bone",
   "Gamble Sands · Brewster WA",
   "Nine editions down",
   "2027 · The 10-Year Strand",
@@ -103,8 +103,8 @@ export default function HomePage() {
               The ninth Strand · {STRAND_2026.destination}
             </p>
             <h1 className="headline max-w-[16ch] text-white">
-              <span className="sr-only">Team Justin. 2026 Champions.</span>
-              <HeroLine text="Team Justin." base={60} />
+              <span className="sr-only">Team J-Bone. 2026 Champions.</span>
+              <HeroLine text="Team J-Bone." base={60} />
               <span className="hero-line hero-fade" style={{ "--d": "520ms" } as CSSProperties} aria-hidden>
                 <span className="gold-shimmer">2026 Champions.</span>
               </span>
@@ -164,7 +164,7 @@ export default function HomePage() {
             <Magnetic><Link href={STRAND_2026.recapHref} className="btn-primary">Open the 2026 recap</Link></Magnetic>
           </Reveal>
           <div className="grid gap-6 lg:grid-cols-2">
-            <Reveal><RosterCard title="Team Justin" subtitle="2026 Champions" players={teamJustin} champion /></Reveal>
+            <Reveal><RosterCard title="Team J-Bone" subtitle="2026 Champions" players={teamJustin} champion /></Reveal>
             <Reveal delay={120}><RosterCard title="Team WIX" subtitle="Runners-up" players={teamWix} /></Reveal>
           </div>
           <Reveal className="mt-10">

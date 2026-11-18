@@ -22,7 +22,7 @@ export const STRAND_TOURNAMENTS: StrandTournament[] = [
     slug: "gamble-sands-2026",
     destination: "Brewster, WA",
     label: "Gamble Sands 2026",
-    winnerTeam: "Team Justin",
+    winnerTeam: "Team J-Bone",
     loserTeam: "Team WIX",
     winnerScore: "—",
     loserScore: "—",
@@ -52,7 +52,7 @@ export const STRAND_TOURNAMENTS: StrandTournament[] = [
       "Rhett Fahrney",
     ],
     summary:
-      "J-BONE's Team Justin captured the cup in the Strand's first Pacific Northwest edition — four rounds of 3-point matches across Gamble Sands and Scarecrow.",
+      "Team J-Bone captured the cup in the Strand's first Pacific Northwest edition — four rounds of 3-point matches across Gamble Sands and Scarecrow.",
     sourceUrl: "/the-strand/gamble-sands-2026",
   },
   {

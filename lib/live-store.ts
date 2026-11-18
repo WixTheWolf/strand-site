@@ -111,7 +111,7 @@ function migrateToOfficialSheet(config: TournamentConfig): TournamentConfig {
     status: "provisional",
     teams: {
       wix: { ...config.teams.wix, name: "Team WIX", shortName: "WIX", captainId: "matt-wixted" },
-      jbone: { ...config.teams.jbone, name: "Team Justin", shortName: "J-BONE", captainId: "justin-uribe" },
+      jbone: { ...config.teams.jbone, name: "Team J-Bone", shortName: "J-BONE", captainId: "justin-uribe" },
     },
     players,
     sessions,
