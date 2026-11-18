@@ -209,3 +209,48 @@ export function AmbienceToggle() {
     </div>
   );
 }
+
+/**
+ * The 2027 teaser: a click-to-play trailer with sound. Shows its poster until
+ * the visitor presses play, then hands over to native controls.
+ */
+export function TeaserPlayer() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [started, setStarted] = useState(false);
+
+  return (
+    <div className="relative overflow-hidden rounded-[1.75rem] border border-[#c9a227]/35 bg-black shadow-[0_0_80px_rgba(201,162,39,0.14)]">
+      <video
+        ref={videoRef}
+        poster="/films/teaser-2027-poster.jpg"
+        preload="none"
+        playsInline
+        controls={started}
+        onEnded={() => setStarted(false)}
+        className="block aspect-video w-full"
+      >
+        <source src="/films/teaser-2027.mp4" type="video/mp4" />
+      </video>
+      {started ? null : (
+        <button
+          type="button"
+          aria-label="Play the 2027 teaser"
+          onClick={() => {
+            setStarted(true);
+            videoRef.current?.play().catch(() => {});
+          }}
+          className="group absolute inset-0 flex flex-col items-center justify-end gap-4 bg-gradient-to-t from-black/70 via-black/10 to-transparent pb-8 md:pb-10"
+        >
+          <span className="flex h-16 w-16 items-center justify-center rounded-full border border-[#e8c86a]/70 bg-black/40 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 md:h-20 md:w-20">
+            <svg viewBox="0 0 24 24" className="ml-1 h-6 w-6 fill-[#e8c86a] md:h-7 md:w-7" aria-hidden>
+              <path d="M6 4l14 8-14 8z" />
+            </svg>
+          </span>
+          <span className="text-[11px] font-medium uppercase tracking-[0.3em] text-white/80">
+            Watch the teaser · 26s · sound on
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}

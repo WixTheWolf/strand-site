@@ -209,7 +209,7 @@ export default function GambleSands2026Page() {
                 download
                 className="btn-ghost border-white/30 text-white"
               >
-                ↓ The 2026 film · 35s
+                ↓ The 2026 film · 58s
               </a>
             </Magnetic>
           </Reveal>

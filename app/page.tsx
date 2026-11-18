@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import CoursesSection from "./components/courses-section";
 import { BackToTop, CountUp, Magnetic, ScrollProgress } from "./components/fx";
-import { AmbienceToggle, CartJumpScene, HeroFilmLayer, LipOutScene, TeeShotScene } from "./components/golf-cinema";
+import { AmbienceToggle, CartJumpScene, HeroFilmLayer, LipOutScene, TeaserPlayer, TeeShotScene } from "./components/golf-cinema";
 import HistorySection from "./components/history-section";
 import Marquee from "./components/marquee";
 import OfficialEventSection from "./components/official-event-section";
@@ -224,6 +224,12 @@ export default function HomePage() {
                 </div>
               </Reveal>
             </div>
+            <Reveal className="mt-16 md:mt-20">
+              <p className="label mb-4 text-white/60">The teaser</p>
+              <div className="mx-auto max-w-[1100px]">
+                <TeaserPlayer />
+              </div>
+            </Reveal>
           </div>
           <LipOutScene />
         </section>

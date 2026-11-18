@@ -1,4 +1,3 @@
-import { loadFont } from "@remotion/fonts";
 import { Audio, Video } from "@remotion/media";
 import {
   AbsoluteFill,
@@ -12,6 +11,8 @@ import {
   useVideoConfig,
 } from "remotion";
 import { Grain, Vignette } from "./Cinematic";
+import { TEASER_DURATION, TeaserAct } from "./Teaser2027";
+import { BONE, FONT, Flash, GOLD_SOFT, INK, Kicker, Slam, Stagger, clamp, expoOut } from "./Kinetic";
 
 /**
  * The Strand 2026 — recap v2. Cut to a 120 BPM track (one beat = 15 frames
@@ -19,126 +20,13 @@ import { Grain, Vignette } from "./Cinematic";
  * at 24.0s (the ball drops, champions revealed), final hit at 32.0s.
  */
 
-loadFont({ family: "Geist", url: staticFile("geist.woff2"), weight: "100 900" });
-const FONT = "Geist, Helvetica, Arial, sans-serif";
-
-const GOLD_SOFT = "#e8c86a";
-const BONE = "#f4f2ea";
-const INK = "#07130f";
 
 export const BEAT = 15;
 const DROP_1 = 240; // 8.0s
 const DROP_2 = 720; // 24.0s
 const FINAL_HIT = 960; // 32.0s
-export const RECAP_V2_DURATION = 1065;
+export const RECAP_V2_DURATION = 960 + 790;
 
-const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
-const expoOut = Easing.out(Easing.exp);
-
-/* ------------------------------------------------------------------ */
-/* Kinetic type                                                        */
-/* ------------------------------------------------------------------ */
-
-/** Text that slams in: oversized → 1, with a brief RGB-split ghost. */
-const Slam: React.FC<{
-  children: string;
-  size: number;
-  color?: string;
-  weight?: number;
-  tracking?: string;
-}> = ({ children, size, color = BONE, weight = 900, tracking = "-0.035em" }) => {
-  const frame = useCurrentFrame();
-  const scale = interpolate(frame, [0, 7], [2.3, 1], { ...clamp, easing: expoOut });
-  const split = interpolate(frame, [0, 8], [22, 0], { ...clamp, easing: expoOut });
-  const base: React.CSSProperties = {
-    fontFamily: FONT,
-    fontSize: size,
-    fontWeight: weight,
-    letterSpacing: tracking,
-    lineHeight: 0.92,
-    textTransform: "uppercase",
-    whiteSpace: "nowrap",
-  };
-  return (
-    <div
-      style={{
-        position: "relative",
-        scale: String(scale),
-        opacity: interpolate(frame, [0, 2], [0, 1], clamp),
-      }}
-    >
-      <div style={{ ...base, position: "absolute", inset: 0, color: "#2fd3b0", translate: `${-split}px 0px`, opacity: split > 0.5 ? 0.7 : 0, mixBlendMode: "screen" }}>
-        {children}
-      </div>
-      <div style={{ ...base, position: "absolute", inset: 0, color: "#ff5a3c", translate: `${split}px 0px`, opacity: split > 0.5 ? 0.7 : 0, mixBlendMode: "screen" }}>
-        {children}
-      </div>
-      <div style={{ ...base, color }}>{children}</div>
-    </div>
-  );
-};
-
-/** Letters rise and settle one after another. */
-const Stagger: React.FC<{
-  children: string;
-  size: number;
-  color?: string;
-  weight?: number;
-  tracking?: string;
-  step?: number;
-}> = ({ children, size, color = BONE, weight = 800, tracking = "0em", step = 1.3 }) => {
-  const frame = useCurrentFrame();
-  return (
-    <div
-      style={{
-        fontFamily: FONT,
-        fontSize: size,
-        fontWeight: weight,
-        letterSpacing: tracking,
-        textTransform: "uppercase",
-        color,
-        whiteSpace: "nowrap",
-        display: "flex",
-      }}
-    >
-      {Array.from(children).map((ch, i) => (
-        <span
-          key={i}
-          style={{
-            display: "inline-block",
-            opacity: interpolate(frame, [i * step, i * step + 5], [0, 1], clamp),
-            translate: `0px ${interpolate(frame, [i * step, i * step + 9], [size * 0.55, 0], {
-              ...clamp,
-              easing: Easing.out(Easing.back(1.8)),
-            })}px`,
-          }}
-        >
-          {ch === " " ? " " : ch}
-        </span>
-      ))}
-    </div>
-  );
-};
-
-const Kicker: React.FC<{ children: React.ReactNode; color?: string; size?: number }> = ({
-  children,
-  color = "rgba(244,242,234,0.75)",
-  size = 30,
-}) => (
-  <div
-    style={{
-      fontFamily: FONT,
-      fontSize: size,
-      fontWeight: 600,
-      letterSpacing: "0.42em",
-      textTransform: "uppercase",
-      color,
-      whiteSpace: "nowrap",
-    }}
-  >
-    {children}
-  </div>
-);
 
 /* ------------------------------------------------------------------ */
 /* Shot building blocks                                                */
@@ -244,19 +132,6 @@ const CaptionShot: React.FC<{
     </div>
   </AbsoluteFill>
 );
-
-const Flash: React.FC<{ at: number; strength?: number }> = ({ at, strength = 0.9 }) => {
-  const frame = useCurrentFrame();
-  return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "#fff8e6",
-        opacity: interpolate(frame, [at, at + 1, at + 7], [0, strength, 0], clamp),
-        pointerEvents: "none",
-      }}
-    />
-  );
-};
 
 /** Gold sparks bursting from the center. */
 const Sparks: React.FC<{ count?: number }> = ({ count = 46 }) => {
@@ -463,16 +338,16 @@ const CupTension: React.FC = () => {
 };
 
 const ROSTER = [
-  "Justin Uribe",
-  "Brett Comfort",
-  "Brian Kerns",
-  "Matt Schroeder",
-  "Fred Geisinger",
-  "Shaun Eipper",
-  "Jason Olson",
-  "Matt Onorato",
-  "Ryan D'Arcy",
-  "Kevin Gordon",
+  { name: "Justin Uribe (C)", photo: "players/j-bone.jpg" },
+  { name: "Brett Comfort", photo: "players/brett.jpg" },
+  { name: "Brian Kerns", photo: "players/kerns-cartoon.png" },
+  { name: "Matt Schroeder", photo: "players/tony-schroe.jpg" },
+  { name: "Fred Geisinger", photo: "players/fred.jpg" },
+  { name: "Shaun Eipper", photo: "players/shaun.jpg" },
+  { name: "Jason Olson", photo: "players/jason.jpg" },
+  { name: "Matt Onorato", photo: "players/matty-o.jpg" },
+  { name: "Ryan D'Arcy", photo: "players/darcy.jpg" },
+  { name: "Kevin Gordon", photo: "players/kev.jpg" },
 ];
 
 const Champions: React.FC = () => {
@@ -512,7 +387,7 @@ const Champions: React.FC = () => {
           alignItems: "center",
           justifyContent: "center",
           gap: 20,
-          translate: `0px ${interpolate(frame, [52, 66], [0, -150], { ...clamp, easing: Easing.inOut(Easing.cubic) })}px`,
+          translate: `0px ${interpolate(frame, [52, 66], [0, -330], { ...clamp, easing: Easing.inOut(Easing.cubic) })}px`,
         }}
       >
         <Sequence from={10} layout="none">
@@ -520,44 +395,63 @@ const Champions: React.FC = () => {
             2026 Champions
           </Kicker>
         </Sequence>
-        <Slam size={232} color={GOLD_SOFT}>
+        <Slam size={200} color={GOLD_SOFT}>
           Team J-Bone
         </Slam>
       </AbsoluteFill>
 
-      {/* roster: one name every eighth note */}
+      {/* roll call: one champion every eighth note */}
       <div
         style={{
           position: "absolute",
           left: 0,
           right: 0,
-          top: 600,
+          top: 470,
           display: "grid",
-          gridTemplateColumns: "repeat(5, 360px)",
+          gridTemplateColumns: "repeat(5, 330px)",
           justifyContent: "center",
-          rowGap: 34,
+          rowGap: 30,
         }}
       >
-        {ROSTER.map((name, i) => {
+        {ROSTER.map((player, i) => {
           const at = 60 + i * 7.5;
+          const pop = interpolate(frame, [at, at + 8], [1.7, 1], { ...clamp, easing: expoOut });
           return (
             <div
-              key={name}
+              key={player.name}
               style={{
-                textAlign: "center",
-                fontFamily: FONT,
-                fontSize: 40,
-                fontWeight: 700,
-                letterSpacing: "0.02em",
-                color: i === 0 ? GOLD_SOFT : BONE,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 14,
                 opacity: interpolate(frame, [at, at + 2], [0, 1], clamp),
-                scale: String(
-                  interpolate(frame, [at, at + 7], [1.6, 1], { ...clamp, easing: expoOut }),
-                ),
+                scale: String(pop),
               }}
             >
-              {name}
-              {i === 0 ? " (C)" : ""}
+              <CanvasImage
+                src={staticFile(player.photo)}
+                style={{
+                  width: 168,
+                  height: 168,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  objectPosition: "50% 20%",
+                  border: `4px solid ${i === 0 ? GOLD_SOFT : "rgba(244,242,234,0.85)"}`,
+                  boxShadow: "0 12px 40px rgba(0,0,0,0.55)",
+                }}
+              />
+              <div
+                style={{
+                  fontFamily: FONT,
+                  fontSize: 30,
+                  fontWeight: 700,
+                  letterSpacing: "0.02em",
+                  color: i === 0 ? GOLD_SOFT : BONE,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {player.name}
+              </div>
             </div>
           );
         })}
@@ -566,72 +460,72 @@ const Champions: React.FC = () => {
   );
 };
 
-const CrestBuild: React.FC = () => {
-  const frame = useCurrentFrame();
-  return (
-    <AbsoluteFill style={{ backgroundColor: INK, alignItems: "center", justifyContent: "center", gap: 44 }}>
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(50% 50% at 50% 42%, rgba(201,162,39,0.22) 0%, rgba(7,19,15,0) 70%)",
-        }}
-      />
-      <CanvasImage
-        src={staticFile("ten-year-crest.png")}
-        style={{
-          width: 430,
-          height: 430,
-          borderRadius: "50%",
-          scale: String(interpolate(frame, [0, 14], [0.2, 1], { ...clamp, easing: Easing.out(Easing.back(1.6)) })),
-          rotate: `${interpolate(frame, [0, 16], [-140, 0], { ...clamp, easing: expoOut })}deg`,
-          boxShadow: "0 0 140px rgba(201,162,39,0.4)",
-        }}
-      />
-      <Sequence from={12} layout="none">
-        <Stagger size={104} weight={900} tracking="-0.02em" step={1}>
-          The 10-Year Strand
-        </Stagger>
-      </Sequence>
-    </AbsoluteFill>
-  );
-};
+const EDITIONS = [
+  { year: 2018, place: "Palm Springs" },
+  { year: 2019, place: "Indio" },
+  { year: 2020, place: "Palm Desert" },
+  { year: 2021, place: "La Quinta" },
+  { year: 2022, place: "Rams Hill" },
+  { year: 2023, place: "St. George" },
+  { year: 2024, place: "Ojai" },
+  { year: 2025, place: "Monterey" },
+  { year: 2026, place: "Brewster" },
+];
 
-const Finale: React.FC = () => {
+/** Nine editions in three seconds — one card every ten frames. */
+const DecadeRoll: React.FC = () => {
   const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
+  const i = Math.min(EDITIONS.length - 1, Math.floor(frame / 10));
+  const local = frame - i * 10;
+  const edition = EDITIONS[i];
+  const inverted = i % 2 === 1;
   return (
-    <AbsoluteFill style={{ backgroundColor: INK, alignItems: "center", justifyContent: "center", gap: 30 }}>
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(55% 55% at 50% 48%, rgba(201,162,39,0.3) 0%, rgba(7,19,15,0) 72%)",
-        }}
-      />
-      <Slam size={460} color={GOLD_SOFT}>
-        2027
-      </Slam>
-      <Sequence from={12} layout="none">
-        <Kicker color={BONE} size={40}>
-          Destination TBA
-        </Kicker>
-      </Sequence>
+    <AbsoluteFill
+      style={{
+        backgroundColor: inverted ? GOLD_SOFT : INK,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <div
         style={{
           fontFamily: FONT,
-          fontSize: 26,
-          letterSpacing: "0.22em",
-          color: "rgba(244,242,234,0.5)",
-          opacity: interpolate(frame, [26, 40], [0, 1], clamp),
+          fontSize: 560,
+          fontWeight: 900,
+          letterSpacing: "-0.05em",
+          lineHeight: 0.86,
+          fontVariantNumeric: "tabular-nums",
+          color: inverted ? INK : GOLD_SOFT,
+          scale: String(interpolate(local, [0, 5], [1.35, 1], { ...clamp, easing: expoOut })),
         }}
       >
-        strand-site.vercel.app
+        {edition.year}
       </div>
-      <AbsoluteFill
+      <div
         style={{
-          backgroundColor: "#000",
-          opacity: interpolate(frame, [durationInFrames - 30, durationInFrames - 4], [0, 1], clamp),
+          fontFamily: FONT,
+          fontSize: 76,
+          fontWeight: 800,
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          color: inverted ? INK : BONE,
         }}
-      />
+      >
+        {edition.place}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: 70,
+          fontFamily: FONT,
+          fontSize: 30,
+          fontWeight: 700,
+          letterSpacing: "0.42em",
+          color: inverted ? "rgba(7,19,15,0.7)" : "rgba(244,242,234,0.7)",
+        }}
+      >
+        EDITION {i + 1} OF 9
+      </div>
     </AbsoluteFill>
   );
 };
@@ -651,7 +545,6 @@ const WHOOSH_CUTS = [300, 390, 420, 450, 480, 510, 540, 585, 630, 870];
 
 export const RecapV2: React.FC = () => {
   const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
 
   const shakes = [shakeAt(frame, DROP_1, 26), shakeAt(frame, DROP_2, 30), shakeAt(frame, FINAL_HIT, 22)];
   const sx = shakes.reduce((a, s) => a + s[0], 0);
@@ -668,7 +561,11 @@ export const RecapV2: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
       {/* ---------- audio ---------- */}
-      <Audio name="Music" src={staticFile("music.mp3")} volume={0.72} />
+      <Audio
+        name="Music"
+        src={staticFile("music.mp3")}
+        volume={interpolate(frame, [FINAL_HIT + 6, FINAL_HIT + 50], [0.72, 0], clamp)}
+      />
       <Sequence name="Impact — strike" from={DROP_1} durationInFrames={110} layout="none">
         <Audio src={staticFile("impact.mp3")} volume={0.68} />
       </Sequence>
@@ -686,12 +583,6 @@ export const RecapV2: React.FC = () => {
           <Audio src={staticFile("whoosh.mp3")} volume={0.45} />
         </Sequence>
       ))}
-      <Sequence name="Ambience tail" from={FINAL_HIT} layout="none">
-        <Audio
-          src={staticFile("dusk-ambience.mp3")}
-          volume={interpolate(frame, [FINAL_HIT, FINAL_HIT + 30, durationInFrames - 25, durationInFrames - 2], [0, 0.4, 0.4, 0], clamp)}
-        />
-      </Sequence>
 
       {/* ---------- picture ---------- */}
       <AbsoluteFill style={{ translate: `${sx}px ${sy}px`, scale: String(pump) }}>
@@ -736,25 +627,31 @@ export const RecapV2: React.FC = () => {
         <Sequence name="Champions" from={DROP_2} durationInFrames={150}>
           <Champions />
         </Sequence>
-        <Sequence name="Crest build" from={870} durationInFrames={90}>
-          <CrestBuild />
-        </Sequence>
-        <Sequence name="Finale — 2027" from={FINAL_HIT} durationInFrames={105}>
-          <Finale />
+        <Sequence name="Decade roll" from={870} durationInFrames={90}>
+          <DecadeRoll />
         </Sequence>
       </AbsoluteFill>
 
       {/* ---------- finishing ---------- */}
       <Flash at={DROP_1} />
       <Flash at={DROP_2} />
-      <Flash at={FINAL_HIT} strength={0.7} />
       {WHOOSH_CUTS.slice(1, 8).map((cut) => (
         <Flash key={cut} at={cut} strength={0.22} />
       ))}
-      <Grain opacity={0.045} />
-      <Vignette strength={0.42} />
+      {frame < FINAL_HIT ? (
+        <>
+          <Grain opacity={0.045} />
+          <Vignette strength={0.42} />
+        </>
+      ) : null}
       <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: bars, background: "#000" }} />
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: bars, background: "#000" }} />
+
+      {/* ---------- act four: the 2027 teaser ---------- */}
+      <Sequence name="2027 teaser" from={FINAL_HIT} durationInFrames={TEASER_DURATION}>
+        <TeaserAct openingImpact={false} />
+      </Sequence>
+      <Flash at={FINAL_HIT} strength={0.7} />
     </AbsoluteFill>
   );
 };
