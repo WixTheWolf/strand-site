@@ -4,6 +4,7 @@ import { HeroFilm } from "./HeroFilm";
 import { LipOut } from "./LipOut";
 import { Recap2026 } from "./Recap2026";
 import { RecapV2 } from "./RecapV2";
+import { Teaser2027 } from "./Teaser2027";
 import { TeeStrike } from "./TeeStrike";
 
 export const RemotionRoot: React.FC = () => {
@@ -12,7 +13,15 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="StrandRecap"
         component={RecapV2}
-        durationInFrames={1065}
+        durationInFrames={1750}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="Teaser2027"
+        component={Teaser2027}
+        durationInFrames={790}
         fps={30}
         width={1920}
         height={1080}
