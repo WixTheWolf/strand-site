@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import CoursesSection from "./components/courses-section";
 import { BackToTop, CountUp, Magnetic, ScrollProgress } from "./components/fx";
-import { CartJumpScene, HeroFilmLayer, LipOutScene, TeeShotScene } from "./components/golf-cinema";
+import { AmbienceToggle, CartJumpScene, HeroFilmLayer, LipOutScene, TeeShotScene } from "./components/golf-cinema";
 import HistorySection from "./components/history-section";
 import Marquee from "./components/marquee";
 import OfficialEventSection from "./components/official-event-section";
@@ -94,6 +94,7 @@ export default function HomePage() {
               <Magnetic><Link href={STRAND_2026.recapHref} className="btn-primary">Relive 2026</Link></Magnetic>
               <Magnetic><a href="#next" className="btn-ghost">The 10-Year Strand</a></Magnetic>
               <Magnetic><a href="#history" className="btn-ghost">Archive</a></Magnetic>
+              <AmbienceToggle />
             </div>            <div className="hero-fade absolute bottom-24 right-5 hidden md:bottom-28 md:right-8 md:block" style={{ "--d": "900ms" } as CSSProperties}>
               <div className="scroll-cue flex flex-col items-center gap-2 text-white/70"><span className="text-[9px] uppercase tracking-[0.3em]">Scroll</span><span className="h-8 w-px bg-white/50" /></div>
             </div>
@@ -199,6 +200,15 @@ export default function HomePage() {
                 </div>
               </Reveal>
               <Reveal delay={120}>
+                <div className="mb-8 flex justify-start lg:justify-end">
+                  <Image
+                    src="/brand/ten-year-crest.png"
+                    alt="The Strand Invitational 10-year crest"
+                    width={176}
+                    height={176}
+                    className="h-36 w-36 rounded-full border border-[#c9a227]/35 object-cover shadow-[0_0_60px_rgba(201,162,39,0.15)] md:h-44 md:w-44"
+                  />
+                </div>
                 <p className="label mb-4 text-white/60">The road to ten</p>
                 <div className="flex flex-wrap gap-2">
                   {championsAsc.map((row) => (

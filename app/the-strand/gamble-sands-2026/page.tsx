@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DraftHeader from "../../components/draft-header";
 import { BackToTop, CountUp, Magnetic, ScrollProgress } from "../../components/fx";
+import { TracerScene } from "../../components/golf-cinema";
 import Marquee from "../../components/marquee";
 import Reveal from "../../components/reveal";
 import RosterCard from "../../components/roster-card";
@@ -186,6 +187,8 @@ export default function GambleSands2026Page() {
           </Link>
         </Reveal>
       </section>
+
+      <TracerScene />
 
       {/* ---------------- Photo album ---------------- */}
       <section id="album" className="divider bg-[#1a3c34] text-white">
