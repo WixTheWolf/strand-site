@@ -3,13 +3,22 @@ import { CartJump } from "./CartJump";
 import { HeroFilm } from "./HeroFilm";
 import { LipOut } from "./LipOut";
 import { Recap2026 } from "./Recap2026";
+import { RecapV2 } from "./RecapV2";
 import { TeeStrike } from "./TeeStrike";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
       <Composition
-        id="Recap2026"
+        id="StrandRecap"
+        component={RecapV2}
+        durationInFrames={1065}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="Recap2026Classic"
         component={Recap2026}
         durationInFrames={1012}
         fps={30}
