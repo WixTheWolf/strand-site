@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Golf cinema — short films rendered with Remotion (source in /remotion),
@@ -72,13 +72,26 @@ function CinemaScene({
   );
 }
 
-/** Dusk slo-mo: the strike, with a broadcast-style shot tracer. */
+/** Golden-hour slo-mo of the strike itself — ElevenLabs-generated footage. */
 export function TeeShotScene() {
+  return (
+    <CinemaScene
+      src="/cinema/strike-real.mp4"
+      poster="/cinema/strike-real-poster.jpg"
+      caption="The strike"
+      bg="bg-[#1f1a0f]"
+      captionClass="text-white/40"
+    />
+  );
+}
+
+/** Dusk illustration: the drive, with a broadcast-style gold shot tracer. */
+export function TracerScene() {
   return (
     <CinemaScene
       src="/cinema/tee-strike.mp4"
       poster="/cinema/tee-strike-poster.jpg"
-      caption="The strike"
+      caption="The ninth Strand, in one swing"
       bg="bg-[#0a1b16]"
       captionClass="text-white/35"
     />
@@ -145,5 +158,54 @@ export function HeroFilmLayer() {
     >
       <source src="/cinema/hero-sands.mp4" type="video/mp4" />
     </video>
+  );
+}
+
+/**
+ * Dusk ambience: a 30s ElevenLabs field-recording loop of the course at dusk.
+ * Strictly opt-in — silent until the visitor asks for it.
+ */
+export function AmbienceToggle() {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [on, setOn] = useState(false);
+
+  useEffect(() => {
+    return () => audioRef.current?.pause();
+  }, []);
+
+  const toggle = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (on) {
+      audio.pause();
+      setOn(false);
+    } else {
+      audio.volume = 0.55;
+      audio
+        .play()
+        .then(() => setOn(true))
+        .catch(() => {});
+    }
+  };
+
+  return (
+    <div className={on ? "snd-on" : ""}>
+      <audio ref={audioRef} src="/audio/dusk-ambience.mp3" loop preload="none" />
+      <button
+        type="button"
+        onClick={toggle}
+        aria-pressed={on}
+        className="group flex items-center gap-3 rounded-full border border-white/25 bg-black/25 px-4 py-2 backdrop-blur-sm transition-colors hover:border-white/50"
+      >
+        <span className="flex h-3.5 items-end gap-[3px]" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <span key={i} className="snd-bar block h-full w-[2.5px] rounded-full bg-[#e8c86a]" />
+          ))}
+        </span>
+        <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/70 group-hover:text-white">
+          {on ? "Sound on" : "Sound"}
+        </span>
+      </button>
+    </div>
   );
 }
