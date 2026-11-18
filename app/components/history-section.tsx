@@ -62,11 +62,12 @@ export default function HistorySection() {
                 )}
                 <Link
                   href={event.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  {...(event.sourceUrl.startsWith("/")
+                    ? {}
+                    : { target: "_blank", rel: "noopener noreferrer" })}
                   className="mt-4 inline-block text-xs uppercase tracking-[0.12em] text-black/45 hover:text-black"
                 >
-                  View archive →
+                  {event.sourceUrl.startsWith("/") ? "Open the recap →" : "View archive →"}
                 </Link>
               </article>
               </Reveal>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 const NAV = [
   { label: "2027", href: "#next" },
-  { label: "Schedule", href: "#schedule" },
+  { label: "2026 Recap", href: "/the-strand/gamble-sands-2026" },
   { label: "Players", href: "#players" },
   { label: "Course Intel", href: "/courses" },
   { label: "The Pass", href: "#travel" },

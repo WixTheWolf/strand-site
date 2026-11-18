@@ -2,23 +2,19 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import CoursesSection from "./components/courses-section";
-import { BackToTop, Magnetic, ScrollProgress } from "./components/fx";
+import { BackToTop, Confetti, CountUp, Magnetic, ScrollProgress } from "./components/fx";
 import HistorySection from "./components/history-section";
 import Marquee from "./components/marquee";
 import OfficialEventSection from "./components/official-event-section";
 import PlayersHandicapSection from "./components/players-handicap-section";
 import Reveal from "./components/reveal";
+import RosterCard from "./components/roster-card";
 import SiteFooter from "./components/site-footer";
 import SiteHeader from "./components/site-header";
 import TravelSection from "./components/travel-section";
-import {
-  CAPTAINS,
-  MATCHMAKER_RULES,
-  ON_COURSE_RULES,
-  ROUND_FORMATS,
-  STRAND_FORMAT,
-  WEEKEND_SCHEDULE,
-} from "@/lib/tournament";
+import { CHAMPIONS_BOARD } from "@/lib/history";
+import { rosterPlayers, STRAND_2026, TEAM_JUSTIN_2026_IDS, TEAM_WIX_2026_IDS } from "@/lib/strand-2026";
+import { ROUND_FORMATS } from "@/lib/tournament";
 
 const HERO_IMAGE = "/courses/gamble-sands.jpg";
 
@@ -26,25 +22,24 @@ const TICKER_ITEMS = [
   "The Strand Invitational",
   "2026 Champions · Team Justin",
   "Gamble Sands · Brewster WA",
-  "Nine editions since 2018",
-  "The Strand 2027 · Coming soon",
+  "Nine editions down",
+  "2027 · The 10-Year Strand",
   "Destination TBA",
-  "20 players · 2 teams",
 ];
 
-const TRIP_FACTS = [
-  { label: "2026 Champions", value: "Team Justin" },
-  { label: "Where it happened", value: "Gamble Sands, Brewster WA" },
-  { label: "When", value: "Aug 20–23, 2026" },
-  { label: "Next up", value: "The Strand 2027 — TBA" },
-];
+const ROUND_PHOTOS: Record<number, string> = {
+  1: "/courses/holes/gamble-sands/hole-01.jpg",
+  2: "/courses/holes/scarecrow/hole-02.jpg",
+  3: "/courses/holes/scarecrow/hole-17.jpg",
+  4: "/courses/holes/gamble-sands/hole-18.jpg",
+};
 
 function HeroLine({ text, base }: { text: string; base: number }) {
   return (
     <span className="hero-line" aria-hidden>
       {Array.from(text).map((char, i) => (
         <span key={`${char}-${i}`} className="hero-letter" style={{ "--d": `${base + i * 28}ms` } as CSSProperties}>
-          {char === " " ? " " : char}
+          {char === " " ? "\u00A0" : char}
         </span>
       ))}
     </span>
@@ -62,36 +57,66 @@ function GolfBall({ id, className, size = 44 }: { id: string; className?: string
   );
 }
 
+function PinFlag({ className, tone = "gold" }: { className?: string; tone?: "gold" | "white" }) {
+  const flag = tone === "gold" ? "#c9a227" : "#f7f5f0";
+  return (
+    <svg viewBox="0 0 64 120" width={38} height={72} className={className} aria-hidden>
+      <rect x="30" y="4" width="3" height="104" rx="1.5" fill="currentColor" opacity="0.65" />
+      <path className="flag-wave" d="M33 8 L60 16 L33 26 Z" fill={flag} />
+      <ellipse cx="31.5" cy="112" rx="14" ry="4" fill="currentColor" opacity="0.18" />
+      <ellipse cx="31.5" cy="112" rx="6" ry="2.2" fill="currentColor" opacity="0.4" />
+    </svg>
+  );
+}
+
+/** A ball rolling the width of the page into a waiting pin — section divider */
+function RollingDivider({ dark = false }: { dark?: boolean }) {
+  return (
+    <div aria-hidden className={`relative h-14 overflow-hidden ${dark ? "text-white/70" : "text-[#1a3c34]"}`}>
+      <div className="absolute inset-x-5 bottom-5 border-b border-dashed border-current opacity-25 md:inset-x-8" />
+      <div className="ball-roll absolute bottom-6 left-5 md:left-8" style={{ "--roll": "min(82vw, 1200px)" } as CSSProperties}>
+        <GolfBall id={dark ? "roll-ball-dark" : "roll-ball"} size={18} />
+      </div>
+      <div className="absolute bottom-3 right-5 md:right-8"><PinFlag tone={dark ? "white" : "gold"} /></div>
+    </div>
+  );
+}
+
 export default function HomePage() {
+  const teamJustin = rosterPlayers(TEAM_JUSTIN_2026_IDS);
+  const teamWix = rosterPlayers(TEAM_WIX_2026_IDS);
+  const championsAsc = [...CHAMPIONS_BOARD].sort((a, b) => a.year - b.year);
+
   return (
     <>
       <ScrollProgress />
       <SiteHeader />
       <main className="bg-[#f7f5f0] text-[#111]">
+        {/* ---------------- Hero: 2026 Champions ---------------- */}
         <section id="home" className="relative min-h-[100svh] overflow-hidden">
           <Image src={HERO_IMAGE} alt="Gamble Sands fairway above the Columbia River" fill priority className="hero-media object-cover" sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/25" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_100%,rgba(201,162,39,0.18),transparent)]" />
+          <Confetti pieces={70} />
           <div className="relative mx-auto flex min-h-[100svh] max-w-[1400px] flex-col justify-end px-5 pb-24 pt-28 md:px-8 md:pb-28">
-            <p className="hero-fade label mb-4 text-white/70" style={{ "--d": "250ms" } as CSSProperties}>Gamble Sands 2026 · In the books</p>
-            <h1 className="headline max-w-[14ch] text-white">
-              <span className="sr-only">Golf trip. Boys trip. Since 2018.</span>
-              <HeroLine text="Golf trip." base={60} /><HeroLine text="Boys trip." base={220} /><HeroLine text="Since 2018." base={380} />
-            </h1>
-            <p className="hero-fade mt-6 max-w-md text-base leading-relaxed text-white/80 md:text-lg" style={{ "--d": "550ms" } as CSSProperties}>
-              The ninth Strand is in the books: four rounds above the Columbia River, 75 points on the line, and
-              Team Justin carrying the cup home. Next stop — the 10th edition in 2027.
+            <p className="hero-fade label mb-4 text-white/70" style={{ "--d": "250ms" } as CSSProperties}>
+              The ninth Strand · {STRAND_2026.destination}
             </p>
-            <div className="hero-fade mt-8 flex flex-wrap items-center gap-3" style={{ "--d": "700ms" } as CSSProperties}>
-              <Magnetic><a href="#next" className="btn-primary">The Strand 2027</a></Magnetic>
-              <Magnetic><a href="#history" className="btn-ghost">2026 Results</a></Magnetic>
-              <Magnetic><Link href="/courses" className="btn-ghost">Course Intel</Link></Magnetic>
-            </div>
-            <div className="hero-fade mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/20 bg-black/25 px-5 py-4 backdrop-blur-sm" style={{ "--d": "850ms" } as CSSProperties}>
-              <span className="text-2xl" aria-hidden>🏆</span>
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">2026 Champions</div>
-                <div className="text-lg font-medium text-white">Team Justin</div>
-              </div>
+            <h1 className="headline max-w-[16ch] text-white">
+              <span className="sr-only">Team Justin. 2026 Champions.</span>
+              <HeroLine text="Team Justin." base={60} />
+              <span className="hero-line hero-fade" style={{ "--d": "520ms" } as CSSProperties} aria-hidden>
+                <span className="gold-shimmer">2026 Champions.</span>
+              </span>
+            </h1>
+            <p className="hero-fade mt-6 max-w-md text-base leading-relaxed text-white/80 md:text-lg" style={{ "--d": "650ms" } as CSSProperties}>
+              Four rounds above the Columbia River and the cup went to J-BONE&apos;s side. Next on the tee:
+              the <strong className="text-white">10-year Strand</strong> in 2027.
+            </p>
+            <div className="hero-fade mt-8 flex flex-wrap items-center gap-3" style={{ "--d": "800ms" } as CSSProperties}>
+              <Magnetic><Link href={STRAND_2026.recapHref} className="btn-primary">Relive 2026</Link></Magnetic>
+              <Magnetic><a href="#next" className="btn-ghost">The 10-Year Strand</a></Magnetic>
+              <Magnetic><a href="#history" className="btn-ghost">Archive</a></Magnetic>
             </div>
             <GolfBall id="ball-a" className="float-slow pointer-events-none absolute right-[12%] top-[22%] hidden opacity-70 lg:block" size={40} />
             <GolfBall id="ball-b" className="float-slower pointer-events-none absolute right-[26%] top-[42%] hidden opacity-40 lg:block" size={24} />
@@ -104,90 +129,123 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ---------------- Count-up stat band ---------------- */}
         <section id="trip" className="divider">
           <div className="mx-auto grid max-w-[1400px] grid-cols-2 gap-px bg-[#e2ddd3] md:grid-cols-4">
-            {TRIP_FACTS.map((fact, i) => <Reveal key={fact.label} delay={i * 70} className="bg-[#f7f5f0]"><div className="group px-5 py-8 transition-colors duration-300 hover:bg-white md:px-8"><div className="label">{fact.label}</div><div className="mt-2 text-sm font-medium md:text-base">{fact.value}</div></div></Reveal>)}
+            {[
+              { label: "Editions played", value: 9, suffix: "" },
+              { label: "Points contested in 2026", value: 75, suffix: "" },
+              { label: "Players in the field", value: 20, suffix: "" },
+              { label: "Years of The Strand in 2027", value: 10, suffix: "" },
+            ].map((stat, i) => (
+              <Reveal key={stat.label} delay={i * 70} className="bg-[#f7f5f0]">
+                <div className="group px-5 py-8 transition-colors duration-300 hover:bg-white md:px-8">
+                  <div className="label">{stat.label}</div>
+                  <div className="mt-2 text-3xl font-medium tracking-[-0.03em] md:text-4xl">
+                    <CountUp value={stat.value} suffix={stat.suffix} />
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </section>
 
-        <section id="next" className="divider bg-[#1a3c34] text-white">
-          <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
-            <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        {/* ---------------- The 2026 result ---------------- */}
+        <section id="schedule" className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
+          <Reveal className="mb-12 flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-lg">
+              <p className="label">Gamble Sands 2026</p>
+              <h2 className="section-title mt-3">The result.</h2>
+              <p className="mt-4 text-sm leading-relaxed text-black/55">
+                {STRAND_2026.dates} · {STRAND_2026.courses.join(" · ")}. No tally published — the cup
+                says enough. Full story, round by round, on the recap page.
+              </p>
+            </div>
+            <Magnetic><Link href={STRAND_2026.recapHref} className="btn-primary">Open the 2026 recap</Link></Magnetic>
+          </Reveal>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Reveal><RosterCard title="Team Justin" subtitle="2026 Champions" players={teamJustin} champion /></Reveal>
+            <Reveal delay={120}><RosterCard title="Team WIX" subtitle="Runners-up" players={teamWix} /></Reveal>
+          </div>
+          <Reveal className="mt-10">
+            <div className="grid gap-px overflow-hidden rounded-[2rem] border border-black/10 bg-[#e2ddd3] sm:grid-cols-2 xl:grid-cols-4">
+              {ROUND_FORMATS.map((round) => (
+                <div key={round.round} className="group relative isolate overflow-hidden bg-white">
+                  <Image
+                    src={ROUND_PHOTOS[round.round] ?? HERO_IMAGE}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    className="-z-10 object-cover opacity-0 transition-all duration-500 group-hover:scale-105 group-hover:opacity-100"
+                  />
+                  <div className="-z-10 absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/55" />
+                  <div className="p-6 transition-colors duration-500 group-hover:text-white md:p-7">
+                    <div className="label transition-colors duration-500 group-hover:text-white/70">R{round.round} · {round.course}</div>
+                    <div className="mt-2 text-lg font-medium">{round.format}</div>
+                    <div className="mt-1 text-xs text-black/45 transition-colors duration-500 group-hover:text-white/60">{round.day}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+
+        <RollingDivider />
+
+        <OfficialEventSection />
+
+        {/* ---------------- 10-Year Anniversary · 2027 ---------------- */}
+        <section id="next" className="relative overflow-hidden bg-[#1a3c34] text-white">
+          <div aria-hidden className="dimples-light pointer-events-none absolute inset-0 opacity-50" />
+          <div aria-hidden className="pointer-events-none absolute -right-10 -top-16 select-none text-[46vw] leading-none md:text-[30vw]">
+            <span className="ten-outline">10</span>
+          </div>
+          <div className="relative mx-auto max-w-[1400px] px-5 py-24 md:px-8 md:py-36">
+            <div className="grid gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
               <Reveal>
-                <p className="label text-white/60">Next up</p>
-                <h2 className="section-title mt-3 text-white">The Strand 2027 — the 10th edition.</h2>
-                <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70">
-                  Ten years of The Strand. Destination, dates, and courses are being scouted now and will be
-                  announced right here. Captains, format, and the usual complete lack of restraint — all TBA.
+                <div className="flex items-center gap-3 text-white/80">
+                  <PinFlag className="shrink-0" />
+                  <p className="label text-white/60">Next on the tee</p>
+                </div>
+                <h2 className="section-title mt-4 text-white">
+                  2027 · <span className="gold-shimmer">Ten years</span> of The Strand.
+                </h2>
+                <p className="mt-5 max-w-lg text-sm leading-relaxed text-white/70">
+                  Palm Springs 2018 to Gamble Sands 2026 — nine editions, a different name on the cup
+                  nearly every year, and one decade-long argument about handicaps. The 10th Strand gets
+                  the anniversary it deserves. Destination and dates are being scouted now and will land
+                  right here first.
                 </p>
-              </Reveal>
-              <Reveal delay={120}>
-                <div className="space-y-3 text-sm">
+                <div className="mt-8 max-w-md space-y-3 text-sm">
                   <div className="flex justify-between border-b border-white/15 pb-3"><span className="text-white/55">Destination</span><strong>To be announced</strong></div>
                   <div className="flex justify-between border-b border-white/15 pb-3"><span className="text-white/55">Dates</span><strong>To be announced</strong></div>
-                  <div className="flex justify-between"><span className="text-white/55">Edition</span><strong>No. 10 · Since 2018</strong></div>
+                  <div className="flex justify-between"><span className="text-white/55">Edition</span><strong className="gold-shimmer">No. 10</strong></div>
+                </div>
+              </Reveal>
+              <Reveal delay={120}>
+                <p className="label mb-4 text-white/60">The road to ten</p>
+                <div className="flex flex-wrap gap-2">
+                  {championsAsc.map((row) => (
+                    <div key={row.year} className="era-chip rounded-2xl border border-white/15 bg-white/5 px-4 py-3">
+                      <div className="font-mono text-xs text-white/50">{row.year}</div>
+                      <div className="mt-1 text-sm font-medium">{row.winner}</div>
+                    </div>
+                  ))}
+                  <div className="era-chip rounded-2xl border border-[#c9a227]/60 bg-[#c9a227]/10 px-4 py-3">
+                    <div className="font-mono text-xs text-[#e8c86a]">2027</div>
+                    <div className="gold-shimmer mt-1 text-sm font-semibold">Your name here</div>
+                  </div>
                 </div>
               </Reveal>
             </div>
           </div>
-        </section>
-
-        <section id="schedule" className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
-          <Reveal className="mb-12 max-w-lg"><p className="label">The 2026 Weekend</p><h2 className="section-title mt-3">How the week ran at Gamble Sands.</h2></Reveal>
-          <Reveal className="relative">
-            <span aria-hidden className="timeline-rail absolute inset-y-0 left-1/2 hidden w-px -translate-x-1/2 bg-[#1a3c34]/25 md:block" />
-            <div className="grid gap-px bg-[#e2ddd3] md:grid-cols-2">
-              {WEEKEND_SCHEDULE.map((item, i) => (
-                <Reveal key={`${item.day}-${item.time}`} delay={(i % 2) * 90}>
-                  <div className="group h-full bg-[#f7f5f0] p-6 transition-colors duration-300 hover:bg-white md:p-8">
-                    <div className="flex items-baseline justify-between gap-4"><span className="label transition-colors duration-300 group-hover:text-[#1a3c34]">{item.day}</span><span className="font-mono text-xs text-black/45">{item.time}</span></div>
-                    <h3 className="mt-3 text-lg font-medium">{item.title}</h3><p className="mt-2 text-sm leading-relaxed text-black/55">{item.note}</p>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </Reveal>
-          <Reveal className="mt-12">
-            <div className="grid gap-8 md:grid-cols-2">
-              <div><p className="label mb-4">Formats</p><ul className="space-y-2 text-sm text-black/65">{STRAND_FORMAT.map((line) => <li key={line}>{line}</li>)}</ul></div>
-              <div><p className="label mb-4">Rounds</p><ul className="space-y-3">{ROUND_FORMATS.map((round) => <li key={round.round} className="flex items-baseline justify-between gap-4 text-sm"><span className="font-medium">R{round.round} · {round.format}</span><span className="text-black/45">{round.teeTime} · {round.course}</span></li>)}</ul></div>
-            </div>
-          </Reveal>
-        </section>
-
-        <OfficialEventSection />
-        <PlayersHandicapSection />
-        <CoursesSection />
-        <TravelSection />
-
-        <section className="divider bg-white">
-          <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
-            <div className="grid gap-16 lg:grid-cols-2">
-              <Reveal>
-                <p className="label">Thursday Night</p><h2 className="section-title mt-3">Opening Ceremony + Matchmaker</h2>
-                <p className="mt-4 text-sm leading-relaxed text-black/55">How it worked: after QuickSands and dinner, {CAPTAINS.wix.nickname} and {CAPTAINS.justin.nickname} set the matchups following the rules and scoring review.</p>
-                <ul className="mt-6 space-y-2 text-sm text-black/65">{MATCHMAKER_RULES.map((rule) => <li key={rule}>{rule}</li>)}</ul>
-              </Reveal>
-              <Reveal delay={120}>
-                <p className="label">The Numbers</p><h2 className="section-title mt-3">What the weekend cost</h2>
-                <p className="mt-4 text-sm leading-relaxed text-black/55">Double King Rooms near Scarecrow with shuttles between the courses. For the record books — and a baseline for budgeting 2027.</p>
-                <div className="mt-8 space-y-3 text-sm"><div className="flex justify-between border-b border-black/8 pb-3"><span className="text-black/55">Tournament buy-in</span><strong>$105</strong></div><div className="flex justify-between border-b border-black/8 pb-3"><span className="text-black/55">Tee gift</span><strong>$25</strong></div><div className="flex justify-between"><span className="text-black/55">Match-play pot</span><strong>$100 per man</strong></div></div>
-              </Reveal>
-            </div>
-          </div>
-        </section>
-
-        <section className="divider">
-          <div className="mx-auto max-w-[1400px] px-5 py-16 md:px-8"><Reveal><p className="label mb-6">On Course</p><div className="flex flex-wrap gap-x-8 gap-y-3">{ON_COURSE_RULES.map((rule) => <span key={rule} className="text-sm text-black/65">{rule}</span>)}</div></Reveal></div>
-        </section>
-
-        <section className="relative min-h-[60vh] overflow-hidden">
-          <Image src="/courses/scarecrow.jpg" alt="Scarecrow aerial with Columbia River and mountain views" fill className="object-cover" sizes="100vw" />
-          <div className="absolute inset-0 bg-black/60" /><div aria-hidden className="pointer-events-none absolute -bottom-10 right-0 select-none text-[22vw] font-semibold leading-none tracking-tighter text-white/[0.06]">2026</div>
-          <div className="relative mx-auto max-w-[1400px] px-5 py-24 md:px-8 md:py-36"><Reveal><p className="label text-white/60">The Record</p><h2 className="section-title mt-3 max-w-md text-white">Team Justin takes Gamble Sands.</h2><p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70">Fourball, shamble, singles, and the closing scramble — J-BONE&apos;s side did enough across the four rounds to carry the 2026 cup. The full year-by-year ledger lives in the archive below.</p><a href="#history" className="btn-primary mt-8 bg-white text-black hover:opacity-90">See the Archive</a></Reveal></div>
+          <RollingDivider dark />
         </section>
 
         <HistorySection />
+        <PlayersHandicapSection />
+        <CoursesSection />
+        <TravelSection />
       </main>
       <SiteFooter /><BackToTop />
     </>

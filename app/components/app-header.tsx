@@ -11,7 +11,7 @@ type AppHeaderProps = {
 
 const APP_NAV = [
   { label: "My Strand", shortLabel: "Home", href: "/my-strand", icon: "S" },
-  { label: "Live", shortLabel: "Live", href: "/live", icon: "●" },
+  { label: "2026 Recap", shortLabel: "2026", href: "/the-strand/gamble-sands-2026", icon: "●" },
   { label: "Course Intel", shortLabel: "Courses", href: "/courses", icon: "◇" },
   { label: "Players", shortLabel: "Players", href: "/#players", icon: "○" },
   { label: "Draft Lab", shortLabel: "Draft", href: "/draft", icon: "◆" },
