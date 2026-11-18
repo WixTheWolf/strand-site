@@ -215,7 +215,7 @@ export default function HomePage() {
               </Reveal>
             </div>
           </div>
-          <LipOutScene dark />
+          <LipOutScene />
         </section>
 
         <HistorySection />
