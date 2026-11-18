@@ -2,8 +2,8 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import CoursesSection from "./components/courses-section";
-import { BackToTop, Confetti, CountUp, Magnetic, ScrollProgress } from "./components/fx";
-import { CartJumpScene, LipOutScene, TeeShotScene } from "./components/golf-cinema";
+import { BackToTop, CountUp, Magnetic, ScrollProgress } from "./components/fx";
+import { CartJumpScene, HeroFilmLayer, LipOutScene, TeeShotScene } from "./components/golf-cinema";
 import HistorySection from "./components/history-section";
 import Marquee from "./components/marquee";
 import OfficialEventSection from "./components/official-event-section";
@@ -72,9 +72,9 @@ export default function HomePage() {
         {/* ---------------- Hero: 2026 Champions ---------------- */}
         <section id="home" className="relative min-h-[100svh] overflow-hidden">
           <Image src={HERO_IMAGE} alt="Gamble Sands fairway above the Columbia River" fill priority className="hero-media object-cover" sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/25" />
+          <HeroFilmLayer />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/20" />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_100%,rgba(201,162,39,0.18),transparent)]" />
-          <Confetti pieces={70} />
           <div className="relative mx-auto flex min-h-[100svh] max-w-[1400px] flex-col justify-end px-5 pb-24 pt-28 md:px-8 md:pb-28">
             <p className="hero-fade label mb-4 text-white/70" style={{ "--d": "250ms" } as CSSProperties}>
               The ninth Strand · {STRAND_2026.destination}

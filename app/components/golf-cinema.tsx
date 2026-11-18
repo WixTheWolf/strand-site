@@ -28,21 +28,27 @@ function CinemaScene({
     const video = videoRef.current;
     if (!video) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onReducedChange = () => {
+      if (reduced.matches) video.pause();
+    };
+    reduced.addEventListener("change", onReducedChange);
     const io = new IntersectionObserver(
       (entries) =>
         entries.forEach((entry) => {
-          if (reduced.matches) return;
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.4 && !reduced.matches) {
             video.currentTime = 0;
             video.play().catch(() => {});
           } else {
             video.pause();
           }
         }),
-      { threshold: 0.4 },
+      { threshold: [0, 0.4] },
     );
     io.observe(video);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      reduced.removeEventListener("change", onReducedChange);
+    };
   }, []);
 
   return (
@@ -66,41 +72,78 @@ function CinemaScene({
   );
 }
 
-/** Close-up slo-mo: driver meets ball, turf flies, ball screams off frame. */
+/** Dusk slo-mo: the strike, with a broadcast-style shot tracer. */
 export function TeeShotScene() {
   return (
     <CinemaScene
       src="/cinema/tee-strike.mp4"
       poster="/cinema/tee-strike-poster.jpg"
-      caption="The strike · super slo-mo"
-      bg="bg-[#f7f5f0]"
-      captionClass="text-black/40"
+      caption="The strike"
+      bg="bg-[#0a1b16]"
+      captionClass="text-white/35"
     />
   );
 }
 
-/** The supercharged cart sends it over the bunker. Club rules are silent on this. */
+/** A silhouetted cart sends it over the bunker at dusk. */
 export function CartJumpScene() {
   return (
     <CinemaScene
       src="/cinema/cart-jump.mp4"
       poster="/cinema/cart-jump-poster.jpg"
       caption="Cart path optional"
-      bg="bg-[#f7f5f0]"
-      captionClass="text-black/40"
+      bg="bg-[#0a1b16]"
+      captionClass="text-white/35"
     />
   );
 }
 
-/** Approach shot bounces on, tracks at the cup, orbits the lip... stays out. */
+/** The approach runs out, rides the lip, and stays up. */
 export function LipOutScene() {
   return (
     <CinemaScene
       src="/cinema/lip-out.mp4"
       poster="/cinema/lip-out-poster.jpg"
       caption="The approach · so, so close"
-      bg="bg-[#1a3c34]"
-      captionClass="text-white/40"
+      bg="bg-[#0a1b16]"
+      captionClass="text-white/35"
     />
+  );
+}
+
+/**
+ * Hero background film: a slow, graded Ken Burns pass over real 2026 frames.
+ * Plays continuously; holds its poster under prefers-reduced-motion.
+ */
+export function HeroFilmLayer() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      if (reduced.matches) video.pause();
+      else video.play().catch(() => {});
+    };
+    sync();
+    reduced.addEventListener("change", sync);
+    return () => reduced.removeEventListener("change", sync);
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      aria-hidden
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      poster="/cinema/hero-sands-poster.jpg"
+      className="absolute inset-0 h-full w-full object-cover"
+    >
+      <source src="/cinema/hero-sands.mp4" type="video/mp4" />
+    </video>
   );
 }

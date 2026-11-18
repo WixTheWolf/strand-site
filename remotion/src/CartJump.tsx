@@ -4,261 +4,218 @@ import {
   interpolate,
   useCurrentFrame,
 } from "remotion";
-import { COLORS } from "./palette";
+import { DUSK, Dunes, DuskSky, Grain, Vignette } from "./Cinematic";
 
-const GROUND = 80; // turf band height
-const RAMP_X = 560;
-const BUNKER_X = 1000;
+const HORIZON = 68; // percent
+const GROUND_Y = 640 * (HORIZON / 100) + 86; // cart baseline in px from top
 const TAKEOFF = 64;
 const LAND = 122;
+const BUNKER_X = 1010;
 
-type Grain = { vx: number; vy: number; delay: number; r: number };
+/** The cart as a refined silhouette with a thin gold rim light. */
+const CartSilhouette: React.FC<{ wheelSpin: number; airborne: boolean }> = ({
+  wheelSpin,
+  airborne,
+}) => (
+  <svg viewBox="0 0 160 92" width={320} height={184}>
+    <defs>
+      <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor={DUSK.goldSoft} stopOpacity="0.9" />
+        <stop offset="1" stopColor={DUSK.goldSoft} stopOpacity="0" />
+      </linearGradient>
+    </defs>
+    {/* chassis: low body with a raked front cowl */}
+    <path d="M18 66 Q16 52 32 52 L122 52 Q140 52 138 66 Z" fill="#050f0c" />
+    <path d="M18 56 L34 53 L34 56 Z" fill="#050f0c" />
+    {/* open cabin: slim posts + floating roof */}
+    <rect x="38" y="24" width="4" height="30" fill="#050f0c" transform="skewX(-8)" />
+    <rect x="106" y="24" width="4" height="30" fill="#050f0c" transform="skewX(-8)" />
+    <rect x="30" y="17" width="94" height="6" rx="3" fill="#050f0c" />
+    <rect x="30" y="16.4" width="94" height="2" rx="1" fill="url(#rim)" />
+    {/* body rim light along the cowl */}
+    <path d="M20 52.5 L136 52.5 L135 55 L21 55 Z" fill={DUSK.goldSoft} opacity="0.28" />
+    {/* seated golfer silhouette, visible through the open cabin */}
+    <circle cx="72" cy="31" r="6" fill="#050f0c" />
+    <path d="M64 37 Q72 33 80 37 L80 52 L64 52 Z" fill="#050f0c" />
+    <path d="M78 40 L92 44 L92 47 L78 44 Z" fill="#050f0c" />
+    {/* seat back */}
+    <path d="M86 28 L92 28 L94 52 L88 52 Z" fill="#050f0c" />
+    {/* bag silhouette on the rear deck */}
+    <path d="M118 32 L128 34 L126 54 L116 52 Z" fill="#050f0c" />
+    <line x1="121" y1="20" x2="123" y2="33" stroke="#050f0c" strokeWidth="2.4" />
+    <line x1="127" y1="23" x2="127" y2="34" stroke="#050f0c" strokeWidth="2.4" />
+    {/* wheels: dark discs, slim gold hub arc that spins */}
+    {[44, 116].map((cx) => (
+      <g key={cx}>
+        <circle cx={cx} cy="70" r="13" fill="#040c09" />
+        <circle cx={cx} cy="70" r="12.2" fill="none" stroke="rgba(232,200,106,0.2)" strokeWidth="1" />
+        <g style={{ transformOrigin: `${cx}px 70px`, rotate: `${wheelSpin}deg` }}>
+          <path
+            d={`M ${cx} 64 A 6 6 0 0 1 ${cx + 5.2} 73`}
+            fill="none"
+            stroke={DUSK.goldSoft}
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            opacity={airborne ? 0.8 : 0.5}
+          />
+        </g>
+      </g>
+    ))}
+  </svg>
+);
 
-const SAND_BURST: Grain[] = [
-  { vx: -3.4, vy: -7.4, delay: 0, r: 10 },
-  { vx: -1.2, vy: -9.4, delay: 2, r: 8 },
-  { vx: 0.8, vy: -8.4, delay: 1, r: 11 },
-  { vx: 2.6, vy: -6.4, delay: 3, r: 8 },
-  { vx: -4.6, vy: -5.0, delay: 2, r: 7 },
-  { vx: 4.1, vy: -5.6, delay: 4, r: 10 },
-  { vx: 1.7, vy: -10.4, delay: 1, r: 7 },
-  { vx: -2.4, vy: -11.0, delay: 3, r: 6 },
-  { vx: 3.3, vy: -8.8, delay: 5, r: 9 },
-  { vx: -0.3, vy: -12.2, delay: 2, r: 7 },
-];
-
-export const CartJump: React.FC = () => {
-  const frame = useCurrentFrame();
-
-  // Piecewise X: drive in → ramp → flight → land → floor it off-frame.
-  const cartX = interpolate(
-    frame,
-    [0, TAKEOFF, LAND, 168],
-    [-420, RAMP_X - 40, 1340, 2350],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-  );
-
-  // Flight arc + approach bounce.
-  const airborne = frame > TAKEOFF && frame < LAND;
-  const flightT = (frame - TAKEOFF) / (LAND - TAKEOFF);
-  const jumpY = airborne ? -300 * 4 * flightT * (1 - flightT) : 0;
-  const driveBounce =
-    frame <= TAKEOFF ? Math.sin(frame * 0.9) * 3 : frame >= LAND ? Math.sin(frame * 0.9) * 2 : 0;
-  const rampLift = interpolate(frame, [TAKEOFF - 10, TAKEOFF], [0, -34], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const cartY = jumpY + driveBounce + (airborne ? 0 : frame < TAKEOFF ? rampLift : 0);
-
-  // Nose up on takeoff, nose down into the landing, squash on touchdown.
-  const cartTilt = interpolate(
-    frame,
-    [TAKEOFF - 10, TAKEOFF + 6, LAND - 10, LAND, LAND + 8],
-    [0, -14, 12, 4, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.quad) },
-  );
-  const squash = interpolate(frame, [LAND, LAND + 4, LAND + 10], [1, 0.88, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  const wheelSpin = frame * (airborne ? 34 : 22);
-
+const DustPuff: React.FC<{
+  x: number;
+  y: number;
+  start: number;
+  frame: number;
+  scale?: number;
+}> = ({ x, y, start, frame, scale = 1 }) => {
+  const t = frame - start;
+  if (t < 0 || t > 50) return null;
   return (
-    <AbsoluteFill style={{ backgroundColor: COLORS.cream, overflow: "hidden" }}>
-      {/* ground */}
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: GROUND,
-          background: COLORS.turf,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: GROUND - 4,
-          height: 5,
-          background: "rgba(26,60,52,0.3)",
-        }}
-      />
-
-      {/* launch ramp mound */}
-      <div
-        style={{
-          position: "absolute",
-          left: RAMP_X - 160,
-          bottom: GROUND - 6,
-          width: 330,
-          height: 62,
-          borderRadius: "60% 60% 0 0",
-          background: COLORS.turf,
-        }}
-      />
-
-      {/* bunker cut into the turf */}
-      <div
-        style={{
-          position: "absolute",
-          left: BUNKER_X - 250,
-          bottom: 0,
-          width: 500,
-          height: 70,
-          borderRadius: "50% 50% 0 0",
-          background: COLORS.sand,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: BUNKER_X - 210,
-          bottom: 0,
-          width: 420,
-          height: 44,
-          borderRadius: "50% 50% 0 0",
-          background: COLORS.sandDeep,
-        }}
-      />
-      {/* rake lines */}
-      {[-150, -90, -30, 30, 90].map((dx) => (
-        <div
-          key={dx}
-          style={{
-            position: "absolute",
-            left: BUNKER_X + dx,
-            bottom: 8,
-            width: 3,
-            height: 26,
-            background: "rgba(138,107,63,0.3)",
-            borderRadius: 3,
-          }}
-        />
-      ))}
-
-      {/* flying shadow racing beneath the cart */}
-      <div
-        style={{
-          position: "absolute",
-          left: cartX + 60,
-          bottom: interpolate(
-            cartX + 170,
-            [BUNKER_X - 290, BUNKER_X - 200, BUNKER_X + 200, BUNKER_X + 290],
-            [GROUND - 18, 24, 24, GROUND - 18],
-            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-          ),
-          width: 230,
-          height: 20,
-          borderRadius: "50%",
-          background: "rgba(0,0,0,0.28)",
-          scale: String(interpolate(Math.abs(jumpY), [0, 300], [1, 0.55])),
-          opacity: interpolate(Math.abs(jumpY), [0, 300], [0.9, 0.45]),
-        }}
-      />
-
-      {/* dust puff over the bunker while the cart buzzes it */}
-      <div
-        style={{
-          position: "absolute",
-          left: BUNKER_X - 130,
-          bottom: 30,
-          width: 260,
-          height: 90,
-          borderRadius: "50%",
-          background: COLORS.sand,
-          opacity: interpolate(frame, [TAKEOFF + 14, TAKEOFF + 26, TAKEOFF + 60], [0, 0.55, 0], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          }),
-          scale: String(
-            interpolate(frame, [TAKEOFF + 14, TAKEOFF + 60], [0.5, 1.5], {
+    <div
+      style={{
+        position: "absolute",
+        left: x - 90,
+        top: y - 44,
+        width: 180,
+        height: 70,
+        borderRadius: "50%",
+        background:
+          "radial-gradient(50% 60% at 50% 70%, rgba(130,112,76,0.4) 0%, rgba(130,112,76,0) 70%)",
+        scale: String(
+          scale *
+            interpolate(t, [0, 50], [0.45, 1.6], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
               easing: Easing.out(Easing.quad),
             }),
-          ),
+        ),
+        opacity: interpolate(t, [0, 8, 50], [0, 0.85, 0], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        }),
+      }}
+    />
+  );
+};
+
+export const CartJump: React.FC = () => {
+  const frame = useCurrentFrame();
+
+  const cartX = interpolate(frame, [0, TAKEOFF, LAND, 168], [-440, 540, 1390, 2400], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const airborne = frame > TAKEOFF && frame < LAND;
+  const flightT = (frame - TAKEOFF) / (LAND - TAKEOFF);
+  const jumpY = airborne ? -270 * 4 * flightT * (1 - flightT) : 0;
+  const rampLift = interpolate(frame, [TAKEOFF - 12, TAKEOFF], [0, -30], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const cartY = jumpY + (frame <= TAKEOFF ? rampLift : 0) + Math.sin(frame * 0.8) * (airborne ? 0 : 1.6);
+
+  const cartTilt = interpolate(
+    frame,
+    [TAKEOFF - 12, TAKEOFF + 6, LAND - 12, LAND, LAND + 10],
+    [0, -12, 10, 3, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.quad) },
+  );
+  const squash = interpolate(frame, [LAND, LAND + 4, LAND + 12], [1, 0.95, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: DUSK.skyTop, overflow: "hidden" }}>
+      <DuskSky horizonY={HORIZON} />
+      <Dunes horizonY={HORIZON - 5} drift={frame * 0.1} />
+
+      {/* foreground ridge the cart rides */}
+      <svg
+        viewBox="0 0 1920 220"
+        preserveAspectRatio="none"
+        style={{ position: "absolute", left: 0, bottom: 0, width: "100%", height: 220 }}
+      >
+        {/* ridge with a carved bunker gap and a launch-side lip */}
+        <path
+          d="M0 96 C 220 76, 420 92, 560 78 C 640 70, 700 64, 740 70 L 790 86 C 850 150, 1170 150, 1230 86 L 1280 72 C 1420 58, 1640 84, 1920 68 L 1920 220 L 0 220 Z"
+          fill="#06120e"
+        />
+        {/* dusk-lit sand in the gap */}
+        <path d="M800 100 C 870 146, 1150 146, 1220 100 C 1150 128, 870 128, 800 100 Z" fill="#584a33" opacity="0.85" />
+        <path d="M830 108 C 890 138, 1130 138, 1190 108 C 1130 126, 890 126, 830 108 Z" fill="#6b5a3e" opacity="0.6" />
+      </svg>
+
+      {/* distant pin for depth */}
+      <div style={{ position: "absolute", left: 1700, top: 640 * (HORIZON / 100) - 68, width: 3, height: 64, background: "rgba(244,242,234,0.5)", borderRadius: 3 }} />
+      <svg viewBox="0 0 30 18" width={30} height={18} style={{ position: "absolute", left: 1703, top: 640 * (HORIZON / 100) - 68 }}>
+        <path d="M0 0 L26 6 L0 14 Z" fill={DUSK.gold} opacity="0.75" />
+      </svg>
+
+      {/* soft shadow tracking below */}
+      <div
+        style={{
+          position: "absolute",
+          left: cartX + 70,
+          top:
+            interpolate(
+              cartX + 160,
+              [BUNKER_X - 300, BUNKER_X - 210, BUNKER_X + 210, BUNKER_X + 300],
+              [GROUND_Y + 64, GROUND_Y + 120, GROUND_Y + 120, GROUND_Y + 64],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            ),
+          width: 220,
+          height: 18,
+          borderRadius: "50%",
+          background: "rgba(0,0,0,0.5)",
+          filter: "blur(4px)",
+          scale: String(interpolate(Math.abs(jumpY), [0, 270], [1, 0.55])),
+          opacity: interpolate(Math.abs(jumpY), [0, 270], [0.65, 0.3]),
         }}
       />
-      {/* sand erupting as the cart clears the bunker */}
-      {SAND_BURST.map((g, i) => {
-        const t = Math.max(0, frame - (TAKEOFF + 16 + g.delay));
-        const alive = t > 0 && t < 44;
-        return (
+
+      {/* takeoff + landing dust */}
+      <DustPuff x={640} y={GROUND_Y + 60} start={TAKEOFF - 2} frame={frame} />
+      <DustPuff x={1460} y={GROUND_Y + 60} start={LAND - 1} frame={frame} scale={1.2} />
+
+      {/* air streaks while airborne */}
+      {airborne &&
+        [0, 1, 2].map((i) => (
           <div
             key={i}
             style={{
               position: "absolute",
-              left: BUNKER_X - 20 + g.vx * t * 3,
-              bottom: 40 - g.vy * t * 2.6 - 0.35 * t * t,
-              width: g.r * 2,
-              height: g.r * 2,
-              borderRadius: "50%",
-              background: COLORS.sandDeep,
-              opacity: alive
-                ? interpolate(t, [0, 30, 44], [1, 1, 0], {
-                    extrapolateLeft: "clamp",
-                    extrapolateRight: "clamp",
-                  })
-                : 0,
+              left: cartX - 60 - i * 70,
+              top: GROUND_Y + cartY + 50 + i * 26,
+              width: interpolate(flightT, [0, 0.5, 1], [30, 110 - i * 20, 30]),
+              height: 2,
+              borderRadius: 2,
+              background: "rgba(232,200,106,0.22)",
             }}
           />
-        );
-      })}
+        ))}
 
       {/* THE CART */}
       <div
         style={{
           position: "absolute",
           left: cartX,
-          bottom: GROUND - 14,
+          top: GROUND_Y - 120,
           translate: `0px ${cartY}px`,
           rotate: `${cartTilt}deg`,
           scale: `1 ${squash}`,
           transformOrigin: "50% 100%",
         }}
       >
-        <svg viewBox="0 0 150 90" width={310} height={186}>
-          {/* boost flames — flicker */}
-          <g
-            style={{
-              transformOrigin: "16px 58px",
-              scale: `${1 + Math.sin(frame * 2.6) * 0.25} 1`,
-              opacity: airborne ? 1 : 0.65,
-            }}
-          >
-            <path d="M18 54 L-16 58 L18 64 Z" fill={COLORS.gold} />
-            <path d="M18 56 L-4 58 L18 62 Z" fill={COLORS.goldSoft} />
-          </g>
-          {/* body */}
-          <rect x="18" y="44" width="104" height="22" rx="8" fill={COLORS.deepGreen} />
-          <rect x="26" y="20" width="6" height="26" fill={COLORS.deepGreen} />
-          <rect x="98" y="20" width="6" height="26" fill={COLORS.deepGreen} />
-          <rect x="20" y="14" width="92" height="8" rx="4" fill={COLORS.gold} />
-          <rect x="40" y="30" width="44" height="16" rx="4" fill={COLORS.cream} opacity="0.85" />
-          {/* golfer silhouette — arm up during the jump */}
-          <circle cx="62" cy="30" r="7" fill={COLORS.ink} />
-          <rect x="54" y="36" width="16" height="12" rx="5" fill={COLORS.ink} />
-          {airborne && (
-            <rect x="68" y="18" width="5" height="16" rx="3" fill={COLORS.ink} transform="rotate(28 70 26)" />
-          )}
-          {/* bag on the back */}
-          <rect x="112" y="26" width="12" height="24" rx="5" fill={COLORS.dirt} transform="rotate(14 118 38)" />
-          <line x1="117" y1="12" x2="119" y2="28" stroke={COLORS.ink} strokeWidth="2.4" />
-          <line x1="123" y1="14" x2="123" y2="28" stroke={COLORS.ink} strokeWidth="2.4" />
-          {/* wheels */}
-          {[38, 104].map((cx) => (
-            <g key={cx} style={{ transformOrigin: `${cx}px 70px`, rotate: `${wheelSpin}deg` }}>
-              <circle cx={cx} cy="70" r="12" fill={COLORS.ink} />
-              <circle cx={cx} cy="70" r="5" fill={COLORS.cream} />
-              <rect x={cx - 1.2} y="59" width="2.4" height="22" fill={COLORS.cream} opacity="0.7" />
-            </g>
-          ))}
-        </svg>
+        <CartSilhouette wheelSpin={frame * (airborne ? 30 : 20)} airborne={airborne} />
       </div>
+
+      <Grain />
+      <Vignette strength={0.5} />
     </AbsoluteFill>
   );
 };
