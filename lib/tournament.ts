@@ -5,7 +5,7 @@ export const DRAFT_AT = new Date("2026-07-23T18:00:00-07:00").getTime();
 
 export const CAPTAINS = {
   wix: { ...MY_CAPTAIN, teamName: "Team WIX", picks: 9, role: "Captain" },
-  justin: { ...OPPONENT_CAPTAIN, teamName: "Team Justin", picks: 9, role: "Captain" },
+  justin: { ...OPPONENT_CAPTAIN, teamName: "Team J-Bone", picks: 9, role: "Captain" },
 } as const;
 
 export const CAPTAIN_DRAFT_RULES = [

@@ -14,13 +14,13 @@ import { ROUND_FORMATS, WEEKEND_SCHEDULE } from "@/lib/tournament";
 export const metadata = {
   title: "Gamble Sands 2026 | The Strand Invitational",
   description:
-    "The ninth Strand Invitational — Team Justin takes the cup at Gamble Sands. Rosters, the weekend, the courses, and the photo album.",
+    "The ninth Strand Invitational — Team J-Bone takes the cup at Gamble Sands. Rosters, the weekend, the courses, and the photo album.",
 };
 
 const TICKER = [
   "Gamble Sands 2026",
   "The Ninth Strand",
-  "Champions · Team Justin",
+  "Champions · Team J-Bone",
   "Gamble Sands · Scarecrow · QuickSands",
   "Aug 20–23, 2026",
 ];
@@ -68,7 +68,7 @@ export default function GambleSands2026Page() {
             The Ninth Strand · {STRAND_2026.dates}
           </p>
           <h1 className="headline mt-4 max-w-[14ch] text-white">
-            <span className="gold-shimmer">Team Justin</span> takes the Sands.
+            <span className="gold-shimmer">Team J-Bone</span> takes the Sands.
           </h1>
           <p className="hero-fade mt-6 max-w-xl text-base leading-relaxed text-white/80" style={{ "--d": "450ms" } as CSSProperties}>
             Fourball, shamble, singles, and a closing scramble across {STRAND_2026.courses.join(", ")} —
@@ -111,7 +111,7 @@ export default function GambleSands2026Page() {
           <h2 className="section-title mt-3">Ten on ten.</h2>
         </Reveal>
         <div className="grid gap-6 lg:grid-cols-2">
-          <Reveal><RosterCard title="Team Justin" subtitle="2026 Champions" players={teamJustin} champion /></Reveal>
+          <Reveal><RosterCard title="Team J-Bone" subtitle="2026 Champions" players={teamJustin} champion /></Reveal>
           <Reveal delay={120}><RosterCard title="Team WIX" subtitle="Runners-up" players={teamWix} /></Reveal>
         </div>
       </section>

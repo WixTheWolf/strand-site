@@ -37,7 +37,7 @@ export function rosterPlayers(ids: readonly string[]): StrandPlayer[] {
 }
 
 export const STRAND_2026 = {
-  champion: "Team Justin",
+  champion: "Team J-Bone",
   runnerUp: "Team WIX",
   destination: "Gamble Sands · Brewster, WA",
   dates: "August 20–23, 2026",

@@ -19,7 +19,7 @@ export const STUD_BUCKETS_TEAM = {
 
 export const JBONE_TEAM = {
   id: "jbone",
-  name: "Team Justin",
+  name: "Team J-Bone",
   shortName: "J-BONE",
   captainId: "justin-uribe",
   playerIds: [

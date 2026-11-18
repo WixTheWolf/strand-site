@@ -24,7 +24,7 @@ export default function DraftPage() {
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">2026 Archive</div>
             <div className="mt-1 text-sm font-medium uppercase tracking-[0.14em]">
-              Drafted July 23 · Team Justin won the cup at Gamble Sands
+              Drafted July 23 · Team J-Bone won the cup at Gamble Sands
             </div>
             <Link
               href="/draft/plan"
