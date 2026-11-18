@@ -203,6 +203,15 @@ export default function GambleSands2026Page() {
                   : "The frames are reserved — trip photos are being collected and drop in here as they land."}
               </p>
             </div>
+            <Magnetic>
+              <a
+                href="/films/strand-2026-recap.mp4"
+                download
+                className="btn-ghost border-white/30 text-white"
+              >
+                ↓ The 2026 film · 34s
+              </a>
+            </Magnetic>
           </Reveal>
           {GALLERY_2026.length ? (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
