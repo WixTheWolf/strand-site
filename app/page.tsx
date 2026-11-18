@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import CoursesSection from "./components/courses-section";
 import { BackToTop, Confetti, CountUp, Magnetic, ScrollProgress } from "./components/fx";
+import { CartJumpScene, LipOutScene, TeeShotScene } from "./components/golf-cinema";
 import HistorySection from "./components/history-section";
 import Marquee from "./components/marquee";
 import OfficialEventSection from "./components/official-event-section";
@@ -46,17 +47,6 @@ function HeroLine({ text, base }: { text: string; base: number }) {
   );
 }
 
-function GolfBall({ id, className, size = 44 }: { id: string; className?: string; size?: number }) {
-  return (
-    <svg viewBox="0 0 44 44" width={size} height={size} className={className} aria-hidden>
-      <circle cx="22" cy="22" r="20" fill="rgba(255,255,255,0.9)" />
-      <circle cx="22" cy="22" r="20" fill={`url(#${id})`} />
-      <defs><radialGradient id={id} cx="0.35" cy="0.3" r="0.9"><stop offset="0%" stopColor="rgba(255,255,255,0)" /><stop offset="100%" stopColor="rgba(0,0,0,0.35)" /></radialGradient></defs>
-      {[[14,14],[22,12],[30,14],[12,22],[20,20],[28,20],[34,24],[16,28],[24,27],[31,31],[20,34]].map(([x,y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="1.5" fill="rgba(0,0,0,0.14)" />)}
-    </svg>
-  );
-}
-
 function PinFlag({ className, tone = "gold" }: { className?: string; tone?: "gold" | "white" }) {
   const flag = tone === "gold" ? "#c9a227" : "#f7f5f0";
   return (
@@ -66,19 +56,6 @@ function PinFlag({ className, tone = "gold" }: { className?: string; tone?: "gol
       <ellipse cx="31.5" cy="112" rx="14" ry="4" fill="currentColor" opacity="0.18" />
       <ellipse cx="31.5" cy="112" rx="6" ry="2.2" fill="currentColor" opacity="0.4" />
     </svg>
-  );
-}
-
-/** A ball rolling the width of the page into a waiting pin — section divider */
-function RollingDivider({ dark = false }: { dark?: boolean }) {
-  return (
-    <div aria-hidden className={`relative h-14 overflow-hidden ${dark ? "text-white/70" : "text-[#1a3c34]"}`}>
-      <div className="absolute inset-x-5 bottom-5 border-b border-dashed border-current opacity-25 md:inset-x-8" />
-      <div className="ball-roll absolute bottom-6 left-5 md:left-8" style={{ "--roll": "min(82vw, 1200px)" } as CSSProperties}>
-        <GolfBall id={dark ? "roll-ball-dark" : "roll-ball"} size={18} />
-      </div>
-      <div className="absolute bottom-3 right-5 md:right-8"><PinFlag tone={dark ? "white" : "gold"} /></div>
-    </div>
   );
 }
 
@@ -117,10 +94,7 @@ export default function HomePage() {
               <Magnetic><Link href={STRAND_2026.recapHref} className="btn-primary">Relive 2026</Link></Magnetic>
               <Magnetic><a href="#next" className="btn-ghost">The 10-Year Strand</a></Magnetic>
               <Magnetic><a href="#history" className="btn-ghost">Archive</a></Magnetic>
-            </div>
-            <GolfBall id="ball-a" className="float-slow pointer-events-none absolute right-[12%] top-[22%] hidden opacity-70 lg:block" size={40} />
-            <GolfBall id="ball-b" className="float-slower pointer-events-none absolute right-[26%] top-[42%] hidden opacity-40 lg:block" size={24} />
-            <div className="hero-fade absolute bottom-24 right-5 hidden md:bottom-28 md:right-8 md:block" style={{ "--d": "900ms" } as CSSProperties}>
+            </div>            <div className="hero-fade absolute bottom-24 right-5 hidden md:bottom-28 md:right-8 md:block" style={{ "--d": "900ms" } as CSSProperties}>
               <div className="scroll-cue flex flex-col items-center gap-2 text-white/70"><span className="text-[9px] uppercase tracking-[0.3em]">Scroll</span><span className="h-8 w-px bg-white/50" /></div>
             </div>
           </div>
@@ -151,6 +125,8 @@ export default function HomePage() {
         </section>
 
         {/* ---------------- The 2026 result ---------------- */}
+        <TeeShotScene />
+
         <section id="schedule" className="mx-auto max-w-[1400px] px-5 py-20 md:px-8 md:py-28">
           <Reveal className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-lg">
@@ -190,7 +166,7 @@ export default function HomePage() {
           </Reveal>
         </section>
 
-        <RollingDivider />
+        <CartJumpScene />
 
         <OfficialEventSection />
 
@@ -239,7 +215,7 @@ export default function HomePage() {
               </Reveal>
             </div>
           </div>
-          <RollingDivider dark />
+          <LipOutScene dark />
         </section>
 
         <HistorySection />
