@@ -225,7 +225,7 @@ export default function HomePage() {
               </Reveal>
             </div>
             <Reveal className="mt-16 md:mt-20">
-              <p className="label mb-4 text-white/60">The teaser</p>
+              <p className="label mb-4 text-white/60">The film · Destination unknown</p>
               <div className="mx-auto max-w-[1100px]">
                 <TeaserPlayer />
               </div>
