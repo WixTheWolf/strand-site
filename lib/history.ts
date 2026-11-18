@@ -27,9 +27,30 @@ export const STRAND_TOURNAMENTS: StrandTournament[] = [
     winnerScore: "—",
     loserScore: "—",
     courses: ["Gamble Sands", "Scarecrow", "QuickSands"],
-    // Final rosters pending captain write-up; appearance records update when added.
-    winnerRoster: [],
-    loserRoster: [],
+    winnerRoster: [
+      "Justin Uribe (C)",
+      "Fred Geisinger",
+      "Matt Schroeder",
+      "Ryan D'Arcy",
+      "Brian Kerns",
+      "Shaun Eipper",
+      "Jason Olson",
+      "Kevin Gordon",
+      "Matt Onorato",
+      "Brett Comfort",
+    ],
+    loserRoster: [
+      "Matt Wixted (C)",
+      "Andrew Mager",
+      "Jack Groot",
+      "Jordan Brodbeck",
+      "Nick Sprowls",
+      "Tim Hummel",
+      "Nick Kane",
+      "Pat Morse",
+      "Sam Blonski",
+      "Rhett Fahrney",
+    ],
     summary:
       "J-BONE's Team Justin captured the cup in the Strand's first Pacific Northwest edition — four rounds of 3-point matches across Gamble Sands and Scarecrow.",
     sourceUrl: "https://www.strandinvitational.life/the-strand",
@@ -341,24 +362,24 @@ export interface PlayerStrandRecord {
  */
 export const STRAND_CHAMPIONSHIP_YEARS: Record<string, number[]> = {
   "andrew-mager": [2018, 2019],
-  "brett-comfort": [],
-  "brian-kerns": [],
-  "fred-geisinger": [2021, 2022, 2023, 2024, 2025],
+  "brett-comfort": [2026],
+  "brian-kerns": [2026],
+  "fred-geisinger": [2021, 2022, 2023, 2024, 2025, 2026],
   "jack-groot": [],
-  "jason-olson": [2020, 2021, 2022, 2025],
+  "jason-olson": [2020, 2021, 2022, 2025, 2026],
   "jordan-brodbeck": [2019, 2020, 2021, 2023],
-  "justin-uribe": [2019, 2020, 2022, 2025],
-  "kevin-gordon": [2018, 2020, 2022, 2024],
-  "matt-onorato": [2019, 2020, 2021, 2022, 2023, 2024, 2025],
-  "matt-schroeder": [2023, 2025],
+  "justin-uribe": [2019, 2020, 2022, 2025, 2026],
+  "kevin-gordon": [2018, 2020, 2022, 2024, 2026],
+  "matt-onorato": [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+  "matt-schroeder": [2023, 2025, 2026],
   "matt-wixted": [2024],
   "nick-kane": [2023, 2024, 2025],
   "nick-sprowls": [2021, 2023, 2025],
   "pat-morse": [2025],
   "rhett-fahrney": [2019, 2021, 2023],
-  "ryan-darcy": [2024],
+  "ryan-darcy": [2024, 2026],
   "sam-blonski": [],
-  "shaun-eipper": [2022],
+  "shaun-eipper": [2022, 2026],
   "tim-hummel": [2022, 2023, 2024],
 };
 
@@ -367,8 +388,8 @@ export const STRAND_CHAMPIONSHIP_YEARS: Record<string, number[]> = {
  * reconstructed from a champions sheet alone.
  */
 const VERIFIED_APPEARANCE_YEARS: Record<string, number[]> = {
-  "brett-comfort": [2023, 2024, 2025],
-  "sam-blonski": [2023, 2024, 2025],
+  "brett-comfort": [2023, 2024, 2025, 2026],
+  "sam-blonski": [2023, 2024, 2025, 2026],
 };
 
 export function buildPlayerRecords(players: { id: string; name: string }[]): PlayerStrandRecord[] {
