@@ -28,21 +28,27 @@ function CinemaScene({
     const video = videoRef.current;
     if (!video) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onReducedChange = () => {
+      if (reduced.matches) video.pause();
+    };
+    reduced.addEventListener("change", onReducedChange);
     const io = new IntersectionObserver(
       (entries) =>
         entries.forEach((entry) => {
-          if (reduced.matches) return;
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.4 && !reduced.matches) {
             video.currentTime = 0;
             video.play().catch(() => {});
           } else {
             video.pause();
           }
         }),
-      { threshold: 0.4 },
+      { threshold: [0, 0.4] },
     );
     io.observe(video);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      reduced.removeEventListener("change", onReducedChange);
+    };
   }, []);
 
   return (
