@@ -211,8 +211,9 @@ export function AmbienceToggle() {
 }
 
 /**
- * The 2027 teaser: a click-to-play trailer with sound. Shows its poster until
- * the visitor presses play, then hands over to native controls.
+ * The Strand film: a short documentary on the 2026 edition and the mystery of
+ * year ten. Click-to-play with sound; shows its poster until the visitor
+ * presses play, then hands over to native controls.
  */
 export function TeaserPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -222,19 +223,19 @@ export function TeaserPlayer() {
     <div className="relative overflow-hidden rounded-[1.75rem] border border-[#c9a227]/35 bg-black shadow-[0_0_80px_rgba(201,162,39,0.14)]">
       <video
         ref={videoRef}
-        poster="/films/teaser-2027-poster.jpg"
+        poster="/films/the-strand-film-poster.jpg"
         preload="none"
         playsInline
         controls={started}
         onEnded={() => setStarted(false)}
         className="block aspect-video w-full"
       >
-        <source src="/films/teaser-2027.mp4" type="video/mp4" />
+        <source src="/films/the-strand-film.mp4" type="video/mp4" />
       </video>
       {started ? null : (
         <button
           type="button"
-          aria-label="Play the 2027 teaser"
+          aria-label="Play The Strand film"
           onClick={() => {
             setStarted(true);
             videoRef.current?.play().catch(() => {});
@@ -247,7 +248,7 @@ export function TeaserPlayer() {
             </svg>
           </span>
           <span className="text-[11px] font-medium uppercase tracking-[0.3em] text-white/80">
-            Watch the teaser · 26s · sound on
+            Watch the film · 95s · sound on
           </span>
         </button>
       )}

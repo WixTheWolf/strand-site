@@ -205,11 +205,11 @@ export default function GambleSands2026Page() {
             </div>
             <Magnetic>
               <a
-                href="/films/strand-2026-recap.mp4"
+                href="/films/the-strand-film.mp4"
                 download
                 className="btn-ghost border-white/30 text-white"
               >
-                ↓ The 2026 film · 58s
+                ↓ The Strand film · 95s
               </a>
             </Magnetic>
           </Reveal>
