@@ -4,10 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const NAV = [
-  { label: "My Strand", href: "/my-strand" },
+  { label: "2027", href: "#next" },
   { label: "Schedule", href: "#schedule" },
   { label: "Players", href: "#players" },
-  { label: "Live", href: "/live" },
   { label: "Course Intel", href: "/courses" },
   { label: "The Pass", href: "#travel" },
   { label: "Draft", href: "/draft" },
@@ -67,7 +66,7 @@ export default function SiteHeader() {
               scrolled ? "text-black/45" : "text-white/60"
             }`}
           >
-            Gamble Sands 2026
+            The Strand Invitational · Est. 2018
           </div>
           <div
             className={`text-lg font-medium tracking-[-0.04em] transition-colors duration-500 md:text-xl ${

@@ -52,7 +52,7 @@ export default function HistorySection() {
                   <div className="text-right text-sm">
                     <div className="font-medium">{event.winnerTeam}</div>
                     <div className="text-black/40">
-                      {event.winnerScore !== "—" ? `${event.winnerScore}–${event.loserScore}` : "TBD"}
+                      {event.winnerScore !== "—" ? `${event.winnerScore}–${event.loserScore}` : "Champions"}
                     </div>
                   </div>
                 </div>

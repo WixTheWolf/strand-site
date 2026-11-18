@@ -32,7 +32,7 @@ export default function AppHeader({ title, extraLink }: AppHeaderProps) {
       <header className="sticky top-0 z-50 border-b border-black/8 bg-[#f7f5f0]/94 backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] max-w-[1400px] items-center justify-between gap-5 px-5 md:px-8">
           <Link href="/" className="shrink-0" onClick={() => setOpen(false)}>
-            <div className="label text-[9px] text-black/40">Gamble Sands 2026</div>
+            <div className="label text-[9px] text-black/40">The Strand Invitational</div>
             <div className="text-lg font-medium tracking-[-0.045em]">{title}</div>
           </Link>
 

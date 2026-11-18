@@ -18,6 +18,23 @@ export interface StrandTournament {
 /** Canonical archive from strandinvitational.life/the-strand/* */
 export const STRAND_TOURNAMENTS: StrandTournament[] = [
   {
+    year: 2026,
+    slug: "gamble-sands-2026",
+    destination: "Brewster, WA",
+    label: "Gamble Sands 2026",
+    winnerTeam: "Team Justin",
+    loserTeam: "Team WIX",
+    winnerScore: "—",
+    loserScore: "—",
+    courses: ["Gamble Sands", "Scarecrow", "QuickSands"],
+    // Final rosters pending captain write-up; appearance records update when added.
+    winnerRoster: [],
+    loserRoster: [],
+    summary:
+      "J-BONE's Team Justin captured the cup in the Strand's first Pacific Northwest edition — four rounds of 3-point matches across Gamble Sands and Scarecrow.",
+    sourceUrl: "https://www.strandinvitational.life/the-strand",
+  },
+  {
     year: 2025,
     slug: "monterey-2025",
     destination: "Monterey, CA",

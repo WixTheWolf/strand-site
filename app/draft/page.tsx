@@ -1,13 +1,11 @@
 import Link from "next/link";
 import DraftBoard from "./draft-board";
 import DraftHeader from "../components/draft-header";
-import { Countdown } from "../components/fx";
-import { DRAFT_AT } from "@/lib/tournament";
 
 export const metadata = {
-  title: "Strand War Room | Captain WIX",
+  title: "Draft Lab Archive | The Strand 2026",
   description:
-    "Private captain war room for Gamble Sands 2026 — sabermetrics, format projections, pairing optimization, and live draft simulation.",
+    "The 2026 Strand draft archive — sabermetrics, format projections, pairing optimization, and the pre-draft pick plan, preserved from draft night.",
   robots: {
     index: false,
     follow: false,
@@ -24,23 +22,21 @@ export default function DraftPage() {
       <div className="bg-[#1a3c34] text-white">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-5 py-4 md:px-8">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">Draft night</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">2026 Archive</div>
             <div className="mt-1 text-sm font-medium uppercase tracking-[0.14em]">
-              Thursday, July 23 · 6:00 PM Pacific — J-BONE is on the clock first
+              Drafted July 23 · Team Justin won the cup at Gamble Sands
             </div>
             <Link
               href="/draft/plan"
               className="mt-2 inline-block rounded-xl border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-white hover:bg-white/20"
             >
-              📋 WIX pick plan →
+              📋 The WIX pick plan, as written →
             </Link>
           </div>
-          <Countdown
-            target={DRAFT_AT}
-            doneText="On the clock — J-BONE is up"
-            caption={["Until the", "draft"]}
-            ariaLabel="Countdown to the draft"
-          />
+          <div className="text-right">
+            <div className="text-[10px] uppercase tracking-[0.3em] text-white/60">2027 Draft</div>
+            <div className="mt-1 text-sm font-medium uppercase tracking-[0.14em]">TBA</div>
+          </div>
         </div>
       </div>
       <DraftBoard />

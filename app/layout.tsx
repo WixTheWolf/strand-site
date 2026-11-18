@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Strand Invitational | Gamble Sands 2026",
-  description: "The Strand Invitational tournament site — live scoring, schedule, players, and draft lab.",
+  title: "The Strand Invitational",
+  description:
+    "Team Justin won the 2026 Strand Invitational at Gamble Sands. Results, the archive since 2018, and details on the 10th edition coming in 2027.",
 };
 
 export const viewport: Viewport = {
