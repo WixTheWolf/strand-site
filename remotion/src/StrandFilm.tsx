@@ -36,6 +36,8 @@ const LETTERBOX = 138; // 2.39:1 inside 16:9
 // (a beat is 15 frames, a bar 60). Cuts sit on those beats.
 const TITLE_HIT = 360; // 12s
 const CUP_DROP = 1380; // 46s
+const MUSIC_IN = 360; // the cold open plays on sound design alone; the band enters with the title
+const CART_HUSH = [1215, 1290]; // record scratch: "We don't talk about the cart."
 const SILENCE = [2310, 2400]; // the score drops out for "He declined to comment."
 const FINAL_HIT = 2520; // 84s — "2027"
 
@@ -81,14 +83,10 @@ const scoreVolume = (frame: number) => {
       interpolate(frame, [line.at - 6, line.at, line.at + line.len, line.at + line.len + 8], [0, 1, 1, 0], clamp),
     );
   }
-  const silence = interpolate(
-    frame,
-    [SILENCE[0] - 6, SILENCE[0], SILENCE[1] - 1, SILENCE[1]],
-    [1, 0, 0, 1],
-    clamp,
-  );
+  const gap = (g: number[]) => interpolate(frame, [g[0] - 2, g[0], g[1] - 1, g[1]], [1, 0, 0, 1], clamp);
+  const silence = gap(CART_HUSH) * gap(SILENCE);
   const fadeOut = interpolate(frame, [FILM_DURATION - 60, FILM_DURATION - 8], [1, 0], clamp);
-  return 1.0 * (1 - duck * 0.72) * silence * fadeOut;
+  return 0.95 * (1 - duck * 0.7) * silence * fadeOut;
 };
 
 /* ------------------------------------------------------------------ */
@@ -784,12 +782,323 @@ const Finale: React.FC = () => {
 };
 
 /* ------------------------------------------------------------------ */
+/* Fast-cut furniture                                                  */
+/* ------------------------------------------------------------------ */
+
+/** A strobe of stills: each photo punches in for a few frames with a flash. */
+const Burst: React.FC<{ photos: Array<string | [string, string]>; per: number }> = ({ photos, per }) => {
+  const frame = useCurrentFrame();
+  const index = Math.min(photos.length - 1, Math.floor(frame / per));
+  const local = frame - index * per;
+  const entry = photos[index];
+  const [src, oy] = typeof entry === "string" ? [entry, "38%"] : entry;
+  return (
+    <AbsoluteFill style={{ backgroundColor: INK, overflow: "hidden" }}>
+      <CanvasImage
+        key={src}
+        src={staticFile(src)}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: `50% ${oy}`,
+          scale: String(interpolate(local, [0, per], [1.16, 1.04], { ...clamp, easing: ease })),
+          rotate: `${(index % 2 === 0 ? -1 : 1) * interpolate(local, [0, per], [1.2, 0], clamp)}deg`,
+          filter: "contrast(1.08) saturate(1.05)",
+        }}
+      />
+      <AbsoluteFill style={{ backgroundColor: "#fff6df", opacity: interpolate(local, [0, 2], [0.55, 0], clamp) }} />
+    </AbsoluteFill>
+  );
+};
+
+const FIELD: Array<[string, string]> = [
+  ["J-BONE", "j-bone.jpg"],
+  ["WIX", "wix.jpg"],
+  ["FRED", "fred.jpg"],
+  ["DREW", "drew.jpg"],
+  ["D'ARCY", "darcy.jpg"],
+  ["TONY SCHROE", "tony-schroe.jpg"],
+  ["JACK", "jack.jpg"],
+  ["GORD", "gord.jpg"],
+  ["NICK", "nick.jpg"],
+  ["KERNS", "kerns-cartoon.png"],
+  ["HUMMEL", "hummel.jpg"],
+  ["KEV", "kev.jpg"],
+  ["JASON", "jason.jpg"],
+  ["SHAUN", "shaun.jpg"],
+  ["KANE", "kane.jpg"],
+  ["BRETT", "brett.jpg"],
+  ["BLONSKI", "blonski.jpg"],
+  ["P-MO", "p-mo.jpg"],
+  ["RHETT", "rhett.jpg"],
+  ["MATTY O.", "matty-o.jpg"],
+];
+
+/** Twenty faces in two beats: the whole field, one tile every three frames. */
+const RollCall: React.FC = () => {
+  const frame = useCurrentFrame();
+  const shown = Math.min(FIELD.length, Math.floor(frame / 3) + 1);
+  return (
+    <AbsoluteFill style={{ backgroundColor: INK }}>
+      <AbsoluteFill
+        style={{ background: "radial-gradient(70% 60% at 50% 50%, rgba(201,162,39,0.2) 0%, rgba(7,19,15,0) 75%)" }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: LETTERBOX + 26,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "baseline",
+          gap: 26,
+        }}
+      >
+        <Caps size={26} color={BONE}>
+          The field
+        </Caps>
+        <div
+          style={{
+            fontFamily: SERIF,
+            fontSize: 92,
+            fontWeight: 900,
+            fontStyle: "italic",
+            color: GOLD_SOFT,
+            lineHeight: 1,
+            fontVariantNumeric: "tabular-nums",
+            width: 120,
+            textAlign: "center",
+          }}
+        >
+          {shown}
+        </div>
+        <Caps size={26} color={BONE}>
+          Gamble Sands · 2026
+        </Caps>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: LETTERBOX + 150,
+          display: "grid",
+          gridTemplateColumns: "repeat(10, 172px)",
+          justifyContent: "center",
+          rowGap: 22,
+        }}
+      >
+        {FIELD.map(([nick, file], i) => {
+          const at = i * 3;
+          return (
+            <div
+              key={nick}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 10,
+                opacity: frame >= at ? 1 : 0,
+                scale: String(interpolate(frame, [at, at + 6], [1.5, 1], { ...clamp, easing: ease })),
+              }}
+            >
+              <CanvasImage
+                src={staticFile(`players/${file}`)}
+                style={{
+                  width: 148,
+                  height: 190,
+                  objectFit: "cover",
+                  objectPosition: "50% 20%",
+                  borderRadius: 6,
+                  border: `2px solid ${i === 0 ? GOLD_SOFT : "rgba(244,242,234,0.7)"}`,
+                }}
+              />
+              <div
+                style={{
+                  fontFamily: FONT,
+                  fontSize: 17,
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  color: BONE,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {nick}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/** Three swings at once, each panel sliding in on its own beat. */
+const Triptych: React.FC<{ panels: Array<{ src: string; trimBefore?: number; ox?: number }> }> = ({ panels }) => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#000" }}>
+      {panels.map((panel, i) => {
+        const at = i * 8;
+        return (
+          <div
+            key={panel.src}
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: `calc(${(i * 100) / panels.length}% + ${i === 0 ? 0 : 4}px)`,
+              width: `calc(${100 / panels.length}% - ${i === 0 || i === panels.length - 1 ? 4 : 8}px)`,
+              overflow: "hidden",
+              opacity: frame >= at ? 1 : 0,
+              translate: `0px ${interpolate(frame, [at, at + 10], [i % 2 === 0 ? 120 : -120, 0], { ...clamp, easing: ease })}px`,
+            }}
+          >
+            <Video
+              src={staticFile(panel.src)}
+              trimBefore={panel.trimBefore ?? 0}
+              volume={0}
+              // The player keeps its 16:9 shape, so size it to the frame and slide it under the panel.
+              style={{
+                position: "absolute",
+                top: 0,
+                left: -(1920 - 1920 / panels.length) * (panel.ox ?? 0.5),
+                width: 1920,
+                height: 1080,
+                maxWidth: "none",
+              }}
+            />
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
+/** A deadpan label for whoever is on screen. */
+const Tag: React.FC<{ children: string; delay?: number }> = ({ children, delay = 4 }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 130,
+        bottom: LETTERBOX + 56,
+        display: "flex",
+        alignItems: "center",
+        gap: 16,
+        padding: "12px 20px 12px 16px",
+        background: "rgba(7,19,15,0.72)",
+        borderLeft: `5px solid ${GOLD_SOFT}`,
+        opacity: interpolate(frame, [delay, delay + 3], [0, 1], clamp),
+        translate: `${interpolate(frame, [delay, delay + 8], [-30, 0], { ...clamp, easing: ease })}px 0px`,
+      }}
+    >
+      <Caps size={34} color={BONE} tracking="0.24em">
+        {children}
+      </Caps>
+    </div>
+  );
+};
+
+/** One big word, slammed on and gone. */
+const WordSlam: React.FC<{ children: string }> = ({ children }) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  return (
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+      <div
+        style={{
+          fontFamily: SERIF,
+          fontSize: 190,
+          fontWeight: 900,
+          fontStyle: "italic",
+          color: BONE,
+          textShadow: "0 10px 60px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9)",
+          whiteSpace: "nowrap",
+          scale: String(interpolate(frame, [0, 6], [1.7, 1], { ...clamp, easing: ease })),
+          opacity: interpolate(frame, [0, 2, durationInFrames - 5, durationInFrames], [0, 1, 1, 0], clamp),
+        }}
+      >
+        {children}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/** The real Commissioner, before the film gets dramatic about him. */
+const OneMan: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  return (
+    <AbsoluteFill style={{ backgroundColor: INK }}>
+      <CanvasImage
+        src={staticFile("players/fred.jpg")}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "50% 25%",
+          scale: "1.25",
+          filter: "blur(46px) saturate(0.8) brightness(0.45)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          right: 250,
+          top: LETTERBOX + 48,
+          width: 480,
+          height: 696,
+          overflow: "hidden",
+          borderRadius: 6,
+          border: "1px solid rgba(232,200,106,0.5)",
+          boxShadow: "0 30px 90px rgba(0,0,0,0.6)",
+          scale: String(interpolate(frame, [0, durationInFrames], [1.0, 1.08])),
+        }}
+      >
+        <CanvasImage
+          src={staticFile("players/fred.jpg")}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 18%" }}
+        />
+      </div>
+      <div style={{ position: "absolute", left: 130, top: LETTERBOX + 250 }}>
+        <Rise delay={6}>
+          <Caps size={28} color={GOLD_SOFT}>
+            None of it happens without
+          </Caps>
+        </Rise>
+        <div style={{ height: 8 }} />
+        <Rise delay={30} distance={40}>
+          <div style={{ fontFamily: SERIF, fontSize: 210, fontWeight: 900, fontStyle: "italic", color: BONE, lineHeight: 1 }}>
+            One man.
+          </div>
+        </Rise>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/* ------------------------------------------------------------------ */
 /* The film                                                            */
 /* ------------------------------------------------------------------ */
 
-const SHUTTERS = [1560, 1935];
+const BURSTS: Array<{ at: number; per: number; photos: Array<string | [string, string]> }> = [
+  { at: 510, per: 15, photos: ["p/003.jpg", ["p/004.jpg", "30%"]] },
+  { at: 690, per: 5, photos: ["p/017.jpg", "p/042.jpg", ["p/050.jpg", "30%"], "p/072.jpg", "p/074.jpg", "p/097.jpg"] },
+  { at: 990, per: 8, photos: [["p/044.jpg", "28%"], ["p/047.jpg", "30%"], ["p/079.jpg", "30%"], "p/081.jpg"] },
+  {
+    at: 1396,
+    per: 6,
+    photos: ["p/082.jpg", ["p/084.jpg", "30%"], ["p/088.jpg", "40%"], ["p/092.jpg", "62%"], ["p/093.jpg", "30%"], "p/095.jpg", "p/096.jpg"],
+  },
+];
+const SHUTTERS = [1560, 1935, ...BURSTS.flatMap((b) => b.photos.map((_, i) => b.at + i * b.per))];
+const WHOOSHES = [510, 555, 690, 900, 990, 1020, 1140, 1396, 1935, 2040];
 /** Club-on-ball, sand and the cart landing: one dry hit each, on the beat. */
-const THUMPS = [915, 936, 975, 1005, 1035, 1060, 1200];
+const THUMPS = [906, 915, 922, 975, 1035, 1060, 1200];
 
 const shake = (frame: number, at: number, power: number) => {
   const t = frame - at;
@@ -820,13 +1129,44 @@ export const StrandFilm: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
       {/* ---------- sound ---------- */}
-      <Audio name="Score" src={staticFile("score2.mp3")} volume={scoreVolume(frame)} />
-      <Sequence name="Room tone — the silence" from={SILENCE[0]} durationInFrames={SILENCE[1] - SILENCE[0]} layout="none">
+      <Sequence name="Score" from={MUSIC_IN} layout="none">
+        <Audio src={staticFile("score3.mp3")} volume={scoreVolume(frame)} />
+      </Sequence>
+      <Sequence name="Cold open — clock and drone" durationInFrames={MUSIC_IN} layout="none">
         <Audio
-          src={staticFile("dusk-ambience.mp3")}
-          volume={interpolate(frame, [SILENCE[0], SILENCE[0] + 12, SILENCE[1] - 8, SILENCE[1]], [0, 0.3, 0.3, 0], clamp)}
+          src={staticFile("sfx-tick.mp3")}
+          volume={interpolate(frame, [0, 20, MUSIC_IN - 10, MUSIC_IN], [0, 5, 5, 0], clamp)}
         />
       </Sequence>
+      <Sequence name="Boom — the eyes" from={240} durationInFrames={110} layout="none">
+        <Audio src={staticFile("sfx-boom.mp3")} volume={0.7} />
+      </Sequence>
+      <Sequence name="Riser — into the title" from={TITLE_HIT - 87} durationInFrames={87} layout="none">
+        <Audio src={staticFile("sfx-riser.mp3")} volume={0.45} />
+      </Sequence>
+      <Sequence name="Boom — title" from={TITLE_HIT} durationInFrames={110} layout="none">
+        <Audio src={staticFile("sfx-boom.mp3")} volume={0.8} />
+      </Sequence>
+      <Sequence name="Record scratch — the cart" from={CART_HUSH[0] - 4} durationInFrames={30} layout="none">
+        <Audio src={staticFile("sfx-scratch.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence name="Cheer — the putt drops" from={CUP_DROP - 4} durationInFrames={90} layout="none">
+        <Audio src={staticFile("sfx-cheer.mp3")} volume={interpolate(frame, [CUP_DROP + 40, CUP_DROP + 86], [0.5, 0], clamp)} />
+      </Sequence>
+      <Sequence name="Boom — the silence" from={SILENCE[0]} durationInFrames={110} layout="none">
+        <Audio src={staticFile("sfx-boom.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence name="Riser — into 2027" from={FINAL_HIT - 87} durationInFrames={87} layout="none">
+        <Audio src={staticFile("sfx-riser.mp3")} volume={0.4} />
+      </Sequence>
+      <Sequence name="Boom — 2027" from={FINAL_HIT} durationInFrames={110} layout="none">
+        <Audio src={staticFile("sfx-boom.mp3")} volume={0.85} />
+      </Sequence>
+      {WHOOSHES.map((at) => (
+        <Sequence key={at} name={`Whoosh ${at}`} from={at - 7} durationInFrames={25} layout="none">
+          <Audio src={staticFile("whoosh.mp3")} volume={0.32} />
+        </Sequence>
+      ))}
       {NARRATION.map((line) => (
         <Sequence key={line.file} name={`Narration ${line.file}`} from={line.at} durationInFrames={line.len + 6} layout="none">
           <Audio src={staticFile(`${line.file}.mp3`)} volume={VO_GAIN} />
@@ -848,7 +1188,7 @@ export const StrandFilm: React.FC = () => {
       ))}
       {SHUTTERS.map((at) => (
         <Sequence key={at} name={`Shutter ${at}`} from={at} durationInFrames={16} layout="none">
-          <Audio src={staticFile("shutter.mp3")} volume={0.5} />
+          <Audio src={staticFile("shutter.mp3")} volume={0.22} />
         </Sequence>
       ))}
 
@@ -880,26 +1220,20 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="Chapter — Gamble Sands" from={420} durationInFrames={60}>
           <ChapterGambleSands />
         </Sequence>
-        <Sequence name="Convoy" from={480} durationInFrames={30}>
-          <FootageScene src="g-vans.mp4" trimBefore={20} dim={0.04} />
-        </Sequence>
-        <Sequence name="Real — over the Columbia" from={510} durationInFrames={45}>
+        <Sequence name="Real — over the Columbia" from={480} durationInFrames={30}>
           <FootageScene src="r-bridge.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Real — out of the lodge" from={555} durationInFrames={30}>
-          <FootageScene src="r-lodge.mp4" dim={0.04} />
+        <Sequence name="Real — out of the lodge" from={540} durationInFrames={15}>
+          <FootageScene src="r-lodge.mp4" trimBefore={20} dim={0.04} />
         </Sequence>
-        <Sequence name="Real — the walk down" from={585} durationInFrames={45}>
+        <Sequence name="Roll call — the field" from={555} durationInFrames={75}>
+          <RollCall />
+        </Sequence>
+        <Sequence name="Real — the walk down" from={630} durationInFrames={30}>
           <FootageScene src="r-walk.mp4" dim={0.04} />
-        </Sequence>
-        <Sequence name="Real — the ridge" from={630} durationInFrames={30}>
-          <FootageScene src="r-pan1.mp4" dim={0.04} />
         </Sequence>
         <Sequence name="Real — the tee box" from={660} durationInFrames={30}>
           <FootageScene src="r-teebox.mp4" trimBefore={10} dim={0.04} />
-        </Sequence>
-        <Sequence name="Real — the valley" from={690} durationInFrames={30}>
-          <FootageScene src="r-pan2.mp4" dim={0.04} />
         </Sequence>
         <Sequence name="Real — foursome one" from={720} durationInFrames={15}>
           <FootageScene src="r-selfie1.mp4" dim={0.04} />
@@ -908,24 +1242,31 @@ export const StrandFilm: React.FC = () => {
           <FootageScene src="r-selfie2.mp4" dim={0.04} />
         </Sequence>
         <Sequence name="Real — shaka" from={750} durationInFrames={30}>
-          <FootageScene src="r-laugh.mp4" dim={0.04} />
+          <FootageScene src="r-laugh.mp4" dim={0.04}>
+            <Tag>Morale: high</Tag>
+          </FootageScene>
         </Sequence>
         <Sequence name="Real — red sun" from={780} durationInFrames={60}>
-          <FootageScene src="r-redsun.mp4" playbackRate={0.55} dim={0.04} />
+          <FootageScene src="r-redsun.mp4" playbackRate={0.55} dim={0.04}>
+            <Tag delay={26}>Air quality: questionable</Tag>
+          </FootageScene>
         </Sequence>
         <Sequence name="Real — nobody blinked" from={840} durationInFrames={60}>
           <FootageScene src="r-maroon.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Good swing — the smooth one" from={900} durationInFrames={30}>
-          <FootageScene src="real-swing-b.mp4" trimBefore={24} dim={0.04} />
+        <Sequence name="Good swings — three at once" from={900} durationInFrames={60}>
+          <Triptych
+            panels={[
+              { src: "real-swing-b.mp4", trimBefore: 24, ox: 0.62 },
+              { src: "real-tee.mp4", ox: 0.58 },
+              { src: "r-tee75.mp4", trimBefore: 12, ox: 0.38 },
+            ]}
+          />
         </Sequence>
-        <Sequence name="Good swing — over the river" from={930} durationInFrames={30}>
-          <FootageScene src="real-tee.mp4" dim={0.04} />
+        <Sequence name="Word — good swings" from={903} durationInFrames={34}>
+          <WordSlam>Good swings.</WordSlam>
         </Sequence>
-        <Sequence name="Good swing — the ridge tee" from={960} durationInFrames={30}>
-          <FootageScene src="r-tee75.mp4" trimBefore={12} dim={0.04} />
-        </Sequence>
-        <Sequence name="Good swing — the fairway" from={990} durationInFrames={30}>
+        <Sequence name="Good swing — the fairway" from={960} durationInFrames={30}>
           <FootageScene src="r-swing09.mp4" trimBefore={12} dim={0.04} />
         </Sequence>
         <Sequence name="Other swing" from={1020} durationInFrames={30}>
@@ -934,24 +1275,40 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="Other swing — the bunker" from={1050} durationInFrames={33}>
           <FootageScene src="g-shot.mp4" trimBefore={207} dim={0.04} />
         </Sequence>
+        <Sequence name="Word — other swings" from={1052} durationInFrames={30}>
+          <WordSlam>Other swings.</WordSlam>
+        </Sequence>
         <Sequence name="Real — he saw it" from={1083} durationInFrames={57}>
-          <FootageScene src="r-pink.mp4" playbackRate={0.75} dim={0.04} />
+          <FootageScene src="r-pink.mp4" playbackRate={0.75} dim={0.04}>
+            <Tag>Eyewitness</Tag>
+          </FootageScene>
         </Sequence>
         <Sequence name="Real — cart selfie" from={1140} durationInFrames={30}>
-          <FootageScene src="r-cartselfie.mp4" dim={0.04} />
+          <FootageScene src="r-cartselfie.mp4" dim={0.04}>
+            <Tag delay={2}>Last known photo of the cart</Tag>
+          </FootageScene>
         </Sequence>
         <Sequence name="The cart" from={1170} durationInFrames={45}>
           <FootageScene src="g-cart.mp4" trimBefore={90} dim={0.04} />
         </Sequence>
-        <Sequence name="We don't talk about the cart" from={1215} durationInFrames={75}>
-          <FootageScene src="g-stuck.mp4" trimBefore={30} dim={0.04} />
+        <Sequence name="We don't talk about the cart" from={CART_HUSH[0]} durationInFrames={CART_HUSH[1] - CART_HUSH[0]}>
+          <AbsoluteFill style={{ filter: "saturate(0.2) contrast(1.12)" }}>
+            <FootageScene src="g-stuck.mp4" trimBefore={30} playbackRate={0.6} dim={0.1} />
+          </AbsoluteFill>
+          <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 64 }}>
+            <Sequence from={18} layout="none">
+              <Stamped>Classified</Stamped>
+            </Sequence>
+          </div>
         </Sequence>
         <Sequence name="The last putt" from={1290} durationInFrames={106}>
           <FootageScene src="cup.mp4" trimBefore={45} dim={0.04} />
         </Sequence>
-        <Sequence name="The celebration" from={1396} durationInFrames={44}>
-          <FootageScene src="g-party.mp4" trimBefore={60} dim={0.04} />
-        </Sequence>
+        {BURSTS.map((b) => (
+          <Sequence key={b.at} name={`Photo burst ${b.at}`} from={b.at} durationInFrames={b.at === 1396 ? 44 : b.photos.length * b.per}>
+            <Burst photos={b.photos} per={b.per} />
+          </Sequence>
+        ))}
         <Sequence name="Stat — 4 rounds" from={640} durationInFrames={40}>
           <StatTag value="4" label="Rounds" />
         </Sequence>
@@ -979,8 +1336,8 @@ export const StrandFilm: React.FC = () => {
         </Sequence>
 
         {/* The Commissioner */}
-        <Sequence name="The trophy dinner" from={1620} durationInFrames={90}>
-          <FootageScene src="g-dinner.mp4" trimBefore={150} dim={0.1} />
+        <Sequence name="One man — the real Fred" from={1620} durationInFrames={90}>
+          <OneMan />
         </Sequence>
         <Sequence name="The Commissioner" from={1710} durationInFrames={120}>
           <FootageScene src="g-freddy.mp4" trimBefore={8} dim={0.06}>
@@ -1026,6 +1383,18 @@ export const StrandFilm: React.FC = () => {
       </AbsoluteFill>
 
       {/* ---------- finishing ---------- */}
+      <div
+        style={{
+          position: "absolute",
+          right: 130,
+          top: LETTERBOX + 30,
+          opacity: interpolate(frame, [430, 450, SILENCE[0] - 20, SILENCE[0]], [0, 0.55, 0.55, 0], clamp),
+        }}
+      >
+        <Caps size={17} tracking="0.4em" color={BONE}>
+          The Strand · A film
+        </Caps>
+      </div>
       <HitFlash at={240} strength={0.25} />
       <HitFlash at={TITLE_HIT} strength={0.85} />
       <HitFlash at={CUP_DROP} strength={0.3} />
