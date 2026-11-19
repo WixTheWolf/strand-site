@@ -360,7 +360,7 @@ const FootageScene: React.FC<{
 };
 
 const Opening: React.FC = () => (
-  <FootageScene src="dawn.mp4" playbackRate={0.93} dim={0.2}>
+  <FootageScene src="g-sunrise.mp4" dim={0.16}>
     <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 60 }}>
       <Stamp delay={18}>The Strand Invitational · Est. 2018</Stamp>
     </div>
@@ -614,14 +614,16 @@ const Ledger: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ backgroundColor: INK }}>
-      <CanvasImage
-        src={staticFile("strand26-015.jpg")}
+      <Video
+        src={staticFile("g-coast.mp4")}
+        playbackRate={0.55}
+        volume={0}
         style={{
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          scale: String(interpolate(frame, [0, 200], [1.05, 1.15])),
-          filter: "saturate(0.5) brightness(0.22) blur(3px)",
+          scale: String(interpolate(frame, [0, 200], [1.05, 1.12])),
+          filter: "saturate(0.6) brightness(0.3) blur(2px)",
         }}
       />
       <div
@@ -811,7 +813,7 @@ const Finale: React.FC = () => {
 /* The film                                                            */
 /* ------------------------------------------------------------------ */
 
-const SHUTTERS = [160, 560, 640, 720, 800, 880, 1360, 1600, 2240];
+const SHUTTERS = [560, 640, 720, 800, 1360, 2240];
 
 const shake = (frame: number, at: number, power: number) => {
   const t = frame - at;
@@ -863,6 +865,9 @@ export const StrandFilm: React.FC = () => {
       <Sequence name="Impact — strike" from={STRIKE} durationInFrames={110} layout="none">
         <Audio src={staticFile("impact.mp3")} volume={0.6} />
       </Sequence>
+      <Sequence name="Impact — the approach" from={992} durationInFrames={60} layout="none">
+        <Audio src={staticFile("impact.mp3")} volume={0.3} />
+      </Sequence>
       <Sequence name="Cup rattle" from={CUP_DROP - 6} durationInFrames={80} layout="none">
         <Audio src={staticFile("cup-rattle.mp3")} volume={0.9} />
       </Sequence>
@@ -881,11 +886,14 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="Opening — dawn" durationInFrames={BAR}>
           <Opening />
         </Sequence>
-        <Sequence name="Last light" from={BAR} durationInFrames={110}>
-          <Archival src="strand26-076.jpg" ox="60%" oy="55%" dim={0.42} />
+        <Sequence name="One cup" from={100} durationInFrames={60}>
+          <FootageScene src="g-coast.mp4" trimBefore={123} playbackRate={0.7} dim={0.1} />
+        </Sequence>
+        <Sequence name="The road in" from={BAR} durationInFrames={110}>
+          <FootageScene src="convoy.mp4" playbackRate={0.94} dim={0.2} />
         </Sequence>
         <Sequence name="Strike — approach" from={270} durationInFrames={50}>
-          <FootageScene src="strike-full.mp4" playbackRate={0.75} dim={0} />
+          <FootageScene src="g-round.mp4" trimBefore={30} playbackRate={0.58} dim={0.05} />
         </Sequence>
         <Sequence name="Strike — impact" from={STRIKE} durationInFrames={32}>
           <FootageScene src="strike-full.mp4" trimBefore={37} volume={0.7} dim={0} />
@@ -917,8 +925,8 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="The swing" from={800} durationInFrames={80}>
           <Archival src="strand26-067.jpg" ox="55%" oy="35%" />
         </Sequence>
-        <Sequence name="The putt" from={880} durationInFrames={105}>
-          <Archival src="strand26-036.jpg" oy="55%" />
+        <Sequence name="Cart path optional" from={880} durationInFrames={105}>
+          <FootageScene src="g-cart.mp4" trimBefore={60} volume={0.6} dim={0.04} />
         </Sequence>
         <Sequence name="Stat — 20 players" from={558} durationInFrames={36}>
           <StatTag value="20" label="Players" />
@@ -929,13 +937,13 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="Stat — 3 courses" from={634} durationInFrames={110}>
           <StatTag value="3" label="Courses" />
         </Sequence>
-        <Sequence name="Stat — 75 points" from={806} durationInFrames={110}>
+        <Sequence name="Stat — 75 points" from={806} durationInFrames={74}>
           <StatTag value="75" label="Points on the line" />
         </Sequence>
-        <Sequence name="The last putt" from={985} durationInFrames={151}>
-          <FootageScene src="cup.mp4" dim={0.05} />
+        <Sequence name="The last putt" from={985} durationInFrames={234}>
+          <FootageScene src="g-round.mp4" trimBefore={66} volume={0.45} dim={0.04} />
         </Sequence>
-        <Sequence name="Champions — Team J-Bone" from={1136} durationInFrames={224}>
+        <Sequence name="Champions — Team J-Bone" from={1219} durationInFrames={141}>
           <Champions />
         </Sequence>
         <Sequence name="The 2026 field" from={1360} durationInFrames={80}>
@@ -953,11 +961,16 @@ export const StrandFilm: React.FC = () => {
         </Sequence>
 
         {/* III — the commissioner */}
-        <Sequence name="Convoy" from={9 * BAR} durationInFrames={BAR}>
-          <FootageScene src="convoy.mp4" playbackRate={0.94} dim={0.12} />
+        <Sequence name="The trophy dinner" from={9 * BAR} durationInFrames={BAR}>
+          <FootageScene src="g-dinner.mp4" trimBefore={140} playbackRate={0.98} volume={0.2} dim={0.1} />
         </Sequence>
         <Sequence name="The Commissioner" from={10 * BAR} durationInFrames={BAR}>
-          <Commissioner />
+          <FootageScene src="g-desk.mp4" trimBefore={30} dim={0.08}>
+            <AbsoluteFill
+              style={{ background: "linear-gradient(90deg, rgba(7,19,15,0.82) 0%, rgba(7,19,15,0) 58%)" }}
+            />
+            <LowerThird name="Fred Geisinger" role="The Commissioner" delay={22} />
+          </FootageScene>
         </Sequence>
         <Sequence name="Ledger — nine editions" from={11 * BAR} durationInFrames={200}>
           <Ledger />
@@ -965,7 +978,7 @@ export const StrandFilm: React.FC = () => {
 
         {/* IV — year ten */}
         <Sequence name="Year ten" from={1960} durationInFrames={120}>
-          <VideoText text="YEAR TEN" src="dawn.mp4" size={330} />
+          <VideoText text="YEAR TEN" src="g-sunrise.mp4" trimBefore={150} size={330} />
         </Sequence>
         <Sequence name="The envelope" from={13 * BAR} durationInFrames={BAR}>
           <Envelope />
