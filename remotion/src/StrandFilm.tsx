@@ -30,12 +30,14 @@ loadFont({
 });
 const SERIF = '"Playfair Display", Georgia, serif';
 
-export const BAR = 160;
-export const FILM_DURATION = 2850;
+export const FILM_DURATION = 2760;
 const LETTERBOX = 138; // 2.39:1 inside 16:9
-const STRIKE = 2 * BAR; // 320 — club meets ball
-const CUP_DROP = 7 * BAR; // 1120 — the putt drops
-const FINAL_HIT = 16 * BAR; // 2560 — "2027"
+// The score: lone hits at 0s, 8s and 12s, then a 120 BPM groove from 14s
+// (a beat is 15 frames, a bar 60). Cuts sit on those beats.
+const TITLE_HIT = 360; // 12s
+const CUP_DROP = 1380; // 46s
+const SILENCE = [2310, 2400]; // the score drops out for "He declined to comment."
+const FINAL_HIT = 2520; // 84s — "2027"
 
 const ease = Easing.out(Easing.cubic);
 
@@ -44,41 +46,49 @@ const ease = Easing.out(Easing.cubic);
 /* ------------------------------------------------------------------ */
 
 const NARRATION: Array<{ file: string; at: number; len: number }> = [
-  { file: "n-01", at: 30, len: 100 },
-  { file: "n-02", at: 172, len: 121 },
-  { file: "n-03", at: 556, len: 166 },
-  { file: "n-04", at: 790, len: 78 },
-  { file: "n-x1", at: 872, len: 78 },
-  { file: "n-x2", at: 962, len: 72 },
-  { file: "n-05", at: 1044, len: 59 },
-  { file: "n-06", at: 1134, len: 80 },
-  { file: "n-07", at: 1452, len: 81 },
-  { file: "n-08", at: 1612, len: 80 },
-  { file: "n-09", at: 1772, len: 168 },
-  { file: "n-10", at: 1975, len: 55 },
-  { file: "n-11", at: 2092, len: 62 },
-  { file: "n-12a", at: 2252, len: 53 },
-  { file: "n-12b", at: 2330, len: 58 },
-  { file: "n-13a", at: 2408, len: 57 },
-  { file: "n-13b", at: 2486, len: 42 },
-  { file: "n-14a", at: 2580, len: 43 },
-  { file: "n-14b", at: 2640, len: 72 },
+  { file: "v-01", at: 18, len: 170 },
+  { file: "v-02", at: 261, len: 34 },
+  { file: "v-03a", at: 426, len: 63 },
+  { file: "v-03b", at: 489, len: 123 },
+  { file: "v-04", at: 636, len: 134 },
+  { file: "v-05a", at: 786, len: 51 },
+  { file: "v-05b", at: 843, len: 38 },
+  { file: "v-06", at: 903, len: 45 },
+  { file: "v-07", at: 1026, len: 71 },
+  { file: "v-08", at: 1146, len: 62 },
+  { file: "v-09", at: 1230, len: 51 },
+  { file: "v-10", at: 1296, len: 62 },
+  { file: "v-11", at: 1389, len: 82 },
+  { file: "v-12", at: 1626, len: 78 },
+  { file: "v-13", at: 1716, len: 79 },
+  { file: "v-14", at: 1836, len: 166 },
+  { file: "v-15", at: 2046, len: 54 },
+  { file: "v-16", at: 2109, len: 60 },
+  { file: "v-17", at: 2226, len: 42 },
+  { file: "v-18", at: 2328, len: 41 },
+  { file: "v-19", at: 2406, len: 101 },
+  { file: "v-20", at: 2538, len: 42 },
+  { file: "v-21", at: 2592, len: 72 },
 ];
 const VO_GAIN = 1.6;
 
-/** Score level: full between lines, pulled down under the voice. */
+/** Score level: full between lines, pulled down under the voice, out for the silence. */
 const scoreVolume = (frame: number) => {
   let duck = 0;
   for (const line of NARRATION) {
     duck = Math.max(
       duck,
-      interpolate(frame, [line.at - 6, line.at, line.at + line.len, line.at + line.len + 10], [0, 1, 1, 0], clamp),
+      interpolate(frame, [line.at - 6, line.at, line.at + line.len, line.at + line.len + 8], [0, 1, 1, 0], clamp),
     );
   }
-  const fadeOut = interpolate(frame, [FILM_DURATION - 90, FILM_DURATION - 8], [1, 0], clamp);
-  // The cue builds from a quiet first half; lift the early bars so the titles carry.
-  const base = interpolate(frame, [0, 1700, 2000], [1.3, 1.3, 0.85], clamp);
-  return base * (1 - duck * 0.68) * fadeOut;
+  const silence = interpolate(
+    frame,
+    [SILENCE[0] - 6, SILENCE[0], SILENCE[1] - 1, SILENCE[1]],
+    [1, 0, 0, 1],
+    clamp,
+  );
+  const fadeOut = interpolate(frame, [FILM_DURATION - 60, FILM_DURATION - 8], [1, 0], clamp);
+  return 1.0 * (1 - duck * 0.72) * silence * fadeOut;
 };
 
 /* ------------------------------------------------------------------ */
@@ -361,17 +371,6 @@ const FootageScene: React.FC<{
   );
 };
 
-const Opening: React.FC = () => (
-  <FootageScene src="g-sunrise.mp4" dim={0.16}>
-    <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 60 }}>
-      <Stamp delay={18}>The Strand Invitational · Est. 2018</Stamp>
-    </div>
-    <AbsoluteFill
-      style={{ backgroundColor: "#000", opacity: interpolate(useCurrentFrame(), [0, 40], [1, 0], clamp) }}
-    />
-  </FootageScene>
-);
-
 const ChapterGambleSands: React.FC = () => (
   <FootageScene src="flyover.mp4" trimBefore={12} dim={0.06}>
     <AbsoluteFill
@@ -390,7 +389,7 @@ const ChapterGambleSands: React.FC = () => (
         </div>
       </Rise>
       <div style={{ height: 22 }} />
-      <Stamp delay={26}>Brewster, Washington · August 20–23, 2026</Stamp>
+      <Stamp delay={12}>Brewster, Washington · August 20–23, 2026</Stamp>
     </div>
   </FootageScene>
 );
@@ -622,7 +621,7 @@ const Ledger: React.FC = () => {
         </Rise>
         <div style={{ height: 14 }} />
         {EDITIONS.map((e, i) => {
-          const at = 12 + i * 13;
+          const at = 8 + i * 9;
           return (
             <div
               key={e.year}
@@ -718,7 +717,7 @@ const TenYears: React.FC = () => {
           height: 300,
           borderRadius: "50%",
           opacity: interpolate(frame, [0, 20], [0, 1], clamp),
-          scale: String(interpolate(frame, [0, BAR], [0.94, 1.03])),
+          scale: String(interpolate(frame, [0, 120], [0.94, 1.03])),
           boxShadow: "0 0 130px rgba(201,162,39,0.4)",
         }}
       />
@@ -727,7 +726,7 @@ const TenYears: React.FC = () => {
           The Strand Invitational
         </div>
       </Rise>
-      <Sequence from={86} layout="none">
+      <Sequence from={50} layout="none">
         <Rise>
           <Caps size={40} color={GOLD_SOFT} tracking="0.5em">
             Ten years running
@@ -788,9 +787,9 @@ const Finale: React.FC = () => {
 /* The film                                                            */
 /* ------------------------------------------------------------------ */
 
-const SHUTTERS = [1360, 1885];
-/** Club-on-ball and the cart landing: one dry hit each, no clip audio. */
-const THUMPS = [639, 724, 819, 860, 944];
+const SHUTTERS = [1560, 1935];
+/** Club-on-ball, sand and the cart landing: one dry hit each, on the beat. */
+const THUMPS = [915, 936, 975, 1005, 1035, 1060, 1200];
 
 const shake = (frame: number, at: number, power: number) => {
   const t = frame - at;
@@ -814,24 +813,18 @@ const HitFlash: React.FC<{ at: number; strength: number }> = ({ at, strength }) 
 
 export const StrandFilm: React.FC = () => {
   const frame = useCurrentFrame();
-  const shakes = [shake(frame, STRIKE, 22), shake(frame, CUP_DROP, 8), shake(frame, FINAL_HIT, 26)];
-  const sx = shakes.reduce((a, s) => a + s[0], 0);
-  const sy = shakes.reduce((a, s) => a + s[1], 0);
+  const shakes = [shake(frame, TITLE_HIT, 22), shake(frame, 1200, 10), shake(frame, CUP_DROP, 8), shake(frame, FINAL_HIT, 26)];
+  const sx = shakes.reduce((a, v) => a + v[0], 0);
+  const sy = shakes.reduce((a, v) => a + v[1], 0);
 
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
       {/* ---------- sound ---------- */}
-      <Audio name="Score" src={staticFile("score.mp3")} volume={scoreVolume(frame)} />
-      <Sequence name="Ambience — open" durationInFrames={330} layout="none">
+      <Audio name="Score" src={staticFile("score2.mp3")} volume={scoreVolume(frame)} />
+      <Sequence name="Room tone — the silence" from={SILENCE[0]} durationInFrames={SILENCE[1] - SILENCE[0]} layout="none">
         <Audio
           src={staticFile("dusk-ambience.mp3")}
-          volume={interpolate(frame, [0, 30, 280, 325], [0, 0.3, 0.3, 0], clamp)}
-        />
-      </Sequence>
-      <Sequence name="Ambience — the silence" from={2440} durationInFrames={130} layout="none">
-        <Audio
-          src={staticFile("dusk-ambience.mp3")}
-          volume={interpolate(frame, [2440, 2480, 2550, 2566], [0, 0.34, 0.34, 0], clamp)}
+          volume={interpolate(frame, [SILENCE[0], SILENCE[0] + 12, SILENCE[1] - 8, SILENCE[1]], [0, 0.3, 0.3, 0], clamp)}
         />
       </Sequence>
       {NARRATION.map((line) => (
@@ -839,20 +832,20 @@ export const StrandFilm: React.FC = () => {
           <Audio src={staticFile(`${line.file}.mp3`)} volume={VO_GAIN} />
         </Sequence>
       ))}
-      <Sequence name="Impact — strike" from={STRIKE} durationInFrames={110} layout="none">
-        <Audio src={staticFile("impact.mp3")} volume={0.6} />
+      <Sequence name="Impact — title" from={TITLE_HIT} durationInFrames={110} layout="none">
+        <Audio src={staticFile("impact.mp3")} volume={0.5} />
       </Sequence>
-      {THUMPS.map((at) => (
-        <Sequence key={at} name={`Thump ${at}`} from={at} durationInFrames={50} layout="none">
-          <Audio src={staticFile("impact.mp3")} volume={0.28} />
-        </Sequence>
-      ))}
       <Sequence name="Cup rattle" from={CUP_DROP - 6} durationInFrames={80} layout="none">
         <Audio src={staticFile("cup-rattle.mp3")} volume={0.9} />
       </Sequence>
       <Sequence name="Impact — 2027" from={FINAL_HIT} durationInFrames={110} layout="none">
         <Audio src={staticFile("impact.mp3")} volume={0.6} />
       </Sequence>
+      {THUMPS.map((at) => (
+        <Sequence key={at} name={`Thump ${at}`} from={at} durationInFrames={50} layout="none">
+          <Audio src={staticFile("impact.mp3")} volume={0.26} />
+        </Sequence>
+      ))}
       {SHUTTERS.map((at) => (
         <Sequence key={at} name={`Shutter ${at}`} from={at} durationInFrames={16} layout="none">
           <Audio src={staticFile("shutter.mp3")} volume={0.5} />
@@ -861,38 +854,21 @@ export const StrandFilm: React.FC = () => {
 
       {/* ---------- picture ---------- */}
       <AbsoluteFill style={{ translate: `${sx}px ${sy}px` }}>
-        {/* I — nine years */}
-        <Sequence name="Opening — dawn" durationInFrames={BAR}>
-          <Opening />
+        {/* Cold open — the secret */}
+        <Sequence name="The secret" durationInFrames={240}>
+          <FootageScene src="g-freddy.mp4" trimBefore={138} playbackRate={0.42} dim={0.14}>
+            <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 60 }}>
+              <Stamp delay={24}>An undisclosed office · Present day</Stamp>
+            </div>
+          </FootageScene>
         </Sequence>
-        <Sequence name="One cup" from={100} durationInFrames={60}>
-          <FootageScene src="g-coast.mp4" trimBefore={123} playbackRate={0.7} dim={0.1} />
+        <Sequence name="We'll get to him" from={240} durationInFrames={120}>
+          <FootageScene src="g-freddy.mp4" trimBefore={243} playbackRate={0.5} dim={0.1} />
         </Sequence>
-        <Sequence name="Convoy — the road in" from={160} durationInFrames={30}>
-          <FootageScene src="g-vans.mp4" trimBefore={20} dim={0.04} />
-        </Sequence>
-        <Sequence name="Real — over the Columbia" from={190} durationInFrames={40}>
-          <FootageScene src="r-bridge.mp4" dim={0.04} />
-        </Sequence>
-        <Sequence name="Real — the walk down" from={230} durationInFrames={40}>
-          <FootageScene src="r-walk.mp4" dim={0.04} />
-        </Sequence>
-        <Sequence name="Pre-shot — eyes" from={270} durationInFrames={17}>
-          <FootageScene src="g-shot.mp4" trimBefore={41} dim={0.04} />
-        </Sequence>
-        <Sequence name="Pre-shot — grip" from={287} durationInFrames={16}>
-          <FootageScene src="g-shot.mp4" trimBefore={78} dim={0.04} />
-        </Sequence>
-        <Sequence name="Pre-shot — tee" from={303} durationInFrames={17}>
-          <FootageScene src="g-shot.mp4" trimBefore={108} dim={0.04} />
-        </Sequence>
-        <Sequence name="Strike — impact" from={STRIKE} durationInFrames={32}>
-          <FootageScene src="strike-full.mp4" trimBefore={37} volume={0.7} dim={0} />
-        </Sequence>
-        <Sequence name="Title — The Strand" from={352} durationInFrames={128}>
+        <Sequence name="Title — The Strand" from={TITLE_HIT} durationInFrames={60}>
           <VideoText text="THE STRAND" src="strike-full.mp4" trimBefore={62} playbackRate={0.65} size={250} offsetY={-30} />
           <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", paddingTop: 330 }}>
-            <Rise delay={22}>
+            <Rise delay={10}>
               <Caps size={38} color={GOLD_SOFT} tracking="0.62em">
                 Invitational
               </Caps>
@@ -900,129 +876,148 @@ export const StrandFilm: React.FC = () => {
           </AbsoluteFill>
         </Sequence>
 
-        {/* II — 2026, as it happened */}
-        <Sequence name="Chapter — Gamble Sands" from={3 * BAR} durationInFrames={80}>
+        {/* 2026, as it happened */}
+        <Sequence name="Chapter — Gamble Sands" from={420} durationInFrames={60}>
           <ChapterGambleSands />
         </Sequence>
-        <Sequence name="Real — red sun" from={560} durationInFrames={22}>
-          <FootageScene src="r-redsun.mp4" dim={0.04} />
+        <Sequence name="Convoy" from={480} durationInFrames={30}>
+          <FootageScene src="g-vans.mp4" trimBefore={20} dim={0.04} />
         </Sequence>
-        <Sequence name="Real — the tee box" from={582} durationInFrames={18}>
-          <FootageScene src="r-teebox.mp4" trimBefore={12} dim={0.04} />
+        <Sequence name="Real — over the Columbia" from={510} durationInFrames={45}>
+          <FootageScene src="r-bridge.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Real swing — hazy morning" from={600} durationInFrames={60}>
-          <FootageScene src="real-swing-a.mp4" dim={0.04} />
+        <Sequence name="Real — out of the lodge" from={555} durationInFrames={30}>
+          <FootageScene src="r-lodge.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Real tee shot — wide" from={660} durationInFrames={40}>
-          <FootageScene src="real-tee.mp4" dim={0.04} />
+        <Sequence name="Real — the walk down" from={585} durationInFrames={45}>
+          <FootageScene src="r-walk.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Real swing — under the clouds" from={700} durationInFrames={40}>
-          <FootageScene src="real-swing-b.mp4" trimBefore={15} dim={0.04} />
+        <Sequence name="Real — the ridge" from={630} durationInFrames={30}>
+          <FootageScene src="r-pan1.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Real — foursome one" from={740} durationInFrames={20}>
+        <Sequence name="Real — the tee box" from={660} durationInFrames={30}>
+          <FootageScene src="r-teebox.mp4" trimBefore={10} dim={0.04} />
+        </Sequence>
+        <Sequence name="Real — the valley" from={690} durationInFrames={30}>
+          <FootageScene src="r-pan2.mp4" dim={0.04} />
+        </Sequence>
+        <Sequence name="Real — foursome one" from={720} durationInFrames={15}>
           <FootageScene src="r-selfie1.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Real — foursome two" from={760} durationInFrames={20}>
+        <Sequence name="Real — foursome two" from={735} durationInFrames={15}>
           <FootageScene src="r-selfie2.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Real — shaka" from={780} durationInFrames={20}>
+        <Sequence name="Real — shaka" from={750} durationInFrames={30}>
           <FootageScene src="r-laugh.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="The swing" from={800} durationInFrames={30}>
-          <FootageScene src="g-shot.mp4" trimBefore={138} dim={0.04} />
+        <Sequence name="Real — red sun" from={780} durationInFrames={60}>
+          <FootageScene src="r-redsun.mp4" playbackRate={0.55} dim={0.04} />
         </Sequence>
-        <Sequence name="The flight" from={830} durationInFrames={20}>
-          <FootageScene src="g-shot.mp4" trimBefore={171} dim={0.04} />
+        <Sequence name="Real — nobody blinked" from={840} durationInFrames={60}>
+          <FootageScene src="r-maroon.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="The bunker" from={850} durationInFrames={40}>
+        <Sequence name="Good swing — the smooth one" from={900} durationInFrames={30}>
+          <FootageScene src="real-swing-b.mp4" trimBefore={24} dim={0.04} />
+        </Sequence>
+        <Sequence name="Good swing — over the river" from={930} durationInFrames={30}>
+          <FootageScene src="real-tee.mp4" dim={0.04} />
+        </Sequence>
+        <Sequence name="Good swing — the ridge tee" from={960} durationInFrames={30}>
+          <FootageScene src="r-tee75.mp4" trimBefore={12} dim={0.04} />
+        </Sequence>
+        <Sequence name="Good swing — the fairway" from={990} durationInFrames={30}>
+          <FootageScene src="r-swing09.mp4" trimBefore={12} dim={0.04} />
+        </Sequence>
+        <Sequence name="Other swing" from={1020} durationInFrames={30}>
+          <FootageScene src="g-shot.mp4" trimBefore={143} dim={0.04} />
+        </Sequence>
+        <Sequence name="Other swing — the bunker" from={1050} durationInFrames={33}>
           <FootageScene src="g-shot.mp4" trimBefore={207} dim={0.04} />
         </Sequence>
-        <Sequence name="The reaction" from={890} durationInFrames={30}>
-          <FootageScene src="g-shot.mp4" trimBefore={249} dim={0.04} />
+        <Sequence name="Real — he saw it" from={1083} durationInFrames={57}>
+          <FootageScene src="r-pink.mp4" playbackRate={0.75} dim={0.04} />
         </Sequence>
-        <Sequence name="Real — cart selfie" from={920} durationInFrames={16}>
+        <Sequence name="Real — cart selfie" from={1140} durationInFrames={30}>
           <FootageScene src="r-cartselfie.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Cart path optional" from={936} durationInFrames={29}>
-          <FootageScene src="g-cart.mp4" trimBefore={112} dim={0.04} />
+        <Sequence name="The cart" from={1170} durationInFrames={45}>
+          <FootageScene src="g-cart.mp4" trimBefore={90} dim={0.04} />
         </Sequence>
-        <Sequence name="The cart was never the same" from={965} durationInFrames={50}>
+        <Sequence name="We don't talk about the cart" from={1215} durationInFrames={75}>
           <FootageScene src="g-stuck.mp4" trimBefore={30} dim={0.04} />
         </Sequence>
-        <Sequence name="Stat — 20 players" from={558} durationInFrames={36}>
-          <StatTag value="20" label="Players" />
+        <Sequence name="The last putt" from={1290} durationInFrames={106}>
+          <FootageScene src="cup.mp4" trimBefore={45} dim={0.04} />
         </Sequence>
-        <Sequence name="Stat — 4 rounds" from={594} durationInFrames={40}>
-          <StatTag value="4" label="Rounds" />
-        </Sequence>
-        <Sequence name="Stat — 3 courses" from={634} durationInFrames={66}>
-          <StatTag value="3" label="Courses" />
-        </Sequence>
-        <Sequence name="Stat — 75 points" from={792} durationInFrames={74}>
-          <StatTag value="75" label="Points on the line" />
-        </Sequence>
-        <Sequence name="The last putt" from={1015} durationInFrames={121}>
-          <FootageScene src="cup.mp4" trimBefore={30} dim={0.04} />
-        </Sequence>
-        <Sequence name="The celebration" from={1136} durationInFrames={83}>
+        <Sequence name="The celebration" from={1396} durationInFrames={44}>
           <FootageScene src="g-party.mp4" trimBefore={60} dim={0.04} />
         </Sequence>
-        <Sequence name="Champions — Team J-Bone" from={1219} durationInFrames={141}>
+        <Sequence name="Stat — 4 rounds" from={640} durationInFrames={40}>
+          <StatTag value="4" label="Rounds" />
+        </Sequence>
+        <Sequence name="Stat — 3 courses" from={680} durationInFrames={40}>
+          <StatTag value="3" label="Courses" />
+        </Sequence>
+        <Sequence name="Stat — 75 points" from={722} durationInFrames={56}>
+          <StatTag value="75" label="Points on the line" />
+        </Sequence>
+        <Sequence name="Champions — Team J-Bone" from={1440} durationInFrames={120}>
           <Champions />
         </Sequence>
-        <Sequence name="The 2026 field" from={1360} durationInFrames={80}>
+        <Sequence name="The 2026 field" from={1560} durationInFrames={60}>
           <Archival src="strand26-063.jpg" oy="38%" dim={0.1} />
           <AbsoluteFill
             style={{ background: "linear-gradient(0deg, rgba(7,19,15,0.88) 14%, rgba(7,19,15,0) 52%)" }}
           />
           <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 56 }}>
-            <Rise delay={6}>
+            <Rise delay={4}>
               <div style={{ fontFamily: SERIF, fontSize: 64, fontWeight: 700, color: BONE }}>The 2026 field</div>
             </Rise>
             <div style={{ height: 10 }} />
-            <Stamp delay={14}>Team J-Bone · Team WIX · Gamble Sands</Stamp>
+            <Stamp delay={8}>Team J-Bone · Team WIX · Gamble Sands</Stamp>
           </div>
         </Sequence>
 
-        {/* III — the commissioner */}
-        <Sequence name="The trophy dinner" from={9 * BAR} durationInFrames={BAR}>
-          <FootageScene src="g-dinner.mp4" trimBefore={140} playbackRate={0.98} dim={0.1} />
+        {/* The Commissioner */}
+        <Sequence name="The trophy dinner" from={1620} durationInFrames={90}>
+          <FootageScene src="g-dinner.mp4" trimBefore={150} dim={0.1} />
         </Sequence>
-        <Sequence name="The Commissioner" from={10 * BAR} durationInFrames={BAR}>
-          <FootageScene src="g-freddy.mp4" trimBefore={10} dim={0.06}>
+        <Sequence name="The Commissioner" from={1710} durationInFrames={120}>
+          <FootageScene src="g-freddy.mp4" trimBefore={8} dim={0.06}>
             <AbsoluteFill
               style={{ background: "linear-gradient(90deg, rgba(7,19,15,0.82) 0%, rgba(7,19,15,0) 58%)" }}
             />
-            <LowerThird name="Fred Geisinger" role="The Commissioner" delay={22} />
+            <LowerThird name="Fred Geisinger" role="The Commissioner" delay={10} />
           </FootageScene>
         </Sequence>
-        <Sequence name="Ledger — nine editions" from={11 * BAR} durationInFrames={200}>
+        <Sequence name="Ledger — nine editions" from={1830} durationInFrames={105}>
           <Ledger />
         </Sequence>
-
-        {/* IV — year ten */}
-        <Sequence name="Real — the pairings sheet" from={1885} durationInFrames={75}>
+        <Sequence name="Real — the pairings sheet" from={1935} durationInFrames={105}>
+          <Ledger />
           <PairingsCard />
         </Sequence>
-        <Sequence name="Year ten" from={1960} durationInFrames={120}>
+
+        {/* Year ten */}
+        <Sequence name="Year ten" from={2040} durationInFrames={60}>
           <VideoText text="YEAR TEN" src="g-sunrise.mp4" trimBefore={150} size={330} />
         </Sequence>
-        <Sequence name="The envelope" from={13 * BAR} durationInFrames={BAR}>
+        <Sequence name="The envelope" from={2100} durationInFrames={120}>
           <Envelope />
         </Sequence>
-        <Sequence name="Only the Commissioner knows" from={14 * BAR} durationInFrames={85}>
-          <FootageScene src="g-freddy.mp4" trimBefore={158} playbackRate={0.95} dim={0.1} />
+        <Sequence name="We asked the Commissioner" from={2220} durationInFrames={90}>
+          <FootageScene src="g-freddy.mp4" trimBefore={70} dim={0.08} />
         </Sequence>
-        <Sequence name="And he isn't talking" from={2325} durationInFrames={75}>
-          <FootageScene src="g-freddy.mp4" trimBefore={243} playbackRate={0.75} dim={0.12}>
+        <Sequence name="He declined to comment" from={SILENCE[0]} durationInFrames={SILENCE[1] - SILENCE[0]}>
+          <FootageScene src="g-freddy.mp4" trimBefore={243} playbackRate={0.6} dim={0.12}>
             <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 64 }}>
-              <Sequence from={22} layout="none">
+              <Sequence from={54} layout="none">
                 <Stamped>Declined to comment</Stamped>
               </Sequence>
             </div>
           </FootageScene>
         </Sequence>
-        <Sequence name="Ten years running" from={15 * BAR} durationInFrames={BAR}>
+        <Sequence name="Ten years running" from={SILENCE[1]} durationInFrames={FINAL_HIT - SILENCE[1]}>
           <TenYears />
         </Sequence>
         <Sequence name="2027 — destination unknown" from={FINAL_HIT} durationInFrames={FILM_DURATION - FINAL_HIT}>
@@ -1031,7 +1026,8 @@ export const StrandFilm: React.FC = () => {
       </AbsoluteFill>
 
       {/* ---------- finishing ---------- */}
-      <HitFlash at={STRIKE} strength={0.85} />
+      <HitFlash at={240} strength={0.25} />
+      <HitFlash at={TITLE_HIT} strength={0.85} />
       <HitFlash at={CUP_DROP} strength={0.3} />
       <HitFlash at={FINAL_HIT} strength={0.85} />
       <Grain opacity={0.055} />
@@ -1041,7 +1037,7 @@ export const StrandFilm: React.FC = () => {
       <AbsoluteFill
         style={{
           backgroundColor: "#000",
-          opacity: interpolate(frame, [FILM_DURATION - 60, FILM_DURATION - 6], [0, 1], clamp),
+          opacity: interpolate(frame, [FILM_DURATION - 50, FILM_DURATION - 6], [0, 1], clamp),
         }}
       />
     </AbsoluteFill>

@@ -248,7 +248,7 @@ export function TeaserPlayer() {
             </svg>
           </span>
           <span className="text-[11px] font-medium uppercase tracking-[0.3em] text-white/80">
-            Watch the film · 95s · sound on
+            Watch the film · 92s · sound on
           </span>
         </button>
       )}
