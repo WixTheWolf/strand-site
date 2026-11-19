@@ -44,23 +44,23 @@ const ease = Easing.out(Easing.cubic);
 /* ------------------------------------------------------------------ */
 
 const NARRATION: Array<{ file: string; at: number; len: number }> = [
-  { file: "n-01", at: 30, len: 101 },
-  { file: "n-02", at: 172, len: 127 },
-  { file: "n-03", at: 556, len: 175 },
-  { file: "n-04", at: 806, len: 81 },
-  { file: "n-05", at: 1000, len: 68 },
-  { file: "n-06", at: 1134, len: 86 },
-  { file: "n-07", at: 1452, len: 86 },
-  { file: "n-08", at: 1612, len: 85 },
-  { file: "n-09", at: 1772, len: 165 },
+  { file: "n-01", at: 30, len: 100 },
+  { file: "n-02", at: 172, len: 121 },
+  { file: "n-03", at: 556, len: 166 },
+  { file: "n-04", at: 806, len: 78 },
+  { file: "n-05", at: 1000, len: 59 },
+  { file: "n-06", at: 1134, len: 80 },
+  { file: "n-07", at: 1452, len: 81 },
+  { file: "n-08", at: 1612, len: 80 },
+  { file: "n-09", at: 1772, len: 168 },
   { file: "n-10", at: 1975, len: 55 },
-  { file: "n-11", at: 2092, len: 66 },
-  { file: "n-12a", at: 2252, len: 54 },
+  { file: "n-11", at: 2092, len: 62 },
+  { file: "n-12a", at: 2252, len: 53 },
   { file: "n-12b", at: 2330, len: 58 },
   { file: "n-13a", at: 2408, len: 57 },
-  { file: "n-13b", at: 2486, len: 43 },
+  { file: "n-13b", at: 2486, len: 42 },
   { file: "n-14a", at: 2580, len: 43 },
-  { file: "n-14b", at: 2640, len: 71 },
+  { file: "n-14b", at: 2640, len: 72 },
 ];
 const VO_GAIN = 1.6;
 
@@ -813,7 +813,9 @@ const Finale: React.FC = () => {
 /* The film                                                            */
 /* ------------------------------------------------------------------ */
 
-const SHUTTERS = [560, 640, 720, 800, 1360, 2240];
+const SHUTTERS = [560, 680, 720, 840, 1360, 2240];
+/** Club-on-ball and the cart landing: one dry hit each, no clip audio. */
+const THUMPS = [639, 799, 940, 992];
 
 const shake = (frame: number, at: number, power: number) => {
   const t = frame - at;
@@ -865,9 +867,11 @@ export const StrandFilm: React.FC = () => {
       <Sequence name="Impact — strike" from={STRIKE} durationInFrames={110} layout="none">
         <Audio src={staticFile("impact.mp3")} volume={0.6} />
       </Sequence>
-      <Sequence name="Impact — the approach" from={992} durationInFrames={60} layout="none">
-        <Audio src={staticFile("impact.mp3")} volume={0.3} />
-      </Sequence>
+      {THUMPS.map((at) => (
+        <Sequence key={at} name={`Thump ${at}`} from={at} durationInFrames={50} layout="none">
+          <Audio src={staticFile("impact.mp3")} volume={0.28} />
+        </Sequence>
+      ))}
       <Sequence name="Cup rattle" from={CUP_DROP - 6} durationInFrames={80} layout="none">
         <Audio src={staticFile("cup-rattle.mp3")} volume={0.9} />
       </Sequence>
@@ -913,20 +917,26 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="Chapter — Gamble Sands" from={3 * BAR} durationInFrames={80}>
           <ChapterGambleSands />
         </Sequence>
-        <Sequence name="The walk in" from={560} durationInFrames={80}>
-          <Archival src="strand26-015.jpg" oy="42%" />
+        <Sequence name="The walk in" from={560} durationInFrames={40}>
+          <Archival src="strand26-015.jpg" oy="42%" from={1.05} to={1.12} />
         </Sequence>
-        <Sequence name="High desert" from={640} durationInFrames={80}>
-          <Archival src="strand26-023.jpg" />
+        <Sequence name="Real swing — hazy morning" from={600} durationInFrames={80}>
+          <FootageScene src="real-swing-a.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Three courses" from={720} durationInFrames={80}>
-          <Archival src="strand26-032.jpg" />
+        <Sequence name="High desert" from={680} durationInFrames={40}>
+          <Archival src="strand26-023.jpg" from={1.05} to={1.12} />
         </Sequence>
-        <Sequence name="The swing" from={800} durationInFrames={80}>
-          <Archival src="strand26-067.jpg" ox="55%" oy="35%" />
+        <Sequence name="Three courses" from={720} durationInFrames={40}>
+          <Archival src="strand26-032.jpg" from={1.05} to={1.12} />
+        </Sequence>
+        <Sequence name="Real swing — under the clouds" from={760} durationInFrames={80}>
+          <FootageScene src="real-swing-b.mp4" dim={0.04} />
+        </Sequence>
+        <Sequence name="The swing" from={840} durationInFrames={40}>
+          <Archival src="strand26-067.jpg" ox="55%" oy="35%" from={1.05} to={1.12} />
         </Sequence>
         <Sequence name="Cart path optional" from={880} durationInFrames={105}>
-          <FootageScene src="g-cart.mp4" trimBefore={60} volume={0.6} dim={0.04} />
+          <FootageScene src="g-cart.mp4" trimBefore={60} dim={0.04} />
         </Sequence>
         <Sequence name="Stat — 20 players" from={558} durationInFrames={36}>
           <StatTag value="20" label="Players" />
@@ -941,7 +951,7 @@ export const StrandFilm: React.FC = () => {
           <StatTag value="75" label="Points on the line" />
         </Sequence>
         <Sequence name="The last putt" from={985} durationInFrames={234}>
-          <FootageScene src="g-round.mp4" trimBefore={66} volume={0.45} dim={0.04} />
+          <FootageScene src="g-round.mp4" trimBefore={66} dim={0.04} />
         </Sequence>
         <Sequence name="Champions — Team J-Bone" from={1219} durationInFrames={141}>
           <Champions />
@@ -962,7 +972,7 @@ export const StrandFilm: React.FC = () => {
 
         {/* III — the commissioner */}
         <Sequence name="The trophy dinner" from={9 * BAR} durationInFrames={BAR}>
-          <FootageScene src="g-dinner.mp4" trimBefore={140} playbackRate={0.98} volume={0.2} dim={0.1} />
+          <FootageScene src="g-dinner.mp4" trimBefore={140} playbackRate={0.98} dim={0.1} />
         </Sequence>
         <Sequence name="The Commissioner" from={10 * BAR} durationInFrames={BAR}>
           <FootageScene src="g-desk.mp4" trimBefore={30} dim={0.08}>
