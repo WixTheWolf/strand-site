@@ -518,6 +518,39 @@ const Champions: React.FC = () => {
   );
 };
 
+/** The Commissioner's handwritten pairings, laid over the ledger like evidence. */
+const PairingsCard: React.FC = () => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill
+      style={{
+        backgroundColor: `rgba(7,19,15,${interpolate(frame, [0, 8], [0, 0.82], clamp)})`,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          width: 450,
+          height: 600,
+          overflow: "hidden",
+          borderRadius: 4,
+          border: "10px solid #f4f2ea",
+          boxShadow: "0 30px 90px rgba(0,0,0,0.7)",
+          rotate: `${interpolate(frame, [0, 10], [-9, -3], { ...clamp, easing: ease })}deg`,
+          scale: String(interpolate(frame, [0, 10, 75], [1.25, 1, 1.05], { ...clamp, easing: ease })),
+          opacity: interpolate(frame, [0, 4], [0, 1], clamp),
+        }}
+      >
+        <Video src={staticFile("r-pairings.mp4")} volume={0} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+      </div>
+      <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 64 }}>
+        <Stamp delay={12}>Exhibit A · The pairings, by hand</Stamp>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 /** A rubber-stamp slam for the one thing the Commissioner will say. */
 const Stamped: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const frame = useCurrentFrame();
@@ -755,7 +788,7 @@ const Finale: React.FC = () => {
 /* The film                                                            */
 /* ------------------------------------------------------------------ */
 
-const SHUTTERS = [560, 780, 1360];
+const SHUTTERS = [1360, 1885];
 /** Club-on-ball and the cart landing: one dry hit each, no clip audio. */
 const THUMPS = [639, 724, 819, 860, 944];
 
@@ -835,14 +868,14 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="One cup" from={100} durationInFrames={60}>
           <FootageScene src="g-coast.mp4" trimBefore={123} playbackRate={0.7} dim={0.1} />
         </Sequence>
-        <Sequence name="Convoy — the road in" from={160} durationInFrames={55}>
-          <FootageScene src="g-vans.mp4" dim={0.04} />
+        <Sequence name="Convoy — the road in" from={160} durationInFrames={30}>
+          <FootageScene src="g-vans.mp4" trimBefore={20} dim={0.04} />
         </Sequence>
-        <Sequence name="Convoy — the driver" from={215} durationInFrames={30}>
-          <FootageScene src="g-vans.mp4" trimBefore={120} dim={0.04} />
+        <Sequence name="Real — over the Columbia" from={190} durationInFrames={40}>
+          <FootageScene src="r-bridge.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Convoy — arrival" from={245} durationInFrames={25}>
-          <FootageScene src="g-vans.mp4" trimBefore={210} dim={0.04} />
+        <Sequence name="Real — the walk down" from={230} durationInFrames={40}>
+          <FootageScene src="r-walk.mp4" dim={0.04} />
         </Sequence>
         <Sequence name="Pre-shot — eyes" from={270} durationInFrames={17}>
           <FootageScene src="g-shot.mp4" trimBefore={41} dim={0.04} />
@@ -871,8 +904,11 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="Chapter — Gamble Sands" from={3 * BAR} durationInFrames={80}>
           <ChapterGambleSands />
         </Sequence>
-        <Sequence name="The walk in" from={560} durationInFrames={40}>
-          <Archival src="strand26-015.jpg" oy="42%" from={1.05} to={1.12} />
+        <Sequence name="Real — red sun" from={560} durationInFrames={22}>
+          <FootageScene src="r-redsun.mp4" dim={0.04} />
+        </Sequence>
+        <Sequence name="Real — the tee box" from={582} durationInFrames={18}>
+          <FootageScene src="r-teebox.mp4" trimBefore={12} dim={0.04} />
         </Sequence>
         <Sequence name="Real swing — hazy morning" from={600} durationInFrames={60}>
           <FootageScene src="real-swing-a.mp4" dim={0.04} />
@@ -883,11 +919,14 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="Real swing — under the clouds" from={700} durationInFrames={40}>
           <FootageScene src="real-swing-b.mp4" trimBefore={15} dim={0.04} />
         </Sequence>
-        <Sequence name="Real tee shot — watching it" from={740} durationInFrames={40}>
-          <FootageScene src="real-tee.mp4" trimBefore={195} dim={0.04} />
+        <Sequence name="Real — foursome one" from={740} durationInFrames={20}>
+          <FootageScene src="r-selfie1.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Three courses" from={780} durationInFrames={20}>
-          <Archival src="strand26-032.jpg" from={1.05} to={1.1} />
+        <Sequence name="Real — foursome two" from={760} durationInFrames={20}>
+          <FootageScene src="r-selfie2.mp4" dim={0.04} />
+        </Sequence>
+        <Sequence name="Real — shaka" from={780} durationInFrames={20}>
+          <FootageScene src="r-laugh.mp4" dim={0.04} />
         </Sequence>
         <Sequence name="The swing" from={800} durationInFrames={30}>
           <FootageScene src="g-shot.mp4" trimBefore={138} dim={0.04} />
@@ -901,8 +940,11 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="The reaction" from={890} durationInFrames={30}>
           <FootageScene src="g-shot.mp4" trimBefore={249} dim={0.04} />
         </Sequence>
-        <Sequence name="Cart path optional" from={920} durationInFrames={45}>
-          <FootageScene src="g-cart.mp4" trimBefore={96} dim={0.04} />
+        <Sequence name="Real — cart selfie" from={920} durationInFrames={16}>
+          <FootageScene src="r-cartselfie.mp4" dim={0.04} />
+        </Sequence>
+        <Sequence name="Cart path optional" from={936} durationInFrames={29}>
+          <FootageScene src="g-cart.mp4" trimBefore={112} dim={0.04} />
         </Sequence>
         <Sequence name="The cart was never the same" from={965} durationInFrames={50}>
           <FootageScene src="g-stuck.mp4" trimBefore={30} dim={0.04} />
@@ -959,6 +1001,9 @@ export const StrandFilm: React.FC = () => {
         </Sequence>
 
         {/* IV — year ten */}
+        <Sequence name="Real — the pairings sheet" from={1885} durationInFrames={75}>
+          <PairingsCard />
+        </Sequence>
         <Sequence name="Year ten" from={1960} durationInFrames={120}>
           <VideoText text="YEAR TEN" src="g-sunrise.mp4" trimBefore={150} size={330} />
         </Sequence>
