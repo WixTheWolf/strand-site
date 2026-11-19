@@ -209,7 +209,7 @@ export default function GambleSands2026Page() {
                 download
                 className="btn-ghost border-white/30 text-white"
               >
-                ↓ The Strand film · 95s
+                ↓ The Strand film · 92s
               </a>
             </Magnetic>
           </Reveal>
