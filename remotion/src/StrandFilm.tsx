@@ -47,8 +47,10 @@ const NARRATION: Array<{ file: string; at: number; len: number }> = [
   { file: "n-01", at: 30, len: 100 },
   { file: "n-02", at: 172, len: 121 },
   { file: "n-03", at: 556, len: 166 },
-  { file: "n-04", at: 806, len: 78 },
-  { file: "n-05", at: 1000, len: 59 },
+  { file: "n-04", at: 790, len: 78 },
+  { file: "n-x1", at: 872, len: 78 },
+  { file: "n-x2", at: 962, len: 72 },
+  { file: "n-05", at: 1044, len: 59 },
   { file: "n-06", at: 1134, len: 80 },
   { file: "n-07", at: 1452, len: 81 },
   { file: "n-08", at: 1612, len: 80 },
@@ -371,7 +373,7 @@ const Opening: React.FC = () => (
 );
 
 const ChapterGambleSands: React.FC = () => (
-  <FootageScene src="flyover.mp4" trimBefore={12} dim={0.2}>
+  <FootageScene src="flyover.mp4" trimBefore={12} dim={0.06}>
     <AbsoluteFill
       style={{ background: "linear-gradient(90deg, rgba(7,19,15,0.7) 0%, rgba(7,19,15,0) 60%)" }}
     />
@@ -516,85 +518,25 @@ const Champions: React.FC = () => {
   );
 };
 
-/** The Commissioner. `sealed` is the later, darker return to him. */
-const Commissioner: React.FC<{ sealed?: boolean }> = ({ sealed = false }) => {
+/** A rubber-stamp slam for the one thing the Commissioner will say. */
+const Stamped: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  const push = interpolate(frame, [0, durationInFrames], [1, 1.07]);
   return (
-    <AbsoluteFill style={{ backgroundColor: INK }}>
-      {/* soft, enlarged backdrop from the same portrait */}
-      <CanvasImage
-        src={staticFile("players/fred.jpg")}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition: "50% 25%",
-          scale: "1.25",
-          filter: `blur(46px) saturate(${sealed ? 0.3 : 0.8}) brightness(${sealed ? 0.3 : 0.5})`,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          right: 250,
-          top: LETTERBOX + 48,
-          width: 480,
-          height: 696,
-          overflow: "hidden",
-          borderRadius: 6,
-          border: "1px solid rgba(232,200,106,0.5)",
-          boxShadow: "0 30px 90px rgba(0,0,0,0.6)",
-          scale: String(push),
-        }}
-      >
-        <CanvasImage
-          src={staticFile("players/fred.jpg")}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "50% 18%",
-            filter: sealed ? "grayscale(1) brightness(0.55) contrast(1.2)" : "saturate(0.92) contrast(1.05)",
-          }}
-        />
-      </div>
-      {sealed ? (
-        <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 70 }}>
-          <Rise delay={10}>
-            <div style={{ fontFamily: SERIF, fontSize: 78, fontWeight: 700, color: BONE, lineHeight: 1 }}>
-              Fred Geisinger
-            </div>
-          </Rise>
-          <div style={{ height: 14 }} />
-          <Rise delay={18}>
-            <Caps size={26} color={GOLD_SOFT}>
-              The Commissioner
-            </Caps>
-          </Rise>
-          <div style={{ height: 26 }} />
-          <Sequence from={86} layout="none">
-            <div
-              style={{
-                display: "inline-block",
-                border: `3px solid ${GOLD_SOFT}`,
-                padding: "10px 22px",
-                rotate: "-3deg",
-                opacity: interpolate(frame, [86, 90], [0, 1], clamp),
-                scale: String(interpolate(frame, [86, 94], [1.5, 1], { ...clamp, easing: ease })),
-              }}
-            >
-              <Caps size={30} color={GOLD_SOFT} tracking="0.34em">
-                Declined to comment
-              </Caps>
-            </div>
-          </Sequence>
-        </div>
-      ) : (
-        <LowerThird name="Fred Geisinger" role="The Commissioner" delay={22} />
-      )}
-    </AbsoluteFill>
+    <div
+      style={{
+        display: "inline-block",
+        border: `4px solid ${GOLD_SOFT}`,
+        padding: "12px 26px",
+        rotate: "-3deg",
+        background: "rgba(7,19,15,0.55)",
+        opacity: interpolate(frame, [0, 3], [0, 1], clamp),
+        scale: String(interpolate(frame, [0, 8], [1.6, 1], { ...clamp, easing: ease })),
+      }}
+    >
+      <Caps size={40} color={GOLD_SOFT} tracking="0.34em">
+        {children}
+      </Caps>
+    </div>
   );
 };
 
@@ -813,9 +755,9 @@ const Finale: React.FC = () => {
 /* The film                                                            */
 /* ------------------------------------------------------------------ */
 
-const SHUTTERS = [560, 680, 720, 840, 1360, 2240];
+const SHUTTERS = [560, 780, 1360];
 /** Club-on-ball and the cart landing: one dry hit each, no clip audio. */
-const THUMPS = [639, 799, 940, 992];
+const THUMPS = [639, 724, 819, 860, 944];
 
 const shake = (frame: number, at: number, power: number) => {
   const t = frame - at;
@@ -893,11 +835,23 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="One cup" from={100} durationInFrames={60}>
           <FootageScene src="g-coast.mp4" trimBefore={123} playbackRate={0.7} dim={0.1} />
         </Sequence>
-        <Sequence name="The road in" from={BAR} durationInFrames={110}>
-          <FootageScene src="convoy.mp4" playbackRate={0.94} dim={0.2} />
+        <Sequence name="Convoy — the road in" from={160} durationInFrames={55}>
+          <FootageScene src="g-vans.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Strike — approach" from={270} durationInFrames={50}>
-          <FootageScene src="g-round.mp4" trimBefore={30} playbackRate={0.58} dim={0.05} />
+        <Sequence name="Convoy — the driver" from={215} durationInFrames={30}>
+          <FootageScene src="g-vans.mp4" trimBefore={120} dim={0.04} />
+        </Sequence>
+        <Sequence name="Convoy — arrival" from={245} durationInFrames={25}>
+          <FootageScene src="g-vans.mp4" trimBefore={210} dim={0.04} />
+        </Sequence>
+        <Sequence name="Pre-shot — eyes" from={270} durationInFrames={17}>
+          <FootageScene src="g-shot.mp4" trimBefore={41} dim={0.04} />
+        </Sequence>
+        <Sequence name="Pre-shot — grip" from={287} durationInFrames={16}>
+          <FootageScene src="g-shot.mp4" trimBefore={78} dim={0.04} />
+        </Sequence>
+        <Sequence name="Pre-shot — tee" from={303} durationInFrames={17}>
+          <FootageScene src="g-shot.mp4" trimBefore={108} dim={0.04} />
         </Sequence>
         <Sequence name="Strike — impact" from={STRIKE} durationInFrames={32}>
           <FootageScene src="strike-full.mp4" trimBefore={37} volume={0.7} dim={0} />
@@ -920,23 +874,38 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="The walk in" from={560} durationInFrames={40}>
           <Archival src="strand26-015.jpg" oy="42%" from={1.05} to={1.12} />
         </Sequence>
-        <Sequence name="Real swing — hazy morning" from={600} durationInFrames={80}>
+        <Sequence name="Real swing — hazy morning" from={600} durationInFrames={60}>
           <FootageScene src="real-swing-a.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="High desert" from={680} durationInFrames={40}>
-          <Archival src="strand26-023.jpg" from={1.05} to={1.12} />
+        <Sequence name="Real tee shot — wide" from={660} durationInFrames={40}>
+          <FootageScene src="real-tee.mp4" dim={0.04} />
         </Sequence>
-        <Sequence name="Three courses" from={720} durationInFrames={40}>
-          <Archival src="strand26-032.jpg" from={1.05} to={1.12} />
+        <Sequence name="Real swing — under the clouds" from={700} durationInFrames={40}>
+          <FootageScene src="real-swing-b.mp4" trimBefore={15} dim={0.04} />
         </Sequence>
-        <Sequence name="Real swing — under the clouds" from={760} durationInFrames={80}>
-          <FootageScene src="real-swing-b.mp4" dim={0.04} />
+        <Sequence name="Real tee shot — watching it" from={740} durationInFrames={40}>
+          <FootageScene src="real-tee.mp4" trimBefore={195} dim={0.04} />
         </Sequence>
-        <Sequence name="The swing" from={840} durationInFrames={40}>
-          <Archival src="strand26-067.jpg" ox="55%" oy="35%" from={1.05} to={1.12} />
+        <Sequence name="Three courses" from={780} durationInFrames={20}>
+          <Archival src="strand26-032.jpg" from={1.05} to={1.1} />
         </Sequence>
-        <Sequence name="Cart path optional" from={880} durationInFrames={105}>
-          <FootageScene src="g-cart.mp4" trimBefore={60} dim={0.04} />
+        <Sequence name="The swing" from={800} durationInFrames={30}>
+          <FootageScene src="g-shot.mp4" trimBefore={138} dim={0.04} />
+        </Sequence>
+        <Sequence name="The flight" from={830} durationInFrames={20}>
+          <FootageScene src="g-shot.mp4" trimBefore={171} dim={0.04} />
+        </Sequence>
+        <Sequence name="The bunker" from={850} durationInFrames={40}>
+          <FootageScene src="g-shot.mp4" trimBefore={207} dim={0.04} />
+        </Sequence>
+        <Sequence name="The reaction" from={890} durationInFrames={30}>
+          <FootageScene src="g-shot.mp4" trimBefore={249} dim={0.04} />
+        </Sequence>
+        <Sequence name="Cart path optional" from={920} durationInFrames={45}>
+          <FootageScene src="g-cart.mp4" trimBefore={96} dim={0.04} />
+        </Sequence>
+        <Sequence name="The cart was never the same" from={965} durationInFrames={50}>
+          <FootageScene src="g-stuck.mp4" trimBefore={30} dim={0.04} />
         </Sequence>
         <Sequence name="Stat — 20 players" from={558} durationInFrames={36}>
           <StatTag value="20" label="Players" />
@@ -944,14 +913,17 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="Stat — 4 rounds" from={594} durationInFrames={40}>
           <StatTag value="4" label="Rounds" />
         </Sequence>
-        <Sequence name="Stat — 3 courses" from={634} durationInFrames={110}>
+        <Sequence name="Stat — 3 courses" from={634} durationInFrames={66}>
           <StatTag value="3" label="Courses" />
         </Sequence>
-        <Sequence name="Stat — 75 points" from={806} durationInFrames={74}>
+        <Sequence name="Stat — 75 points" from={792} durationInFrames={74}>
           <StatTag value="75" label="Points on the line" />
         </Sequence>
-        <Sequence name="The last putt" from={985} durationInFrames={234}>
-          <FootageScene src="g-round.mp4" trimBefore={66} dim={0.04} />
+        <Sequence name="The last putt" from={1015} durationInFrames={121}>
+          <FootageScene src="cup.mp4" trimBefore={30} dim={0.04} />
+        </Sequence>
+        <Sequence name="The celebration" from={1136} durationInFrames={83}>
+          <FootageScene src="g-party.mp4" trimBefore={60} dim={0.04} />
         </Sequence>
         <Sequence name="Champions — Team J-Bone" from={1219} durationInFrames={141}>
           <Champions />
@@ -975,7 +947,7 @@ export const StrandFilm: React.FC = () => {
           <FootageScene src="g-dinner.mp4" trimBefore={140} playbackRate={0.98} dim={0.1} />
         </Sequence>
         <Sequence name="The Commissioner" from={10 * BAR} durationInFrames={BAR}>
-          <FootageScene src="g-desk.mp4" trimBefore={30} dim={0.08}>
+          <FootageScene src="g-freddy.mp4" trimBefore={10} dim={0.06}>
             <AbsoluteFill
               style={{ background: "linear-gradient(90deg, rgba(7,19,15,0.82) 0%, rgba(7,19,15,0) 58%)" }}
             />
@@ -993,8 +965,17 @@ export const StrandFilm: React.FC = () => {
         <Sequence name="The envelope" from={13 * BAR} durationInFrames={BAR}>
           <Envelope />
         </Sequence>
-        <Sequence name="Declined to comment" from={14 * BAR} durationInFrames={BAR}>
-          <Commissioner sealed />
+        <Sequence name="Only the Commissioner knows" from={14 * BAR} durationInFrames={85}>
+          <FootageScene src="g-freddy.mp4" trimBefore={158} playbackRate={0.95} dim={0.1} />
+        </Sequence>
+        <Sequence name="And he isn't talking" from={2325} durationInFrames={75}>
+          <FootageScene src="g-freddy.mp4" trimBefore={243} playbackRate={0.75} dim={0.12}>
+            <div style={{ position: "absolute", left: 130, bottom: LETTERBOX + 64 }}>
+              <Sequence from={22} layout="none">
+                <Stamped>Declined to comment</Stamped>
+              </Sequence>
+            </div>
+          </FootageScene>
         </Sequence>
         <Sequence name="Ten years running" from={15 * BAR} durationInFrames={BAR}>
           <TenYears />
