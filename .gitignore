@@ -55,3 +55,8 @@ remotion/out
 /remotion/public/ten/drew0.mp4
 /remotion/scripts/*.local.json
 /remotion/src/ten-timeline.json
+# Raw trip footage and photo selects for the private film stay out of this public repo
+/remotion/public/mv/
+/remotion/public/m/
+/remotion/scripts/build_movie.py
+/remotion/public/logos/

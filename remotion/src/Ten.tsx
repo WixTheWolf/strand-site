@@ -50,6 +50,9 @@ const SFX = timeline.sfx as Array<{ file: string; at: number; vol: number }>;
 const SUBS = timeline.subs as Array<{ text: string; from: number; len: number }>;
 const LYRICS = timeline.lyrics as Array<{ text: string; from: number; len: number }>;
 const HUSH = timeline.hush as number[][];
+const OVERS = ((timeline as { overs?: Array<{ src: string; from: number; len: number }> }).overs ?? []);
+const LTS = ((timeline as { lts?: Array<{ name: string; role: string; from: number; len: number }> }).lts ?? []);
+const FACTS = ((timeline as { facts?: Array<{ text: string; from: number; len: number }> }).facts ?? []);
 const DUCK = (timeline as { duck?: number }).duck ?? 0.26;
 
 const caps = (size: number, weight = 800, tracking = "0.06em"): React.CSSProperties => ({
@@ -74,6 +77,36 @@ const LowerThird: React.FC<{ name: string; role?: string; delay?: number; top?: 
           {role ? <div style={{ ...caps(24, 600, "0.22em"), color: GOLD_SOFT, marginTop: 10 }}>{role}</div> : null}
         </div>
       </div>
+    </div>
+  );
+};
+
+const LowerThirdOut: React.FC<{ name: string; role: string; len: number }> = ({ name, role, len }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{ opacity: interpolate(frame, [len - 8, len], [1, 0], clamp) }}>
+      <LowerThird name={name} role={role} delay={0} />
+    </div>
+  );
+};
+
+/** A dry on-screen note, top right, in the manner of a broadcast fact-check. */
+const Fact: React.FC<{ text: string; len: number }> = ({ text, len }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div
+      style={{
+        position: "absolute",
+        right: 110,
+        top: BAR + 44,
+        display: "flex",
+        alignItems: "stretch",
+        opacity: interpolate(frame, [0, 4, len - 8, len], [0, 1, 1, 0], clamp),
+        translate: `${interpolate(frame, [0, 8], [50, 0], { ...clamp, easing: ease })}px 0px`,
+      }}
+    >
+      <div style={{ background: RED, padding: "14px 16px", ...caps(24, 900, "0.2em"), color: "#fff", display: "flex", alignItems: "center" }}>Note</div>
+      <div style={{ background: "rgba(8,8,8,0.9)", padding: "14px 22px", ...caps(34, 800, "0.05em"), color: "#fff" }}>{text}</div>
     </div>
   );
 };
@@ -127,6 +160,65 @@ const TallPhoto: React.FC<{ src: string }> = ({ src }) => {
         style={{ height: 950, width: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.7)", scale: String(interpolate(frame, [0, durationInFrames], [1.04, 1.0], { ...clamp, easing: ease })) }}
       />
       <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 3], [0.45, 0], clamp) }} />
+    </AbsoluteFill>
+  );
+};
+
+/** A photograph shown whole — nobody is ever cropped out — over a soft blur of itself. */
+const Whole: React.FC<{ src: string }> = ({ src }) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#060606", overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
+      <CanvasImage src={staticFile(src)} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(36px) brightness(0.42) saturate(0.9)", scale: "1.2" }} />
+      <CanvasImage
+        src={staticFile(src)}
+        style={{
+          maxWidth: 1800,
+          maxHeight: 940,
+          width: "auto",
+          height: "auto",
+          boxShadow: "0 26px 90px rgba(0,0,0,0.75)",
+          filter: "contrast(1.06) saturate(1.04)",
+          scale: String(interpolate(frame, [0, durationInFrames], [1.0, 1.045])),
+        }}
+      />
+      <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 3], [0.35, 0], clamp) }} />
+    </AbsoluteFill>
+  );
+};
+
+/** Credits: the whole headshot, the name beside it. */
+const Face: React.FC<{ s: Shot }> = ({ s }) => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#060606", overflow: "hidden" }}>
+      <CanvasImage src={staticFile(s.src ?? "")} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(40px) brightness(0.3)", scale: "1.25" }} />
+      <div style={{ position: "absolute", left: 150, top: 110, width: 800, height: 860, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <CanvasImage src={staticFile(s.src ?? "")} style={{ maxWidth: 800, maxHeight: 860, width: "auto", height: "auto", boxShadow: "0 26px 90px rgba(0,0,0,0.75)" }} />
+      </div>
+      <div style={{ position: "absolute", left: 1030, right: 100, top: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div style={{ width: 140, height: 10, background: RED, marginBottom: 26 }} />
+        <div style={{ ...caps(Math.min(140, Math.round(1150 / Math.max(5, (s.name ?? "").length))), 900, "0.01em"), color: "#fff", translate: `${interpolate(frame, [0, 8], [40, 0], { ...clamp, easing: ease })}px 0px` }}>{s.name}</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/** The original Strand Invitational mark, drawn on from the left on its own cream ground. */
+const Logo: React.FC<{ s: Shot }> = ({ s }) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  const wipe = interpolate(frame, [6, 44], [0, 100], { ...clamp, easing: ease });
+  const out = interpolate(frame, [durationInFrames - 10, durationInFrames], [1, 0], clamp);
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#fbf7ef", alignItems: "center", justifyContent: "center", opacity: out }}>
+      <div style={{ clipPath: `inset(0 ${100 - wipe}% 0 0)`, scale: String(interpolate(frame, [0, durationInFrames], [1.0, 1.06])) }}>
+        <CanvasImage src={staticFile(s.src ?? "")} style={{ width: 860, height: 860 }} />
+      </div>
+      {s.sub ? (
+        <div style={{ position: "absolute", bottom: BAR + 70, ...caps(30, 600, "0.42em"), color: "#1f4a2e", opacity: interpolate(frame, [46, 60], [0, 1], clamp) }}>{s.sub}</div>
+      ) : null}
     </AbsoluteFill>
   );
 };
@@ -488,6 +580,12 @@ export const Ten: React.FC = () => {
             <WidePhoto s={s} />
           ) : s.t === "p" ? (
             <TallPhoto src={s.src ?? ""} />
+          ) : s.t === "m" ? (
+            <Whole src={s.src ?? ""} />
+          ) : s.t === "face" ? (
+            <Face s={s} />
+          ) : s.t === "logo" ? (
+            <Logo s={s} />
           ) : s.t === "ps" ? (
             <SlowPlate src={s.src ?? ""} oy={s.oy} bright={0.9} />
           ) : s.t === "a" ? (
@@ -514,6 +612,22 @@ export const Ten: React.FC = () => {
           {s.tag ? <Stamp>{s.tag}</Stamp> : null}
           {s.re ? <Corner>Reenactment</Corner> : null}
           {s.t === "iv" && !s.name && s.role ? <LowerThird name={s.role} role={s.sub} top /> : null}
+        </Sequence>
+      ))}
+
+      {OVERS.map((o) => (
+        <Sequence key={`over-${o.from}`} name={`Cutaway ${o.src}`} from={o.from} durationInFrames={o.len}>
+          <Whole src={o.src} />
+        </Sequence>
+      ))}
+      {LTS.map((l) => (
+        <Sequence key={`lt-${l.from}`} name={`Lower third ${l.name}`} from={l.from} durationInFrames={l.len} layout="none">
+          <LowerThirdOut name={l.name} role={l.role} len={l.len} />
+        </Sequence>
+      ))}
+      {FACTS.map((f) => (
+        <Sequence key={`fact-${f.from}`} name={`Fact ${f.text}`} from={f.from} durationInFrames={f.len} layout="none">
+          <Fact text={f.text} len={f.len} />
         </Sequence>
       ))}
 
