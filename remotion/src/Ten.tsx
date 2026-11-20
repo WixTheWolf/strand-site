@@ -200,6 +200,7 @@ const Face: React.FC<{ s: Shot }> = ({ s }) => {
       <div style={{ position: "absolute", left: 1030, right: 100, top: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <div style={{ width: 140, height: 10, background: RED, marginBottom: 26 }} />
         <div style={{ ...caps(Math.min(140, Math.round(1150 / Math.max(5, (s.name ?? "").length))), 900, "0.01em"), color: "#fff", translate: `${interpolate(frame, [0, 8], [40, 0], { ...clamp, easing: ease })}px 0px` }}>{s.name}</div>
+        {s.role ? <div style={{ ...caps(34, 600, "0.2em"), color: GOLD_SOFT, marginTop: 22 }}>{s.role}</div> : null}
       </div>
     </AbsoluteFill>
   );
