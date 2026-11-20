@@ -50,6 +50,7 @@ const SFX = timeline.sfx as Array<{ file: string; at: number; vol: number }>;
 const SUBS = timeline.subs as Array<{ text: string; from: number; len: number }>;
 const LYRICS = timeline.lyrics as Array<{ text: string; from: number; len: number }>;
 const HUSH = timeline.hush as number[][];
+const DUCK = (timeline as { duck?: number }).duck ?? 0.26;
 
 const caps = (size: number, weight = 800, tracking = "0.06em"): React.CSSProperties => ({
   fontFamily: FONT,
@@ -453,7 +454,7 @@ const Lyric: React.FC<{ text: string }> = ({ text }) => {
 /** The score sits under every voice, drops out for real sound, and only stops dead when it is cut on purpose. */
 const musicVolume = (frame: number, seg: (typeof MUSIC)[number]) => {
   let duck = 1;
-  for (const a of AUDIO) duck = Math.min(duck, interpolate(frame, [a.at - 10, a.at, a.at + a.len, a.at + a.len + 16], [1, 0.26, 0.26, 1], clamp));
+  for (const a of AUDIO) duck = Math.min(duck, interpolate(frame, [a.at - 10, a.at, a.at + a.len, a.at + a.len + 16], [1, DUCK, DUCK, 1], clamp));
   for (const [a, b, level] of HUSH) duck = Math.min(duck, interpolate(frame, [a - 8, a, b, b + 14], [1, level, level, 1], clamp));
   const edge = interpolate(frame, [seg.from, seg.from + 10, seg.to - (seg.cut ? 2 : 30), seg.to], [0, 1, 1, 0], clamp);
   return seg.vol * duck * edge;

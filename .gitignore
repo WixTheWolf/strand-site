@@ -51,3 +51,7 @@ remotion/out
 /remotion/public/ten/o[1-4].mp3
 /remotion/public/ten/song[1-4].mp3
 /remotion/public/ten/drew*.mp4
+/remotion/public/ten/song5.mp3
+/remotion/public/ten/drew0.mp4
+/remotion/scripts/*.local.json
+/remotion/src/ten-timeline.json
