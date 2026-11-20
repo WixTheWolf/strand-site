@@ -44,7 +44,7 @@ SCRIPT = [
           ("Fred Geisinger built his from a couch, long after bedtime, armed with a spreadsheet.",["v:g-desk.mp4","sheet"]),
           ("He has dodged calls from his own boss, to lock down tee times.",["P:2021","P:2022"]),
           ("At dinner, his wife talks. Fred hears one word.",["v:g-dinner.mp4@2"]),
-          ("Strand.",["c:||Strand."])]),
+          ("Strand.",["c:|Strand."])]),
  (I,"d02","Boys, I’ve got incredible news. I saved everyone seven dollars and forty-three cents.","fred.jpg|Fred Geisinger|Commissioner · Founder"),
  # ---- Part two
  (T,2.5,"Part two|The Drop"),
@@ -82,9 +82,9 @@ SCRIPT = [
  (M,None,"cut"),
  (V,"ten/gord-tee.mp4",0,12.2,1.0,"Actual footage · the first tee"),
  (X,"shutter",0,1.0),(X,"groan",0.2,0.7),
- (S,2.6,["z:ten/gord-tee.mp4@12.0|Gord|Ceremonial first tee shot"]),
+ (S,2.6,["z:ten/gord-tee.mp4@3.0|Gord|Ceremonial first tee shot"]),
  (M,"score",64,0.75),
- (N,"x8",[("Let's see that again. Carry: five feet. Lie: bush. Tone: set.",["r:ten/gord-tee.mp4@8.4|Carry: 5 ft|Lie: bush|Tone: set"])]),
+ (N,"x8",[("Let's see that again. Carry: five feet. Lie: bush. Tone: set.",["r:ten/gord-tee.mp4@0.3|Carry: 5 ft|Lie: bush|Tone: set"])]),
  # ---- Part five
  (T,2.5,"Part five|The Ace"),
  (N,"x9",[("Same day. Nick Kane steps up on a par four,",["v:dvid/2023-063.mp4"]),

@@ -1,7 +1,7 @@
 import { Audio, Video } from "@remotion/media";
 import { AbsoluteFill, CanvasImage, Freeze, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Grain, Vignette } from "./Cinematic";
-import { Photo, SlowPlate } from "./Decade";
+import { SlowPlate } from "./Decade";
 import { BONE, FONT, GOLD_SOFT, INK, clamp } from "./Kinetic";
 import { FootageScene, SERIF, ease } from "./StrandFilm";
 import timeline from "./ten-timeline.json";
@@ -61,11 +61,11 @@ const caps = (size: number, weight = 800, tracking = "0.06em"): React.CSSPropert
 });
 
 /** Broadcast lower third: red slab, name, role. */
-const LowerThird: React.FC<{ name: string; role?: string; delay?: number }> = ({ name, role, delay = 6 }) => {
+const LowerThird: React.FC<{ name: string; role?: string; delay?: number; top?: boolean }> = ({ name, role, delay = 6, top }) => {
   const frame = useCurrentFrame();
   const wipe = interpolate(frame, [delay, delay + 9], [0, 100], { ...clamp, easing: ease });
   return (
-    <div style={{ position: "absolute", left: 110, bottom: BAR + 70, clipPath: `inset(0 ${100 - wipe}% 0 0)` }}>
+    <div style={{ position: "absolute", left: 110, ...(top ? { top: BAR + 60 } : { bottom: BAR + 70 }), clipPath: `inset(0 ${100 - wipe}% 0 0)` }}>
       <div style={{ display: "flex", alignItems: "stretch" }}>
         <div style={{ width: 12, background: RED }} />
         <div style={{ background: "rgba(8,8,8,0.9)", padding: "16px 30px 18px 22px" }}>
@@ -108,6 +108,22 @@ const WidePhoto: React.FC<{ s: Shot }> = ({ s }) => {
           scale: String(interpolate(frame, [0, durationInFrames], [1.07, 1.0], { ...clamp, easing: ease })),
           filter: "contrast(1.1) saturate(1.05)",
         }}
+      />
+      <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 3], [0.45, 0], clamp) }} />
+    </AbsoluteFill>
+  );
+};
+
+/** A tall phone photo, shown whole and large over its own blur. */
+const TallPhoto: React.FC<{ src: string }> = ({ src }) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#060606", overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
+      <CanvasImage src={staticFile(src)} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(34px) brightness(0.4)", scale: "1.2" }} />
+      <CanvasImage
+        src={staticFile(src)}
+        style={{ height: 950, width: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.7)", scale: String(interpolate(frame, [0, durationInFrames], [1.04, 1.0], { ...clamp, easing: ease })) }}
       />
       <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 3], [0.45, 0], clamp) }} />
     </AbsoluteFill>
@@ -285,7 +301,7 @@ const City: React.FC<{ s: Shot }> = ({ s }) => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
-      {s.src ? s.tall ? <Photo shot={{ src: s.src }} index={0} /> : <WidePhoto s={s} /> : null}
+      {s.src ? s.tall ? <TallPhoto src={s.src} /> : <WidePhoto s={s} /> : null}
       <AbsoluteFill style={{ background: "linear-gradient(0deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 46%)" }} />
       <div style={{ position: "absolute", left: 110, bottom: BAR + 56, display: "flex", alignItems: "flex-end", gap: 30 }}>
         <div style={{ ...caps(190, 900, "-0.02em"), color: "#fff", scale: String(interpolate(frame, [0, 4], [1.3, 1], { ...clamp, easing: ease })), transformOrigin: "0% 100%" }}>{s.value}</div>
@@ -470,7 +486,7 @@ export const Ten: React.FC = () => {
           ) : s.t === "p" && !s.tall ? (
             <WidePhoto s={s} />
           ) : s.t === "p" ? (
-            <Photo shot={{ src: s.src ?? "" }} index={i} />
+            <TallPhoto src={s.src ?? ""} />
           ) : s.t === "ps" ? (
             <SlowPlate src={s.src ?? ""} oy={s.oy} bright={0.9} />
           ) : s.t === "a" ? (
@@ -496,7 +512,7 @@ export const Ten: React.FC = () => {
           )}
           {s.tag ? <Stamp>{s.tag}</Stamp> : null}
           {s.re ? <Corner>Reenactment</Corner> : null}
-          {s.t === "iv" && !s.name && s.role ? <LowerThird name={s.role} role={s.sub} /> : null}
+          {s.t === "iv" && !s.name && s.role ? <LowerThird name={s.role} role={s.sub} top /> : null}
         </Sequence>
       ))}
 
