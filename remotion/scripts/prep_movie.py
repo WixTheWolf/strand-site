@@ -25,7 +25,7 @@ os.makedirs(OUT, exist_ok=True)
 for name, src, ss, t in CUTS:
     out = os.path.join(OUT, name + ".mp4")
     if os.path.exists(out) and "--force" not in sys.argv: continue
-    r = subprocess.run(["ffmpeg","-y","-v","error","-ss",str(ss),"-t",str(t),"-i",src,"-filter_complex",f"[0:v]{VF}[v]","-map","[v]","-map","0:a?",
+    r = subprocess.run(["ffmpeg","-y","-v","error","-ss",str(ss),"-t",str(t),"-i",src,"-filter_complex",f"[0:v]{VF}[v]","-map","[v]","-map","0:a:0?",
                         "-af","loudnorm=I=-17:TP=-2:LRA=11,afade=t=in:d=0.08","-c:v","libx264","-crf","22","-preset","veryfast","-c:a","aac","-b:a","160k","-ar","48000",out])
     print(name, "ok" if r.returncode == 0 else "FAILED", flush=True)
 print("PREPDONE")

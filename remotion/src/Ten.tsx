@@ -117,7 +117,7 @@ const Stamp: React.FC<{ children: string }> = ({ children }) => {
   const n = Math.round(interpolate(frame, [3, 3 + children.length * 0.7], [0, children.length], clamp));
   return (
     <div style={{ position: "absolute", left: 110, bottom: BAR + 54, ...caps(30, 700, "0.2em"), color: "#fff", textShadow: "0 2px 14px rgba(0,0,0,0.9)" }}>
-      <span style={{ borderLeft: `6px solid ${RED}`, paddingLeft: 16 }}>{children.slice(0, n)}</span>
+      <span style={{ borderLeft: `6px solid ${RED}`, padding: "8px 16px", background: "rgba(8,8,8,0.78)", display: "inline-block" }}>{children.slice(0, n)}</span>
     </div>
   );
 };
