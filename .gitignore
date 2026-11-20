@@ -44,3 +44,10 @@ next-env.d.ts
 # remotion video project
 remotion/node_modules
 remotion/out
+
+# Drew's recordings and the members-only film stay out of this public repo
+/public/songs/
+/public/films/strand-ten-years*
+/remotion/public/ten/o[1-4].mp3
+/remotion/public/ten/song[1-4].mp3
+/remotion/public/ten/drew*.mp4

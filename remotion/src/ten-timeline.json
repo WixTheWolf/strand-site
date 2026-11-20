@@ -1,0 +1,2228 @@
+{
+ "total": 14870,
+ "audio": [
+  {
+   "file": "ten/vo/n01.mp3",
+   "at": 60,
+   "len": 639,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a1.mp3",
+   "at": 1271,
+   "len": 328,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/n03.mp3",
+   "at": 1697,
+   "len": 508,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/d02.mp3",
+   "at": 2213,
+   "len": 194,
+   "kind": "D"
+  },
+  {
+   "file": "ten/vo/d03.mp3",
+   "at": 2417,
+   "len": 36,
+   "kind": "D"
+  },
+  {
+   "file": "ten/vo/n26.mp3",
+   "at": 2463,
+   "len": 423,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a2.mp3",
+   "at": 2894,
+   "len": 507,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a3.mp3",
+   "at": 3409,
+   "len": 251,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/n07.mp3",
+   "at": 3752,
+   "len": 846,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/d05.mp3",
+   "at": 4606,
+   "len": 81,
+   "kind": "D"
+  },
+  {
+   "file": "ten/vo/a4.mp3",
+   "at": 4697,
+   "len": 340,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/d06.mp3",
+   "at": 5045,
+   "len": 83,
+   "kind": "D"
+  },
+  {
+   "file": "ten/vo/a5.mp3",
+   "at": 5138,
+   "len": 644,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a6.mp3",
+   "at": 5790,
+   "len": 338,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a7.mp3",
+   "at": 6400,
+   "len": 307,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/n24.mp3",
+   "at": 6715,
+   "len": 232,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/n25.mp3",
+   "at": 7321,
+   "len": 94,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a8.mp3",
+   "at": 7423,
+   "len": 348,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a9.mp3",
+   "at": 7887,
+   "len": 257,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/d14.mp3",
+   "at": 8272,
+   "len": 54,
+   "kind": "D"
+  },
+  {
+   "file": "ten/vo/a10.mp3",
+   "at": 8822,
+   "len": 272,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a11.mp3",
+   "at": 9750,
+   "len": 328,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a12.mp3",
+   "at": 10722,
+   "len": 364,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a13.mp3",
+   "at": 11832,
+   "len": 610,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a14.mp3",
+   "at": 12450,
+   "len": 550,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/a15.mp3",
+   "at": 13176,
+   "len": 125,
+   "kind": "N"
+  },
+  {
+   "file": "ten/vo/d16.mp3",
+   "at": 14548,
+   "len": 71,
+   "kind": "D"
+  },
+  {
+   "file": "ten/vo/d17.mp3",
+   "at": 14656,
+   "len": 102,
+   "kind": "D"
+  }
+ ],
+ "shots": [
+  {
+   "t": "v",
+   "src": "g-sunrise.mp4",
+   "trim": 30,
+   "rate": 1.0,
+   "from": 0,
+   "len": 60
+  },
+  {
+   "t": "v",
+   "src": "flyover.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 60,
+   "len": 98
+  },
+  {
+   "t": "v",
+   "src": "g-round.mp4",
+   "trim": 15,
+   "rate": 1.0,
+   "from": 158,
+   "len": 98
+  },
+  {
+   "t": "v",
+   "src": "g-coast.mp4",
+   "trim": 15,
+   "rate": 1.0,
+   "from": 256,
+   "len": 59
+  },
+  {
+   "t": "v",
+   "src": "r-pan1.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 315,
+   "len": 63
+  },
+  {
+   "t": "v",
+   "src": "dawn.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 378,
+   "len": 67
+  },
+  {
+   "t": "v",
+   "src": "convoy.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 445,
+   "len": 72
+  },
+  {
+   "t": "p",
+   "src": "d/early-034.jpg",
+   "oy": "13%",
+   "org": "55% 46%",
+   "from": 517,
+   "len": 63
+  },
+  {
+   "t": "p",
+   "src": "d/early-031.jpg",
+   "from": 580,
+   "len": 63
+  },
+  {
+   "t": "p",
+   "src": "d/early-033.jpg",
+   "tall": true,
+   "from": 643,
+   "len": 64
+  },
+  {
+   "from": 707,
+   "len": 210,
+   "t": "v",
+   "src": "ten/drew1.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "vol": 1.0,
+   "tag": "Drew \u00b7 the first Strand song"
+  },
+  {
+   "from": 917,
+   "len": 126,
+   "t": "c",
+   "kicker": "The official unofficial tenth-anniversary film",
+   "title": "The Strand Invitational",
+   "sub": "Ten Years of Questionable Decisions",
+   "foot": ""
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2023-035.mp4",
+    "nv/2023-038.mp4",
+    "nv/2023-046.mp4"
+   ],
+   "from": 1043,
+   "len": 51
+  },
+  {
+   "t": "v",
+   "src": "r-laugh.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 1094,
+   "len": 25
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2024-006.mp4",
+    "nv/2024-010.mp4",
+    "nv/2024-014.mp4"
+   ],
+   "from": 1119,
+   "len": 51
+  },
+  {
+   "t": "v",
+   "src": "r-selfie1.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 1170,
+   "len": 25
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2025-027.mp4",
+    "nv/2025-037.mp4",
+    "nv/2025-038.mp4"
+   ],
+   "from": 1195,
+   "len": 51
+  },
+  {
+   "t": "v",
+   "src": "r-cartselfie.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 1246,
+   "len": 25
+  },
+  {
+   "t": "p",
+   "src": "d/early-010.jpg",
+   "tall": true,
+   "from": 1271,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "d/early-068.jpg",
+   "oy": "44%",
+   "org": "60% 46%",
+   "from": 1303,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "d/early-056.jpg",
+   "oy": "1%",
+   "org": "44% 59%",
+   "from": 1335,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "d/2024-081.jpg",
+   "tall": true,
+   "from": 1367,
+   "len": 33
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2024-003.mp4",
+    "nv/2023-045.mp4",
+    "nv/2025-099.mp4"
+   ],
+   "from": 1400,
+   "len": 54
+  },
+  {
+   "t": "p",
+   "src": "d/2024-001.jpg",
+   "oy": "0%",
+   "org": "56% 43%",
+   "from": 1454,
+   "len": 55
+  },
+  {
+   "t": "p",
+   "src": "p/096.jpg",
+   "oy": "0%",
+   "org": "41% 55%",
+   "from": 1509,
+   "len": 98
+  },
+  {
+   "from": 1607,
+   "len": 90,
+   "t": "c",
+   "kicker": "Strand 1.0",
+   "title": "The Desert Years",
+   "sub": "2018 \u2013 2022 \u00b7 Palm Springs to Rams Hill",
+   "foot": ""
+  },
+  {
+   "t": "v",
+   "src": "g-freddy.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 1697,
+   "len": 205
+  },
+  {
+   "t": "f",
+   "src": "players/fred.jpg",
+   "name": "FRED GEISINGER",
+   "sub": "The Commissioner",
+   "op": "100% 30%",
+   "zoom": 1.18,
+   "org": "321px 230px",
+   "tr": "-41px 40px",
+   "from": 1902,
+   "len": 51
+  },
+  {
+   "t": "v",
+   "src": "g-desk.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 1953,
+   "len": 130
+  },
+  {
+   "t": "p",
+   "src": "d/early-067.jpg",
+   "oy": "50%",
+   "org": "50% 46%",
+   "from": 2083,
+   "len": 130
+  },
+  {
+   "t": "sheet",
+   "from": 2213,
+   "len": 204,
+   "drama": true
+  },
+  {
+   "t": "a",
+   "src": "ten/burritos.jpg",
+   "from": 2417,
+   "len": 46,
+   "drama": true
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2025-044.mp4",
+    "nv/2023-122.mp4",
+    "nv/2025-021.mp4"
+   ],
+   "from": 2463,
+   "len": 49
+  },
+  {
+   "t": "p",
+   "src": "d/2025-105.jpg",
+   "oy": "36%",
+   "org": "44% 50%",
+   "from": 2512,
+   "len": 48
+  },
+  {
+   "t": "p",
+   "src": "d/early-015.jpg",
+   "tall": true,
+   "from": 2560,
+   "len": 122
+  },
+  {
+   "t": "v",
+   "src": "g-dinner.mp4",
+   "trim": 60,
+   "rate": 1.0,
+   "from": 2682,
+   "len": 106
+  },
+  {
+   "t": "c",
+   "kicker": "What the Commissioner hears",
+   "title": "",
+   "sub": "\u201cThe Strand. The Strand.\u201d",
+   "from": 2788,
+   "len": 106
+  },
+  {
+   "t": "a",
+   "src": "ten/lowell.jpg",
+   "from": 2894,
+   "len": 110
+  },
+  {
+   "t": "v",
+   "src": "strike-full.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 3004,
+   "len": 56
+  },
+  {
+   "t": "v",
+   "src": "dvid/early-037.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 3060,
+   "len": 55
+  },
+  {
+   "t": "v",
+   "src": "g-vans.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 3115,
+   "len": 113
+  },
+  {
+   "t": "a",
+   "src": "ten/mattyo.jpg",
+   "from": 3228,
+   "len": 113
+  },
+  {
+   "t": "c",
+   "kicker": "Matt Lowell",
+   "title": "",
+   "sub": "Last seen: Arrivals",
+   "from": 3341,
+   "len": 68
+  },
+  {
+   "t": "f",
+   "src": "players/matty-o.jpg",
+   "name": "MATTY O.",
+   "sub": "The Eagle Scout",
+   "op": "100% 30%",
+   "zoom": 1,
+   "org": "308px 301px",
+   "tr": "0px 0px",
+   "from": 3409,
+   "len": 66
+  },
+  {
+   "t": "v",
+   "src": "dvid/2023-214.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 3475,
+   "len": 83
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2024-030.mp4",
+    "nv/2024-080.mp4",
+    "nv/2023-025.mp4"
+   ],
+   "from": 3558,
+   "len": 55
+  },
+  {
+   "t": "p",
+   "src": "d/2024-028.jpg",
+   "oy": "43%",
+   "org": "33% 46%",
+   "from": 3613,
+   "len": 55
+  },
+  {
+   "from": 3668,
+   "len": 84,
+   "t": "c",
+   "kicker": "2019 \u00b7 Tahquitz Creek \u00b7 The eighteenth hole",
+   "title": "",
+   "sub": "The Bunker Incident",
+   "foot": ""
+  },
+  {
+   "t": "f",
+   "src": "players/kev.jpg",
+   "name": "KEV",
+   "sub": "Seventy yards long",
+   "op": "0% 30%",
+   "zoom": 3.2,
+   "org": "269px 516px",
+   "tr": "11px -155px",
+   "from": 3752,
+   "len": 142
+  },
+  {
+   "t": "v",
+   "src": "g-shot.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 3894,
+   "len": 141
+  },
+  {
+   "t": "f",
+   "src": "players/wix.jpg",
+   "name": "MATT \u201cWIX\u201d WIXTED",
+   "sub": "Driver",
+   "op": "50% 0%",
+   "zoom": 1,
+   "org": "287px 262px",
+   "tr": "0px 0px",
+   "from": 4035,
+   "len": 89
+  },
+  {
+   "t": "p",
+   "src": "d/early-001.jpg",
+   "tall": true,
+   "from": 4124,
+   "len": 88
+  },
+  {
+   "t": "v",
+   "src": "g-cart.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 4212,
+   "len": 113
+  },
+  {
+   "t": "v",
+   "src": "g-stuck.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 4325,
+   "len": 86
+  },
+  {
+   "tag": "Actual photograph \u00b7 2019",
+   "t": "p",
+   "src": "d/early-012.jpg",
+   "from": 4411,
+   "len": 195
+  },
+  {
+   "t": "a",
+   "src": "ten/wixcart.jpg",
+   "from": 4606,
+   "len": 91,
+   "drama": true
+  },
+  {
+   "t": "a",
+   "src": "ten/owner.jpg",
+   "from": 4697,
+   "len": 117
+  },
+  {
+   "t": "p",
+   "src": "d/early-004.jpg",
+   "tall": true,
+   "from": 4814,
+   "len": 116
+  },
+  {
+   "t": "a",
+   "src": "ten/tractor.jpg",
+   "from": 4930,
+   "len": 115
+  },
+  {
+   "t": "a",
+   "src": "ten/tractor.jpg",
+   "from": 5045,
+   "len": 93,
+   "drama": true
+  },
+  {
+   "t": "f",
+   "src": "players/rhett.jpg",
+   "name": "RHETT",
+   "sub": "Handicap: under review",
+   "op": "50% 0%",
+   "zoom": 1.84,
+   "org": "233px 302px",
+   "tr": "47px 59px",
+   "from": 5138,
+   "len": 51
+  },
+  {
+   "t": "a",
+   "src": "ten/committee.jpg",
+   "from": 5189,
+   "len": 125
+  },
+  {
+   "t": "v",
+   "src": "cup.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 5314,
+   "len": 44
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2023-081.mp4",
+    "nv/2023-082.mp4",
+    "nv/2023-196.mp4"
+   ],
+   "from": 5358,
+   "len": 86
+  },
+  {
+   "t": "p",
+   "src": "d/2023-001.jpg",
+   "oy": "52%",
+   "org": "48% 46%",
+   "from": 5444,
+   "len": 117
+  },
+  {
+   "t": "v",
+   "src": "real-swing-a.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 5561,
+   "len": 78
+  },
+  {
+   "t": "c",
+   "kicker": "Injury report",
+   "title": "",
+   "sub": "Black eye",
+   "from": 5639,
+   "len": 78
+  },
+  {
+   "t": "a",
+   "src": "ten/club.jpg",
+   "from": 5717,
+   "len": 73
+  },
+  {
+   "t": "f",
+   "src": "players/darcy.jpg",
+   "name": "D\u2019ARCY",
+   "sub": "Folded \u00b7 La Quinta, 2021",
+   "op": "72% 30%",
+   "zoom": 1.0,
+   "org": "280px 387px",
+   "tr": "0px 0px",
+   "from": 5790,
+   "len": 156
+  },
+  {
+   "t": "c",
+   "kicker": "2020",
+   "title": "",
+   "sub": "The world stopped",
+   "from": 5946,
+   "len": 103
+  },
+  {
+   "t": "p",
+   "src": "d/early-022.jpg",
+   "tall": true,
+   "from": 6049,
+   "len": 43
+  },
+  {
+   "t": "p",
+   "src": "d/early-051.jpg",
+   "tall": true,
+   "from": 6092,
+   "len": 44
+  },
+  {
+   "from": 6136,
+   "len": 180,
+   "t": "v",
+   "src": "ten/drew2.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "vol": 1.0,
+   "tag": "Drew \u00b7 2024"
+  },
+  {
+   "from": 6316,
+   "len": 84,
+   "t": "c",
+   "kicker": "Strand 2.0",
+   "title": "The Expedition Years",
+   "sub": "2023 \u2013 2025 \u00b7 St. George \u00b7 Ojai \u00b7 Monterey",
+   "foot": ""
+  },
+  {
+   "t": "v",
+   "src": "r-pan2.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 6400,
+   "len": 46
+  },
+  {
+   "t": "p",
+   "src": "d/early-057.jpg",
+   "oy": "62%",
+   "org": "16% 46%",
+   "from": 6446,
+   "len": 45
+  },
+  {
+   "t": "v",
+   "src": "r-walk.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 6491,
+   "len": 15
+  },
+  {
+   "t": "v",
+   "src": "r-lodge.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 6506,
+   "len": 15
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2023-114.mp4",
+    "nv/2023-215.mp4",
+    "nv/2023-204.mp4"
+   ],
+   "from": 6521,
+   "len": 54
+  },
+  {
+   "t": "p",
+   "src": "d/2023-014.jpg",
+   "oy": "39%",
+   "org": "45% 46%",
+   "from": 6575,
+   "len": 55
+  },
+  {
+   "t": "p",
+   "src": "d/2023-051.jpg",
+   "oy": "0%",
+   "org": "57% 31%",
+   "from": 6630,
+   "len": 85
+  },
+  {
+   "t": "p",
+   "src": "d/2023-056.jpg",
+   "oy": "13%",
+   "org": "54% 51%",
+   "from": 6715,
+   "len": 120
+  },
+  {
+   "t": "f",
+   "src": "players/gord.jpg",
+   "name": "GORD",
+   "sub": "The ceremonial first tee shot",
+   "op": "100% 30%",
+   "zoom": 3.0,
+   "org": "316px 189px",
+   "tr": "-36px 172px",
+   "from": 6835,
+   "len": 120
+  },
+  {
+   "from": 6955,
+   "len": 366,
+   "t": "v",
+   "src": "ten/gord-tee.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "vol": 1.0,
+   "tag": "Actual footage \u00b7 St. George, 2023"
+  },
+  {
+   "t": "c",
+   "kicker": "Official distance",
+   "title": "",
+   "sub": "Five feet",
+   "from": 7321,
+   "len": 102
+  },
+  {
+   "t": "f",
+   "src": "players/kane.jpg",
+   "name": "NICK KANE",
+   "sub": "A par four. A dream.",
+   "op": "74% 30%",
+   "zoom": 1.84,
+   "org": "280px 230px",
+   "tr": "0px 131px",
+   "from": 7423,
+   "len": 81
+  },
+  {
+   "t": "v",
+   "src": "dvid/2023-063.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 7504,
+   "len": 81
+  },
+  {
+   "t": "v",
+   "src": "dvid/2023-079.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 7585,
+   "len": 68
+  },
+  {
+   "t": "p",
+   "src": "d/2023-054.jpg",
+   "oy": "0%",
+   "org": "62% 45%",
+   "from": 7653,
+   "len": 68
+  },
+  {
+   "t": "a",
+   "src": "ten/kanesprint.jpg",
+   "from": 7721,
+   "len": 58
+  },
+  {
+   "from": 7779,
+   "len": 108,
+   "t": "v",
+   "src": "ten/kane1.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "vol": 1.0,
+   "tag": "Actual footage \u00b7 2023"
+  },
+  {
+   "t": "v",
+   "src": "ten/kane2.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 7887,
+   "len": 70
+  },
+  {
+   "t": "v",
+   "src": "ten/kane3.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 7957,
+   "len": 70
+  },
+  {
+   "t": "a",
+   "src": "ten/kanecup.jpg",
+   "from": 8027,
+   "len": 63
+  },
+  {
+   "t": "a",
+   "src": "ten/kanestand.jpg",
+   "from": 8090,
+   "len": 62
+  },
+  {
+   "from": 8152,
+   "len": 120,
+   "t": "v",
+   "src": "ten/kane4.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "vol": 1.0,
+   "tag": "Actual footage \u00b7 the green"
+  },
+  {
+   "t": "p",
+   "src": "d/2023-202.jpg",
+   "tall": true,
+   "from": 8272,
+   "len": 64,
+   "drama": true
+  },
+  {
+   "from": 8336,
+   "len": 90,
+   "t": "c",
+   "kicker": "St. George, 2023",
+   "title": "",
+   "sub": "It was a par four",
+   "foot": "It did not go in."
+  },
+  {
+   "t": "v",
+   "src": "dvid/2023-032.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 8426,
+   "len": 30
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2023-047.mp4",
+    "nv/2023-061.mp4",
+    "nv/2023-062.mp4"
+   ],
+   "from": 8456,
+   "len": 61
+  },
+  {
+   "t": "p",
+   "src": "d/2023-085.jpg",
+   "oy": "53%",
+   "org": "64% 48%",
+   "from": 8517,
+   "len": 30
+  },
+  {
+   "t": "v",
+   "src": "dvid/2023-203.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 8547,
+   "len": 30
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2023-064.mp4",
+    "nv/2023-077.mp4",
+    "nv/2023-083.mp4"
+   ],
+   "from": 8577,
+   "len": 61
+  },
+  {
+   "t": "p",
+   "src": "d/2023-154.jpg",
+   "oy": "58%",
+   "org": "39% 46%",
+   "from": 8638,
+   "len": 30
+  },
+  {
+   "t": "v",
+   "src": "dvid/2023-058.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 8668,
+   "len": 30
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2023-190.mp4",
+    "nv/2023-193.mp4",
+    "nv/2023-194.mp4"
+   ],
+   "from": 8698,
+   "len": 61
+  },
+  {
+   "t": "p",
+   "src": "d/2023-018.jpg",
+   "oy": "100%",
+   "org": "45% 60%",
+   "from": 8759,
+   "len": 30
+  },
+  {
+   "t": "v",
+   "src": "dvid/2023-024.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 8789,
+   "len": 33
+  },
+  {
+   "t": "v",
+   "src": "nv/2024-026.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 8822,
+   "len": 21
+  },
+  {
+   "t": "p",
+   "src": "d/2024-064.jpg",
+   "oy": "72%",
+   "org": "48% 46%",
+   "from": 8843,
+   "len": 54
+  },
+  {
+   "t": "p",
+   "src": "d/2024-047.jpg",
+   "tall": true,
+   "from": 8897,
+   "len": 54
+  },
+  {
+   "t": "v",
+   "src": "nv/2024-025.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 8951,
+   "len": 76
+  },
+  {
+   "t": "c",
+   "kicker": "Ojai 2024 \u00b7 Final score",
+   "title": "",
+   "sub": "25 \u2013 23",
+   "from": 9027,
+   "len": 75
+  },
+  {
+   "from": 9102,
+   "len": 228,
+   "t": "v",
+   "src": "ten/drew2b.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "vol": 1.0,
+   "tag": "Drew \u00b7 \u201cWith the Strand\u201d \u00b7 2024"
+  },
+  {
+   "t": "v",
+   "src": "dvid/2024-012.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 9330,
+   "len": 32
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2024-015.mp4",
+    "nv/2024-021.mp4",
+    "nv/2024-049.mp4"
+   ],
+   "from": 9362,
+   "len": 65
+  },
+  {
+   "t": "p",
+   "src": "d/2024-007.jpg",
+   "oy": "0%",
+   "org": "48% 31%",
+   "from": 9427,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "nv/2024-018.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 9459,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "dvid/2024-002.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 9491,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "d/2024-016.jpg",
+   "tall": true,
+   "from": 9523,
+   "len": 32
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2024-060.mp4",
+    "nv/2024-061.mp4",
+    "nv/2024-069.mp4"
+   ],
+   "from": 9555,
+   "len": 65
+  },
+  {
+   "t": "v",
+   "src": "dvid/2024-051a.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 9620,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "d/2024-031.jpg",
+   "oy": "87%",
+   "org": "44% 46%",
+   "from": 9652,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "nv/2024-019.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 9684,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "dvid/2024-004.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 9716,
+   "len": 34
+  },
+  {
+   "t": "v",
+   "src": "nv/2025-053.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 9750,
+   "len": 23
+  },
+  {
+   "t": "p",
+   "src": "d/2025-010.jpg",
+   "tall": true,
+   "from": 9773,
+   "len": 108
+  },
+  {
+   "t": "v",
+   "src": "dvid/2025-041.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 9881,
+   "len": 91
+  },
+  {
+   "t": "a",
+   "src": "ten/tone.jpg",
+   "from": 9972,
+   "len": 100
+  },
+  {
+   "t": "p",
+   "src": "d/2025-082.jpg",
+   "oy": "69%",
+   "org": "63% 46%",
+   "from": 10072,
+   "len": 14
+  },
+  {
+   "from": 10086,
+   "len": 180,
+   "t": "v",
+   "src": "ten/drew3.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "vol": 1.0,
+   "tag": "Drew \u00b7 \u201cBy the Bay\u201d \u00b7 2025"
+  },
+  {
+   "t": "v",
+   "src": "dvid/2025-043.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10266,
+   "len": 29
+  },
+  {
+   "t": "tri",
+   "srcs": [
+    "nv/2025-042.mp4",
+    "nv/2025-101.mp4",
+    "nv/2025-110.mp4"
+   ],
+   "from": 10295,
+   "len": 57
+  },
+  {
+   "t": "p",
+   "src": "d/2025-098.jpg",
+   "oy": "42%",
+   "org": "64% 46%",
+   "from": 10352,
+   "len": 29
+  },
+  {
+   "t": "v",
+   "src": "nv/2025-046.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10381,
+   "len": 29
+  },
+  {
+   "t": "v",
+   "src": "dvid/2025-094.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10410,
+   "len": 29
+  },
+  {
+   "t": "p",
+   "src": "d/2025-006.jpg",
+   "tall": true,
+   "from": 10439,
+   "len": 29
+  },
+  {
+   "t": "v",
+   "src": "dvid/2025-116.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10468,
+   "len": 29
+  },
+  {
+   "t": "p",
+   "src": "d/2025-019.jpg",
+   "oy": "100%",
+   "org": "46% 79%",
+   "from": 10497,
+   "len": 29
+  },
+  {
+   "t": "v",
+   "src": "dvid/2025-039.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10526,
+   "len": 29
+  },
+  {
+   "t": "v",
+   "src": "dvid/2025-047.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10555,
+   "len": 29
+  },
+  {
+   "t": "p",
+   "src": "d/2025-020.jpg",
+   "oy": "67%",
+   "org": "51% 46%",
+   "from": 10584,
+   "len": 29
+  },
+  {
+   "t": "v",
+   "src": "dvid/2025-052.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10613,
+   "len": 25
+  },
+  {
+   "from": 10638,
+   "len": 84,
+   "t": "c",
+   "kicker": "Strand 3.0",
+   "title": "Destination Resorts",
+   "sub": "2026 \u00b7 Gamble Sands, Washington",
+   "foot": ""
+  },
+  {
+   "t": "v",
+   "src": "real-tee.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10722,
+   "len": 56
+  },
+  {
+   "t": "p",
+   "src": "p/092.jpg",
+   "tall": true,
+   "from": 10778,
+   "len": 18
+  },
+  {
+   "t": "p",
+   "src": "p/095.jpg",
+   "oy": "0%",
+   "org": "40% 50%",
+   "from": 10796,
+   "len": 18
+  },
+  {
+   "t": "v",
+   "src": "r-pairings.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10814,
+   "len": 58
+  },
+  {
+   "t": "v",
+   "src": "envelope.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 10872,
+   "len": 58
+  },
+  {
+   "t": "p",
+   "src": "p/097.jpg",
+   "oy": "41%",
+   "org": "64% 46%",
+   "from": 10930,
+   "len": 123
+  },
+  {
+   "t": "v",
+   "src": "r-bridge.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11053,
+   "len": 41
+  },
+  {
+   "from": 11094,
+   "len": 228,
+   "t": "v",
+   "src": "ten/drew4.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "vol": 1.0,
+   "tag": "Drew \u00b7 \u201cRamblin\u2019 Man\u201d \u00b7 2026"
+  },
+  {
+   "t": "v",
+   "src": "r-maroon.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11322,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "p/050.jpg",
+   "tall": true,
+   "from": 11354,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "r-pink.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11386,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "p/081.jpg",
+   "oy": "0%",
+   "org": "76% 73%",
+   "from": 11418,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "r-redsun.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11450,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "p/042.jpg",
+   "oy": "50%",
+   "org": "51% 46%",
+   "from": 11482,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "r-swing09.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11514,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "p/074.jpg",
+   "oy": "6%",
+   "org": "40% 46%",
+   "from": 11546,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "r-selfie2.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11578,
+   "len": 26
+  },
+  {
+   "t": "p",
+   "src": "p/082.jpg",
+   "oy": "10%",
+   "org": "66% 66%",
+   "from": 11604,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "r-tee75.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11636,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "p/088.jpg",
+   "tall": true,
+   "from": 11668,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "real-swing-b.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11700,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "p/044.jpg",
+   "tall": true,
+   "from": 11732,
+   "len": 32
+  },
+  {
+   "t": "v",
+   "src": "r-teebox.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 11764,
+   "len": 32
+  },
+  {
+   "t": "p",
+   "src": "p/047.jpg",
+   "tall": true,
+   "from": 11796,
+   "len": 36
+  },
+  {
+   "t": "p",
+   "src": "d/early-062.jpg",
+   "oy": "61%",
+   "org": "38% 46%",
+   "from": 11832,
+   "len": 68
+  },
+  {
+   "t": "f",
+   "src": "players/drew.jpg",
+   "name": "DREW",
+   "sub": "Two meatballs. Eighty dollars.",
+   "op": "8% 30%",
+   "zoom": 2.31,
+   "org": "280px 275px",
+   "tr": "0px 86px",
+   "from": 11900,
+   "len": 91
+  },
+  {
+   "t": "c",
+   "kicker": "Mid-round equipment change",
+   "title": "",
+   "sub": "A new driver shaft",
+   "from": 11991,
+   "len": 107
+  },
+  {
+   "t": "f",
+   "src": "players/p-mo.jpg",
+   "name": "PAT",
+   "sub": "One five-hybrid. Entire golf course.",
+   "op": "0% 30%",
+   "zoom": 1,
+   "org": "274px 329px",
+   "tr": "0px 0px",
+   "from": 12098,
+   "len": 89
+  },
+  {
+   "t": "f",
+   "src": "players/nick.jpg",
+   "name": "NICK SPROWLS",
+   "sub": "Hole-in-one \u00b7 location: a bachelor party",
+   "op": "49% 30%",
+   "zoom": 1.68,
+   "org": "280px 234px",
+   "tr": "0px 127px",
+   "from": 12187,
+   "len": 87
+  },
+  {
+   "t": "v",
+   "src": "g-party.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 12274,
+   "len": 86
+  },
+  {
+   "t": "a",
+   "src": "ten/glass.jpg",
+   "from": 12360,
+   "len": 90
+  },
+  {
+   "t": "ps",
+   "src": "d/early-036.jpg",
+   "tall": true,
+   "from": 12450,
+   "len": 68
+  },
+  {
+   "t": "ps",
+   "src": "d/early-042.jpg",
+   "from": 12518,
+   "len": 68
+  },
+  {
+   "t": "ps",
+   "src": "d/early-043.jpg",
+   "from": 12586,
+   "len": 68
+  },
+  {
+   "t": "p",
+   "src": "d/early-069.jpg",
+   "tall": true,
+   "from": 12654,
+   "len": 35
+  },
+  {
+   "t": "p",
+   "src": "d/2023-027.jpg",
+   "oy": "100%",
+   "org": "59% 47%",
+   "from": 12689,
+   "len": 35
+  },
+  {
+   "t": "p",
+   "src": "d/2025-023.jpg",
+   "oy": "27%",
+   "org": "44% 46%",
+   "from": 12724,
+   "len": 34
+  },
+  {
+   "t": "v",
+   "src": "dvid/2023-203b.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 12758,
+   "len": 48
+  },
+  {
+   "t": "v",
+   "src": "dvid/2024-024.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 12806,
+   "len": 49
+  },
+  {
+   "t": "a",
+   "src": "ten/drone.jpg",
+   "from": 12855,
+   "len": 68
+  },
+  {
+   "t": "p",
+   "src": "p/079.jpg",
+   "tall": true,
+   "from": 12923,
+   "len": 85
+  },
+  {
+   "t": "v",
+   "src": "dvid/early-021.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 13008,
+   "len": 48
+  },
+  {
+   "from": 13056,
+   "len": 120,
+   "t": "c",
+   "kicker": "2018 \u2013 2027",
+   "title": "The Strand Invitational",
+   "sub": "Ten years. One brotherhood.",
+   "foot": ""
+  },
+  {
+   "t": "a",
+   "src": "ten/tease1.jpg",
+   "from": 13176,
+   "len": 47
+  },
+  {
+   "t": "a",
+   "src": "ten/tease2.jpg",
+   "from": 13223,
+   "len": 86
+  },
+  {
+   "from": 13309,
+   "len": 102,
+   "t": "c",
+   "kicker": "2027",
+   "title": "",
+   "sub": "Destination: classified",
+   "foot": ""
+  },
+  {
+   "t": "c",
+   "kicker": "All songs written and performed by",
+   "title": "",
+   "sub": "Drew",
+   "from": 13411,
+   "len": 90
+  },
+  {
+   "t": "f",
+   "src": "players/j-bone.jpg",
+   "name": "J-BONE",
+   "sub": "Also starring",
+   "op": "100% 30%",
+   "zoom": 1,
+   "org": "309px 273px",
+   "tr": "0px 0px",
+   "from": 13501,
+   "len": 45
+  },
+  {
+   "t": "f",
+   "src": "players/jack.jpg",
+   "name": "JACK",
+   "sub": "Also starring",
+   "op": "71% 30%",
+   "zoom": 1.41,
+   "org": "280px 250px",
+   "tr": "0px 102px",
+   "from": 13546,
+   "len": 45
+  },
+  {
+   "t": "f",
+   "src": "players/kerns-cartoon.png",
+   "name": "KERNS",
+   "sub": "Also starring",
+   "op": "50% 30%",
+   "zoom": 1,
+   "org": "280px 387px",
+   "tr": "0px 0px",
+   "from": 13591,
+   "len": 45
+  },
+  {
+   "t": "f",
+   "src": "players/hummel.jpg",
+   "name": "HUMMEL",
+   "sub": "Also starring",
+   "op": "50% 30%",
+   "zoom": 1.0,
+   "org": "280px 585px",
+   "tr": "0px 0px",
+   "from": 13636,
+   "len": 45
+  },
+  {
+   "t": "f",
+   "src": "players/jason.jpg",
+   "name": "JASON",
+   "sub": "Also starring",
+   "op": "67% 30%",
+   "zoom": 3.2,
+   "org": "280px 129px",
+   "tr": "0px 232px",
+   "from": 13681,
+   "len": 45
+  },
+  {
+   "t": "f",
+   "src": "players/shaun.jpg",
+   "name": "SHAUN",
+   "sub": "Also starring",
+   "op": "50% 0%",
+   "zoom": 1.31,
+   "org": "284px 300px",
+   "tr": "-4px 61px",
+   "from": 13726,
+   "len": 45
+  },
+  {
+   "t": "f",
+   "src": "players/brett.jpg",
+   "name": "BRETT",
+   "sub": "Also starring",
+   "op": "0% 30%",
+   "zoom": 1.39,
+   "org": "148px 364px",
+   "tr": "58px -3px",
+   "from": 13771,
+   "len": 45
+  },
+  {
+   "t": "f",
+   "src": "players/blonski.jpg",
+   "name": "BLONSKI",
+   "sub": "Also starring",
+   "op": "79% 30%",
+   "zoom": 1,
+   "org": "280px 516px",
+   "tr": "0px 0px",
+   "from": 13816,
+   "len": 45
+  },
+  {
+   "t": "f",
+   "src": "players/tony-schroe.jpg",
+   "name": "TONY SCHROE",
+   "sub": "Also starring",
+   "op": "0% 30%",
+   "zoom": 1.6,
+   "org": "266px 344px",
+   "tr": "14px 17px",
+   "from": 13861,
+   "len": 45
+  },
+  {
+   "t": "p",
+   "src": "d/early-044.jpg",
+   "from": 13906,
+   "len": 39
+  },
+  {
+   "t": "p",
+   "src": "d/early-046.jpg",
+   "tall": true,
+   "from": 13945,
+   "len": 39
+  },
+  {
+   "t": "v",
+   "src": "dvid/2024-022.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 13984,
+   "len": 39
+  },
+  {
+   "t": "p",
+   "src": "d/early-047.jpg",
+   "tall": true,
+   "from": 14023,
+   "len": 39
+  },
+  {
+   "t": "p",
+   "src": "d/early-050.jpg",
+   "tall": true,
+   "from": 14062,
+   "len": 39
+  },
+  {
+   "t": "v",
+   "src": "dvid/2024-051b.mp4",
+   "trim": 0,
+   "rate": 1.0,
+   "from": 14101,
+   "len": 39
+  },
+  {
+   "t": "p",
+   "src": "d/early-009.jpg",
+   "from": 14140,
+   "len": 39
+  },
+  {
+   "t": "p",
+   "src": "d/early-011.jpg",
+   "tall": true,
+   "from": 14179,
+   "len": 39
+  },
+  {
+   "t": "p",
+   "src": "d/early-072.jpg",
+   "tall": true,
+   "from": 14218,
+   "len": 39
+  },
+  {
+   "t": "p",
+   "src": "d/early-017.jpg",
+   "tall": true,
+   "from": 14257,
+   "len": 39
+  },
+  {
+   "from": 14296,
+   "len": 138,
+   "t": "c",
+   "kicker": "Toeing the line between golf trip and boys trip since 2018",
+   "title": "",
+   "sub": "See you in 2027",
+   "foot": ""
+  },
+  {
+   "t": "k",
+   "from": 14434,
+   "len": 48
+  },
+  {
+   "t": "a",
+   "src": "ten/newcart.jpg",
+   "from": 14482,
+   "len": 66
+  },
+  {
+   "t": "a",
+   "src": "ten/newcart.jpg",
+   "from": 14548,
+   "len": 81,
+   "drama": true
+  },
+  {
+   "t": "a",
+   "src": "ten/newcart.jpg",
+   "from": 14629,
+   "len": 27
+  },
+  {
+   "t": "a",
+   "src": "ten/newcart.jpg",
+   "from": 14656,
+   "len": 112,
+   "drama": true
+  },
+  {
+   "from": 14768,
+   "len": 72,
+   "t": "c",
+   "kicker": "",
+   "title": "",
+   "sub": "The End",
+   "foot": ""
+  }
+ ],
+ "music": [
+  {
+   "file": "ten/mA.mp3",
+   "from": 0,
+   "to": 707,
+   "offset": 0,
+   "vol": 0.8
+  },
+  {
+   "file": "ten/o1.mp3",
+   "from": 917,
+   "to": 1271,
+   "offset": 1314,
+   "vol": 1.0
+  },
+  {
+   "file": "ten/bed.mp3",
+   "from": 1271,
+   "to": 3668,
+   "offset": 0,
+   "vol": 0.5
+  },
+  {
+   "file": "ten/mB.mp3",
+   "from": 3668,
+   "to": 5138,
+   "offset": 0,
+   "vol": 0.8
+  },
+  {
+   "file": "ten/bed.mp3",
+   "from": 5138,
+   "to": 6136,
+   "offset": 1140,
+   "vol": 0.5
+  },
+  {
+   "file": "ten/bed.mp3",
+   "from": 6316,
+   "to": 6955,
+   "offset": 2280,
+   "vol": 0.5
+  },
+  {
+   "file": "ten/bed.mp3",
+   "from": 7423,
+   "to": 7779,
+   "offset": 3000,
+   "vol": 0.5
+  },
+  {
+   "file": "ten/o1.mp3",
+   "from": 8426,
+   "to": 8822,
+   "offset": 180,
+   "vol": 1.0
+  },
+  {
+   "file": "ten/bed.mp3",
+   "from": 8822,
+   "to": 9102,
+   "offset": 600,
+   "vol": 0.5
+  },
+  {
+   "file": "ten/o2.mp3",
+   "from": 9330,
+   "to": 9750,
+   "offset": 918,
+   "vol": 1.0
+  },
+  {
+   "file": "ten/bed.mp3",
+   "from": 9750,
+   "to": 10086,
+   "offset": 1560,
+   "vol": 0.5
+  },
+  {
+   "file": "ten/o3.mp3",
+   "from": 10266,
+   "to": 10638,
+   "offset": 1428,
+   "vol": 1.0
+  },
+  {
+   "file": "ten/bed.mp3",
+   "from": 10638,
+   "to": 11094,
+   "offset": 3360,
+   "vol": 0.5
+  },
+  {
+   "file": "ten/o4.mp3",
+   "from": 11322,
+   "to": 11832,
+   "offset": 768,
+   "vol": 1.0
+  },
+  {
+   "file": "ten/bed.mp3",
+   "from": 11832,
+   "to": 12450,
+   "offset": 240,
+   "vol": 0.5
+  },
+  {
+   "file": "ten/o2.mp3",
+   "from": 12450,
+   "to": 13176,
+   "offset": 1167,
+   "vol": 0.95
+  },
+  {
+   "file": "ten/mB.mp3",
+   "from": 13176,
+   "to": 13411,
+   "offset": 600,
+   "vol": 0.8
+  },
+  {
+   "file": "ten/o4.mp3",
+   "from": 13411,
+   "to": 14434,
+   "offset": 2106,
+   "vol": 1.0
+  }
+ ],
+ "subs": [
+  {
+   "text": "Boys, I\u2019ve got incredible news. I saved everyone seven dollars and forty-three cents.",
+   "from": 2213,
+   "len": 200
+  },
+  {
+   "text": "You\u2019re welcome.",
+   "from": 2417,
+   "len": 42
+  },
+  {
+   "text": "Well... that\u2019s not ideal.",
+   "from": 4606,
+   "len": 87
+  },
+  {
+   "text": "Think that\u2019s a free drop?",
+   "from": 5045,
+   "len": 89
+  },
+  {
+   "text": "You still gotta chip, dude.",
+   "from": 8272,
+   "len": 60
+  },
+  {
+   "text": "Hey, Wix... you driving?",
+   "from": 14548,
+   "len": 77
+  },
+  {
+   "text": "Fuck you.",
+   "from": 14656,
+   "len": 108
+  }
+ ],
+ "lyrics": [
+  {
+   "text": "The Strand, the Strand, take me to the Strand",
+   "from": 731,
+   "len": 138
+  },
+  {
+   "text": "Hey, it\u2019s here, that special time of year",
+   "from": 8447,
+   "len": 132
+  },
+  {
+   "text": "Where we golf and drink lots of beer",
+   "from": 8591,
+   "len": 150
+  },
+  {
+   "text": "The Strand, the Strand\u2026",
+   "from": 8756,
+   "len": 66
+  },
+  {
+   "text": "Hey\u2026 I\u2019m at the Strand, with all of my friends",
+   "from": 9105,
+   "len": 90
+  },
+  {
+   "text": "No, I don\u2019t want this night to end",
+   "from": 9195,
+   "len": 54
+  },
+  {
+   "text": "\u2019Cause I\u2019m at the Strand, with all of my friends",
+   "from": 9252,
+   "len": 75
+  },
+  {
+   "text": "Now it\u2019s time to play Piper",
+   "from": 9342,
+   "len": 54
+  },
+  {
+   "text": "Gotta change a dirty diaper",
+   "from": 9396,
+   "len": 66
+  },
+  {
+   "text": "But I don\u2019t care, my ball\u2019s in the air",
+   "from": 9462,
+   "len": 84
+  },
+  {
+   "text": "Par five comin\u2019 up next, oh yeah",
+   "from": 9546,
+   "len": 69
+  },
+  {
+   "text": "Please hit the green, oh baby",
+   "from": 9615,
+   "len": 66
+  },
+  {
+   "text": "And make an eagle putt, just like Freddie",
+   "from": 9681,
+   "len": 69
+  },
+  {
+   "text": "By the bay, in Monterey, it\u2019s the Strand \u2014 ay, ay",
+   "from": 10098,
+   "len": 150
+  },
+  {
+   "text": "New putter Tone, and Kaners in the zone",
+   "from": 10284,
+   "len": 108
+  },
+  {
+   "text": "So tee it high, boys, let it fly",
+   "from": 10395,
+   "len": 78
+  },
+  {
+   "text": "I hope I bomb a drive!",
+   "from": 10473,
+   "len": 48
+  },
+  {
+   "text": "So tee it high, boys, let it fly",
+   "from": 10521,
+   "len": 78
+  },
+  {
+   "text": "I hope I bomb a drive!",
+   "from": 10599,
+   "len": 39
+  }
+ ]
+}
