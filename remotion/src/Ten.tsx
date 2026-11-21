@@ -201,6 +201,7 @@ const Face: React.FC<{ s: Shot }> = ({ s }) => {
         <div style={{ width: 140, height: 10, background: RED, marginBottom: 26 }} />
         <div style={{ ...caps(Math.min(140, Math.round(1150 / Math.max(5, (s.name ?? "").length))), 900, "0.01em"), color: "#fff", translate: `${interpolate(frame, [0, 8], [40, 0], { ...clamp, easing: ease })}px 0px` }}>{s.name}</div>
         {s.role ? <div style={{ ...caps(34, 600, "0.2em"), color: GOLD_SOFT, marginTop: 22 }}>{s.role}</div> : null}
+        {s.sub ? <div style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 42, color: "#fff", marginTop: 36, lineHeight: 1.35, opacity: interpolate(frame, [14, 22], [0, 1], clamp) }}>{s.sub}</div> : null}
       </div>
     </AbsoluteFill>
   );
@@ -298,6 +299,9 @@ const FaceCard: React.FC<{ s: Shot; quote?: boolean }> = ({ s, quote }) => {
           {name}
         </div>
         <div style={{ ...caps(quote ? 26 : 30, 600, "0.24em"), color: GOLD_SOFT, marginTop: 20, lineHeight: 1.4, opacity: interpolate(frame, [8, 14], [0, 1], clamp) }}>{s.role}</div>
+        {s.sub && !quote ? (
+          <div style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 40, color: "#fff", marginTop: 34, lineHeight: 1.35, opacity: interpolate(frame, [16, 24], [0, 1], clamp) }}>{s.sub}</div>
+        ) : null}
       </div>
       {quote ? <Corner>Reenactment · voiced by an actor</Corner> : null}
     </AbsoluteFill>
