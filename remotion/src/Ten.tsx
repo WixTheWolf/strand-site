@@ -53,6 +53,9 @@ const HUSH = timeline.hush as number[][];
 const OVERS = ((timeline as { overs?: Array<{ src: string; from: number; len: number }> }).overs ?? []);
 const LTS = ((timeline as { lts?: Array<{ name: string; role: string; from: number; len: number }> }).lts ?? []);
 const FACTS = ((timeline as { facts?: Array<{ text: string; from: number; len: number }> }).facts ?? []);
+const KWS = ((timeline as { kws?: Array<{ text: string; from: number; len: number }> }).kws ?? []);
+const CHIPS = ((timeline as { chips?: Array<{ src: string; name: string; idx: string; from: number; len: number }> }).chips ?? []);
+const RAIL = ((timeline as { rail?: Array<{ i: number; year: string; place: string; from: number; len: number }> }).rail ?? []);
 const DUCK = (timeline as { duck?: number }).duck ?? 0.26;
 
 const caps = (size: number, weight = 800, tracking = "0.06em"): React.CSSProperties => ({
@@ -188,6 +191,67 @@ const Whole: React.FC<{ src: string }> = ({ src }) => {
   );
 };
 
+/** A word or number slammed over the picture in time with the narrator. */
+const Kw: React.FC<{ text: string; len: number }> = ({ text, len }) => {
+  const frame = useCurrentFrame();
+  const m = text.match(/^(\S+)\s+(.*)$/);
+  const big = m && /^[\d½–-]+$/.test(m[1]) ? m[1] : null;
+  const rest = big && m ? m[2] : text;
+  const pop = interpolate(frame, [0, 5], [1.5, 1], { ...clamp, easing: ease });
+  return (
+    <AbsoluteFill style={{ opacity: interpolate(frame, [0, 2, len - 5, len], [0, 1, 1, 0], clamp) }}>
+      <AbsoluteFill style={{ background: "linear-gradient(0deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0) 55%)" }} />
+      <div style={{ position: "absolute", left: 110, bottom: BAR + 70, display: "flex", alignItems: "flex-end", gap: 34, scale: String(pop), transformOrigin: "0% 100%" }}>
+        {big ? <div style={{ ...caps(330, 900, "-0.04em"), color: "#fff", lineHeight: 0.82 }}>{big}</div> : null}
+        <div style={{ paddingBottom: big ? 14 : 0 }}>
+          <div style={{ width: interpolate(frame, [2, 10], [0, 220], { ...clamp, easing: ease }), height: 14, background: RED, marginBottom: 20 }} />
+          <div style={{ ...caps(big ? 104 : 150, 900, "-0.01em"), color: "#fff" }}>{rest}</div>
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/** Whose eight seconds these are: a small plate that stays up over their footage. */
+const Chip: React.FC<{ src: string; name: string; idx: string; len: number }> = ({ src, name, idx, len }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{ position: "absolute", left: 110, top: BAR + 40, display: "flex", alignItems: "stretch", opacity: interpolate(frame, [0, 5, len - 5, len], [0, 1, 1, 0], clamp), translate: `${interpolate(frame, [0, 8], [-50, 0], { ...clamp, easing: ease })}px 0px` }}>
+      <div style={{ background: "#0a0a0a", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", width: 112, height: 112 }}>
+        <CanvasImage src={staticFile(src)} style={{ maxWidth: 96, maxHeight: 96, width: "auto", height: "auto" }} />
+      </div>
+      <div style={{ background: RED, padding: "0 20px", display: "flex", alignItems: "center", ...caps(30, 900, "0.1em"), color: "#fff" }}>{idx}</div>
+      <div style={{ background: "rgba(8,8,8,0.92)", padding: "0 30px", display: "flex", alignItems: "center", ...caps(54, 900, "0.02em"), color: "#fff" }}>{name}</div>
+    </div>
+  );
+};
+
+/** Nine years on one line: the year in play lights up. */
+const Rail: React.FC<{ i: number; year: string; place: string; len: number }> = ({ i, year, place, len }) => {
+  const frame = useCurrentFrame();
+  const years = ["18", "19", "20", "21", "22", "23", "24", "25", "26"];
+  return (
+    <AbsoluteFill>
+      <AbsoluteFill style={{ background: "linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 48%)" }} />
+      <div style={{ position: "absolute", left: 110, bottom: BAR + 150, display: "flex", alignItems: "flex-end", gap: 30 }}>
+        <div style={{ ...caps(230, 900, "-0.03em"), color: "#fff", lineHeight: 0.84, scale: String(interpolate(frame, [0, 4], [1.25, 1], { ...clamp, easing: ease })), transformOrigin: "0% 100%" }}>{year}</div>
+        <div style={{ paddingBottom: 12 }}>
+          <div style={{ ...caps(28, 700, "0.34em"), color: GOLD_SOFT, marginBottom: 12 }}>{`Strand ${i + 1} of 9`}</div>
+          <div style={{ ...caps(70, 900, "0.02em"), color: "#fff" }}>{place}</div>
+        </div>
+      </div>
+      <div style={{ position: "absolute", left: 110, right: 110, bottom: BAR + 50, display: "flex", gap: 10 }}>
+        {years.map((y, k) => (
+          <div key={y} style={{ flex: 1 }}>
+            <div style={{ height: 12, background: k < i ? "#fff" : k === i ? RED : "rgba(255,255,255,0.22)", transformOrigin: "0% 50%", scale: k === i ? `${interpolate(frame, [0, len], [0.15, 1], clamp)} 1` : "1 1" }} />
+            <div style={{ ...caps(24, 800, "0.2em"), color: k === i ? "#fff" : "rgba(255,255,255,0.5)", marginTop: 10 }}>{`’${y}`}</div>
+          </div>
+        ))}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 /** Credits: the whole headshot, the name beside it. */
 const Face: React.FC<{ s: Shot }> = ({ s }) => {
   const frame = useCurrentFrame();
@@ -195,14 +259,16 @@ const Face: React.FC<{ s: Shot }> = ({ s }) => {
     <AbsoluteFill style={{ backgroundColor: "#060606", overflow: "hidden" }}>
       <CanvasImage src={staticFile(s.src ?? "")} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(40px) brightness(0.3)", scale: "1.25" }} />
       <div style={{ position: "absolute", left: 150, top: 110, width: 800, height: 860, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CanvasImage src={staticFile(s.src ?? "")} style={{ maxWidth: 800, maxHeight: 860, width: "auto", height: "auto", boxShadow: "0 26px 90px rgba(0,0,0,0.75)" }} />
+        <CanvasImage src={staticFile(s.src ?? "")} style={{ maxWidth: 780, maxHeight: 820, width: "auto", height: "auto", boxShadow: "0 26px 90px rgba(0,0,0,0.75)", border: s.kicker ? "14px solid #fff" : undefined, rotate: s.kicker ? `${interpolate(frame, [0, 10], [-5, -1.5], { ...clamp, easing: ease })}deg` : undefined, scale: s.kicker ? String(interpolate(frame, [0, 8], [1.12, 1], { ...clamp, easing: ease })) : undefined }} />
       </div>
       <div style={{ position: "absolute", left: 1030, right: 100, top: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-        <div style={{ width: 140, height: 10, background: RED, marginBottom: 26 }} />
-        <div style={{ ...caps(Math.min(140, Math.round(1150 / Math.max(5, (s.name ?? "").length))), 900, "0.01em"), color: "#fff", translate: `${interpolate(frame, [0, 8], [40, 0], { ...clamp, easing: ease })}px 0px` }}>{s.name}</div>
+        {s.kicker ? <div style={{ ...caps(40, 900, "0.3em"), color: GOLD_SOFT, marginBottom: 22 }}>{s.kicker}</div> : null}
+        <div style={{ width: s.kicker ? interpolate(frame, [2, 12], [0, 260], { ...clamp, easing: ease }) : 140, height: s.kicker ? 14 : 10, background: RED, marginBottom: 26 }} />
+        <div style={{ ...caps(Math.min(s.kicker ? 190 : 140, Math.round(1150 / Math.max(5, (s.name ?? "").length))), 900, "0.01em"), color: "#fff", translate: `${interpolate(frame, [0, 8], [40, 0], { ...clamp, easing: ease })}px 0px` }}>{s.name}</div>
         {s.role ? <div style={{ ...caps(34, 600, "0.2em"), color: GOLD_SOFT, marginTop: 22 }}>{s.role}</div> : null}
-        {s.sub ? <div style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 42, color: "#fff", marginTop: 36, lineHeight: 1.35, opacity: interpolate(frame, [14, 22], [0, 1], clamp) }}>{s.sub}</div> : null}
+        {s.sub ? <div style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 42, color: "#fff", marginTop: 36, lineHeight: 1.35, opacity: interpolate(frame, s.kicker ? [6, 12] : [14, 22], [0, 1], clamp) }}>{s.sub}</div> : null}
       </div>
+      {s.kicker ? <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 4], [0.6, 0], clamp) }} /> : null}
     </AbsoluteFill>
   );
 };
@@ -623,6 +689,21 @@ export const Ten: React.FC = () => {
       {OVERS.map((o) => (
         <Sequence key={`over-${o.from}`} name={`Cutaway ${o.src}`} from={o.from} durationInFrames={o.len}>
           <Whole src={o.src} />
+        </Sequence>
+      ))}
+      {RAIL.map((r) => (
+        <Sequence key={`rail-${r.from}`} name={`Year ${r.year}`} from={r.from} durationInFrames={r.len}>
+          <Rail i={r.i} year={r.year} place={r.place} len={r.len} />
+        </Sequence>
+      ))}
+      {KWS.map((k) => (
+        <Sequence key={`kw-${k.from}`} name={`Word ${k.text}`} from={k.from} durationInFrames={k.len}>
+          <Kw text={k.text} len={k.len} />
+        </Sequence>
+      ))}
+      {CHIPS.map((c) => (
+        <Sequence key={`chip-${c.from}`} name={`Chip ${c.name}`} from={c.from} durationInFrames={c.len} layout="none">
+          <Chip src={c.src} name={c.name} idx={c.idx} len={c.len} />
         </Sequence>
       ))}
       {LTS.map((l) => (
