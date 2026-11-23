@@ -2,7 +2,7 @@ import { Audio, Video } from "@remotion/media";
 import { AbsoluteFill, CanvasImage, Freeze, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Grain, Vignette } from "./Cinematic";
 import { SlowPlate } from "./Decade";
-import { BONE, FONT, GOLD_SOFT, INK, clamp } from "./Kinetic";
+import { FONT, GOLD_SOFT, INK, clamp } from "./Kinetic";
 import { FootageScene, SERIF, ease } from "./StrandFilm";
 import timeline from "./ten-timeline.json";
 
@@ -15,7 +15,13 @@ import timeline from "./ten-timeline.json";
 export const TEN_DURATION = timeline.total;
 
 const BAR = 62; // slim bars: cinema without hiding heads
-const RED = "#c8102e";
+const PIER = (timeline as { theme?: string }).theme === "pier"; // cream and green, after the pier mark
+const RED = PIER ? "#2e6b52" : "#c8102e";
+const BG = PIER ? "#f3eedf" : "#000";
+const INKC = PIER ? "#16382b" : "#fff";
+const ACC = PIER ? "#9a7a2a" : "#e8c86a";
+const SUBC = PIER ? "#3d5a4c" : "#f4f2ea";
+const SLAB = PIER ? "rgba(243,238,223,0.96)" : "rgba(8,8,8,0.9)";
 
 type Fit = { op?: string; zoom?: number; org?: string; tr?: string };
 type Shot = Fit & {
@@ -59,7 +65,7 @@ const RAIL = ((timeline as { rail?: Array<{ i: number; year: string; place: stri
 const DUCK = (timeline as { duck?: number }).duck ?? 0.26;
 
 const caps = (size: number, weight = 800, tracking = "0.06em"): React.CSSProperties => ({
-  fontFamily: FONT,
+  fontFamily: PIER ? SERIF : FONT,
   fontSize: size,
   fontWeight: weight,
   letterSpacing: tracking,
@@ -75,9 +81,9 @@ const LowerThird: React.FC<{ name: string; role?: string; delay?: number; top?: 
     <div style={{ position: "absolute", left: 110, ...(top ? { top: BAR + 60 } : { bottom: BAR + 70 }), clipPath: `inset(0 ${100 - wipe}% 0 0)` }}>
       <div style={{ display: "flex", alignItems: "stretch" }}>
         <div style={{ width: 12, background: RED }} />
-        <div style={{ background: "rgba(8,8,8,0.9)", padding: "16px 30px 18px 22px" }}>
-          <div style={{ ...caps(58, 900, "0.02em"), color: "#fff" }}>{name}</div>
-          {role ? <div style={{ ...caps(24, 600, "0.22em"), color: GOLD_SOFT, marginTop: 10 }}>{role}</div> : null}
+        <div style={{ background: SLAB, padding: "16px 30px 18px 22px" }}>
+          <div style={{ ...caps(58, 900, "0.02em"), color: INKC }}>{name}</div>
+          {role ? <div style={{ ...caps(24, 600, "0.22em"), color: ACC, marginTop: 10 }}>{role}</div> : null}
         </div>
       </div>
     </div>
@@ -109,7 +115,7 @@ const Fact: React.FC<{ text: string; len: number }> = ({ text, len }) => {
       }}
     >
       <div style={{ background: RED, padding: "14px 16px", ...caps(24, 900, "0.2em"), color: "#fff", display: "flex", alignItems: "center" }}>Note</div>
-      <div style={{ background: "rgba(8,8,8,0.9)", padding: "14px 22px", ...caps(34, 800, "0.05em"), color: "#fff" }}>{text}</div>
+      <div style={{ background: SLAB, padding: "14px 22px", ...caps(34, 800, "0.05em"), color: INKC }}>{text}</div>
     </div>
   );
 };
@@ -119,8 +125,8 @@ const Stamp: React.FC<{ children: string }> = ({ children }) => {
   const frame = useCurrentFrame();
   const n = Math.round(interpolate(frame, [3, 3 + children.length * 0.7], [0, children.length], clamp));
   return (
-    <div style={{ position: "absolute", left: 110, bottom: BAR + 54, ...caps(30, 700, "0.2em"), color: "#fff", textShadow: "0 2px 14px rgba(0,0,0,0.9)" }}>
-      <span style={{ borderLeft: `6px solid ${RED}`, padding: "8px 16px", background: "rgba(8,8,8,0.78)", display: "inline-block" }}>{children.slice(0, n)}</span>
+    <div style={{ position: "absolute", left: 110, bottom: BAR + 54, ...caps(30, 700, "0.2em"), color: INKC, textShadow: PIER ? "none" : "0 2px 14px rgba(0,0,0,0.9)" }}>
+      <span style={{ borderLeft: `6px solid ${RED}`, padding: "8px 16px", background: SLAB, display: "inline-block" }}>{children.slice(0, n)}</span>
     </div>
   );
 };
@@ -217,11 +223,11 @@ const Chip: React.FC<{ src: string; name: string; idx: string; len: number }> = 
   const frame = useCurrentFrame();
   return (
     <div style={{ position: "absolute", left: 110, top: BAR + 40, display: "flex", alignItems: "stretch", opacity: interpolate(frame, [0, 5, len - 5, len], [0, 1, 1, 0], clamp), translate: `${interpolate(frame, [0, 8], [-50, 0], { ...clamp, easing: ease })}px 0px` }}>
-      <div style={{ background: "#0a0a0a", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", width: 112, height: 112 }}>
+      <div style={{ background: BG, padding: 8, display: "flex", alignItems: "center", justifyContent: "center", width: 112, height: 112 }}>
         <CanvasImage src={staticFile(src)} style={{ maxWidth: 96, maxHeight: 96, width: "auto", height: "auto" }} />
       </div>
       <div style={{ background: RED, padding: "0 20px", display: "flex", alignItems: "center", ...caps(30, 900, "0.1em"), color: "#fff" }}>{idx}</div>
-      <div style={{ background: "rgba(8,8,8,0.92)", padding: "0 30px", display: "flex", alignItems: "center", ...caps(54, 900, "0.02em"), color: "#fff" }}>{name}</div>
+      <div style={{ background: SLAB, padding: "0 30px", display: "flex", alignItems: "center", ...caps(54, 900, "0.02em"), color: INKC }}>{name}</div>
     </div>
   );
 };
@@ -256,17 +262,17 @@ const Rail: React.FC<{ i: number; year: string; place: string; len: number }> = 
 const Face: React.FC<{ s: Shot }> = ({ s }) => {
   const frame = useCurrentFrame();
   return (
-    <AbsoluteFill style={{ backgroundColor: "#060606", overflow: "hidden" }}>
-      <CanvasImage src={staticFile(s.src ?? "")} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(40px) brightness(0.3)", scale: "1.25" }} />
+    <AbsoluteFill style={{ backgroundColor: PIER ? BG : "#060606", overflow: "hidden" }}>
+      <CanvasImage src={staticFile(s.src ?? "")} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(40px) brightness(0.3)", opacity: PIER ? 0 : 1, scale: "1.25" }} />
       <div style={{ position: "absolute", left: 150, top: 110, width: 800, height: 860, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CanvasImage src={staticFile(s.src ?? "")} style={{ maxWidth: 780, maxHeight: 820, width: "auto", height: "auto", boxShadow: "0 26px 90px rgba(0,0,0,0.75)", border: s.kicker ? "14px solid #fff" : undefined, rotate: s.kicker ? `${interpolate(frame, [0, 10], [-5, -1.5], { ...clamp, easing: ease })}deg` : undefined, scale: s.kicker ? String(interpolate(frame, [0, 8], [1.12, 1], { ...clamp, easing: ease })) : undefined }} />
+        <CanvasImage src={staticFile(s.src ?? "")} style={{ maxWidth: 780, maxHeight: 820, width: "auto", height: "auto", boxShadow: "0 26px 90px rgba(0,0,0,0.75)", border: s.kicker ? `14px solid ${PIER ? "#16382b" : "#fff"}` : undefined, rotate: s.kicker ? `${interpolate(frame, [0, 10], [-5, -1.5], { ...clamp, easing: ease })}deg` : undefined, scale: s.kicker ? String(interpolate(frame, [0, 8], [1.12, 1], { ...clamp, easing: ease })) : undefined }} />
       </div>
       <div style={{ position: "absolute", left: 1030, right: 100, top: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-        {s.kicker ? <div style={{ ...caps(40, 900, "0.3em"), color: GOLD_SOFT, marginBottom: 22 }}>{s.kicker}</div> : null}
+        {s.kicker ? <div style={{ ...caps(40, 900, "0.3em"), color: ACC, marginBottom: 22 }}>{s.kicker}</div> : null}
         <div style={{ width: s.kicker ? interpolate(frame, [2, 12], [0, 260], { ...clamp, easing: ease }) : 140, height: s.kicker ? 14 : 10, background: RED, marginBottom: 26 }} />
-        <div style={{ ...caps(Math.min(s.kicker ? 190 : 140, Math.round(1150 / Math.max(5, (s.name ?? "").length))), 900, "0.01em"), color: "#fff", translate: `${interpolate(frame, [0, 8], [40, 0], { ...clamp, easing: ease })}px 0px` }}>{s.name}</div>
-        {s.role ? <div style={{ ...caps(34, 600, "0.2em"), color: GOLD_SOFT, marginTop: 22 }}>{s.role}</div> : null}
-        {s.sub ? <div style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: 42, color: "#fff", marginTop: 36, lineHeight: 1.35, opacity: interpolate(frame, s.kicker ? [6, 12] : [14, 22], [0, 1], clamp) }}>{s.sub}</div> : null}
+        <div style={{ ...caps(Math.min(s.kicker ? 190 : 140, Math.round(1150 / Math.max(5, (s.name ?? "").length))), 900, "0.01em"), color: INKC, translate: `${interpolate(frame, [0, 8], [40, 0], { ...clamp, easing: ease })}px 0px` }}>{s.name}</div>
+        {s.role ? <div style={{ ...caps(34, 600, "0.2em"), color: ACC, marginTop: 22 }}>{s.role}</div> : null}
+        {s.sub ? <div style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontSize: PIER ? 58 : 42, color: INKC, marginTop: 36, lineHeight: 1.35, opacity: interpolate(frame, s.kicker ? [6, 12] : [14, 22], [0, 1], clamp) }}>{s.sub}</div> : null}
       </div>
       {s.kicker ? <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 4], [0.6, 0], clamp) }} /> : null}
     </AbsoluteFill>
@@ -406,13 +412,13 @@ const Title: React.FC<{ s: Shot }> = ({ s }) => {
   const shake = frame < 8 ? Math.sin(frame * 2.4) * (8 - frame) * 0.9 : 0;
   const title = s.title ?? "";
   return (
-    <AbsoluteFill style={{ backgroundColor: "#000", alignItems: "center", justifyContent: "center", opacity: interpolate(frame, [durationInFrames - 5, durationInFrames], [1, 0], clamp) }}>
-      <AbsoluteFill style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(200,16,46,0.2) 0%, rgba(0,0,0,0) 70%)" }} />
-      {s.kicker ? <div style={{ ...caps(30, 700, "0.5em"), color: GOLD_SOFT, marginBottom: 30, opacity: interpolate(frame, [4, 10], [0, 1], clamp) }}>{s.kicker}</div> : null}
+    <AbsoluteFill style={{ backgroundColor: BG, alignItems: "center", justifyContent: "center", opacity: interpolate(frame, [durationInFrames - 5, durationInFrames], [1, 0], clamp) }}>
+      <AbsoluteFill style={{ background: "radial-gradient(60% 60% at 50% 50%, rgba(46,107,82,0.12) 0%, rgba(0,0,0,0) 70%)" }} />
+      {s.kicker ? <div style={{ ...caps(30, 700, "0.5em"), color: ACC, marginBottom: 30, opacity: interpolate(frame, [4, 10], [0, 1], clamp) }}>{s.kicker}</div> : null}
       <div
         style={{
           ...caps(Math.min(250, Math.round(2500 / Math.max(6, title.length))), 900, "-0.01em"),
-          color: "#fff",
+          color: INKC,
           scale: String(hit * interpolate(frame, [5, durationInFrames], [1, 1.05])),
           translate: `${shake}px 0px`,
           textAlign: "center",
@@ -422,7 +428,7 @@ const Title: React.FC<{ s: Shot }> = ({ s }) => {
         {title}
       </div>
       <div style={{ width: interpolate(frame, [5, 16], [0, 520], { ...clamp, easing: ease }), height: 12, background: RED, marginTop: 34 }} />
-      {s.sub ? <div style={{ ...caps(36, 600, "0.3em"), color: BONE, marginTop: 34, opacity: interpolate(frame, [14, 22], [0, 1], clamp) }}>{s.sub}</div> : null}
+      {s.sub ? <div style={{ ...caps(36, 600, "0.3em"), color: SUBC, marginTop: 34, opacity: interpolate(frame, [14, 22], [0, 1], clamp) }}>{s.sub}</div> : null}
       <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 4], [0.7, 0], clamp) }} />
     </AbsoluteFill>
   );
@@ -433,8 +439,8 @@ const Stat: React.FC<{ s: Shot }> = ({ s }) => {
   const frame = useCurrentFrame();
   const value = s.value ?? "";
   return (
-    <AbsoluteFill style={{ backgroundColor: "#070707", overflow: "hidden" }}>
-      <AbsoluteFill style={{ background: "linear-gradient(115deg, rgba(200,16,46,0.28) 0%, rgba(0,0,0,0) 46%)" }} />
+    <AbsoluteFill style={{ backgroundColor: PIER ? BG : "#070707", overflow: "hidden" }}>
+      <AbsoluteFill style={{ background: "linear-gradient(115deg, rgba(46,107,82,0.16) 0%, rgba(0,0,0,0) 46%)" }} />
       {s.src ? (
         <div style={{ position: "absolute", right: 150, top: 150, opacity: interpolate(frame, [3, 9], [0, 1], clamp) }}>
           <Portrait src={s.src} fit={s} w={500} h={780} />
@@ -444,7 +450,7 @@ const Stat: React.FC<{ s: Shot }> = ({ s }) => {
         <div
           style={{
             ...caps(Math.min(430, Math.round(1500 / Math.max(2, value.length))), 900, "-0.03em"),
-            color: "#fff",
+            color: INKC,
             scale: String(interpolate(frame, [0, 5], [1.35, 1], { ...clamp, easing: ease })),
             transformOrigin: "0% 60%",
           }}
@@ -452,8 +458,8 @@ const Stat: React.FC<{ s: Shot }> = ({ s }) => {
           {value}
         </div>
         <div style={{ width: interpolate(frame, [3, 12], [0, 300], { ...clamp, easing: ease }), height: 12, background: RED, margin: "26px 0" }} />
-        <div style={{ ...caps(62, 800, "0.03em"), color: "#fff", lineHeight: 1.08, opacity: interpolate(frame, [4, 9], [0, 1], clamp) }}>{s.label}</div>
-        {s.who ? <div style={{ ...caps(34, 600, "0.26em"), color: GOLD_SOFT, marginTop: 22, opacity: interpolate(frame, [8, 14], [0, 1], clamp) }}>{s.who}</div> : null}
+        <div style={{ ...caps(62, 800, "0.03em"), color: INKC, lineHeight: 1.08, opacity: interpolate(frame, [4, 9], [0, 1], clamp) }}>{s.label}</div>
+        {s.who ? <div style={{ ...caps(34, 600, "0.26em"), color: ACC, marginTop: 22, opacity: interpolate(frame, [8, 14], [0, 1], clamp) }}>{s.who}</div> : null}
       </div>
       <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 3], [0.55, 0], clamp) }} />
     </AbsoluteFill>
@@ -580,10 +586,10 @@ const Card: React.FC<{ s: Shot }> = ({ s }) => {
   const { durationInFrames } = useVideoConfig();
   const fade = interpolate(frame, [0, 6, durationInFrames - 6, durationInFrames], [0, 1, 1, 0], clamp);
   return (
-    <AbsoluteFill style={{ backgroundColor: "#000", alignItems: "center", justifyContent: "center", gap: 22, opacity: fade, padding: "0 140px" }}>
-      {s.kicker ? <div style={{ ...caps(30, 700, "0.44em"), color: GOLD_SOFT }}>{s.kicker}</div> : null}
-      {s.title ? <div style={{ ...caps(Math.min(170, Math.round(2600 / s.title.length)), 900, "0em"), color: "#fff", textAlign: "center", lineHeight: 1.05 }}>{s.title}</div> : null}
-      {s.sub ? <div style={{ ...caps(38, 600, "0.24em"), color: BONE, textAlign: "center", lineHeight: 1.4 }}>{s.sub}</div> : null}
+    <AbsoluteFill style={{ backgroundColor: BG, alignItems: "center", justifyContent: "center", gap: 22, opacity: fade, padding: "0 140px" }}>
+      {s.kicker ? <div style={{ ...caps(30, 700, "0.44em"), color: ACC }}>{s.kicker}</div> : null}
+      {s.title ? <div style={{ ...caps(Math.min(170, Math.round(2600 / s.title.length)), 900, "0em"), color: INKC, textAlign: "center", lineHeight: 1.05 }}>{s.title}</div> : null}
+      {s.sub ? <div style={{ ...caps(38, 600, "0.24em"), color: SUBC, textAlign: "center", lineHeight: 1.4 }}>{s.sub}</div> : null}
     </AbsoluteFill>
   );
 };
