@@ -15,6 +15,7 @@ import timeline from "./ten-timeline.json";
 export const TEN_DURATION = timeline.total;
 
 const BAR = 62; // slim bars: cinema without hiding heads
+const A24 = (timeline as { theme?: string }).theme === "a24"; // quiet cut: small serif on black
 const PIER = (timeline as { theme?: string }).theme === "pier"; // cream and green, after the pier mark
 const RED = PIER ? "#2e6b52" : "#c8102e";
 const BG = PIER ? "#f3eedf" : "#000";
@@ -62,10 +63,11 @@ const FACTS = ((timeline as { facts?: Array<{ text: string; from: number; len: n
 const KWS = ((timeline as { kws?: Array<{ text: string; from: number; len: number }> }).kws ?? []);
 const CHIPS = ((timeline as { chips?: Array<{ src: string; name: string; idx: string; from: number; len: number }> }).chips ?? []);
 const RAIL = ((timeline as { rail?: Array<{ i: number; year: string; place: string; from: number; len: number }> }).rail ?? []);
+const CAPS = ((timeline as { caps?: Array<{ text: string; from: number; len: number }> }).caps ?? []);
 const DUCK = (timeline as { duck?: number }).duck ?? 0.26;
 
 const caps = (size: number, weight = 800, tracking = "0.06em"): React.CSSProperties => ({
-  fontFamily: PIER ? SERIF : FONT,
+  fontFamily: PIER || A24 ? SERIF : FONT,
   fontSize: size,
   fontWeight: weight,
   letterSpacing: tracking,
@@ -178,21 +180,21 @@ const Whole: React.FC<{ src: string }> = ({ src }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   return (
-    <AbsoluteFill style={{ backgroundColor: "#060606", overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
-      <CanvasImage src={staticFile(src)} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(36px) brightness(0.42) saturate(0.9)", scale: "1.2" }} />
+    <AbsoluteFill style={{ backgroundColor: A24 ? "#000" : "#060606", overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
+      <CanvasImage src={staticFile(src)} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(36px) brightness(0.42) saturate(0.9)", scale: "1.2", opacity: A24 ? 0 : 1 }} />
       <CanvasImage
         src={staticFile(src)}
         style={{
           maxWidth: 1800,
-          maxHeight: 940,
+          maxHeight: A24 ? 956 : 940,
           width: "auto",
           height: "auto",
-          boxShadow: "0 26px 90px rgba(0,0,0,0.75)",
+          boxShadow: A24 ? "none" : "0 26px 90px rgba(0,0,0,0.75)",
           filter: "contrast(1.06) saturate(1.04)",
-          scale: String(interpolate(frame, [0, durationInFrames], [1.0, 1.045])),
+          scale: String(interpolate(frame, [0, durationInFrames], A24 ? [1.0, 1.03] : [1.0, 1.045])),
         }}
       />
-      <AbsoluteFill style={{ backgroundColor: "#fff", opacity: interpolate(frame, [0, 3], [0.35, 0], clamp) }} />
+      <AbsoluteFill style={{ backgroundColor: "#fff", opacity: A24 ? 0 : interpolate(frame, [0, 3], [0.35, 0], clamp) }} />
     </AbsoluteFill>
   );
 };
@@ -253,6 +255,57 @@ const Rail: React.FC<{ i: number; year: string; place: string; len: number }> = 
             <div style={{ ...caps(24, 800, "0.2em"), color: k === i ? "#fff" : "rgba(255,255,255,0.5)", marginTop: 10 }}>{`’${y}`}</div>
           </div>
         ))}
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+const WARM = "#efe9dc";
+/** Quiet cut: a line of plain type on black, held. */
+const QuietCard: React.FC<{ s: Shot }> = ({ s }) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  const fade = interpolate(frame, [0, 14, durationInFrames - 12, durationInFrames], [0, 1, 1, 0], clamp);
+  const big = (s.title ?? "").length <= 26;
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#000", alignItems: "center", justifyContent: "center", gap: 30, opacity: fade, padding: "0 260px" }}>
+      {s.kicker ? <div style={{ fontFamily: SERIF, fontSize: 30, letterSpacing: "0.42em", textTransform: "uppercase", color: "#9c937f" }}>{s.kicker}</div> : null}
+      {s.title ? (
+        <div style={{ fontFamily: SERIF, fontSize: big ? 92 : 58, fontWeight: 500, letterSpacing: big ? "0.16em" : "0.01em", textTransform: big ? "uppercase" : "none", color: WARM, textAlign: "center", lineHeight: 1.35 }}>{s.title}</div>
+      ) : null}
+      {s.sub ? <div style={{ fontFamily: SERIF, fontSize: 40, fontStyle: "italic", color: "#b9ad94", textAlign: "center", lineHeight: 1.4 }}>{s.sub}</div> : null}
+    </AbsoluteFill>
+  );
+};
+
+/** Quiet cut: the cast, one at a time, all the same size. */
+const QuietFace: React.FC<{ s: Shot }> = ({ s }) => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#000", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 90, opacity: interpolate(frame, [0, 5], [0, 1], clamp) }}>
+        <div style={{ width: 560, height: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <CanvasImage src={staticFile(s.src ?? "")} style={{ width: 560, height: 700, objectFit: "contain" }} />
+        </div>
+        <div style={{ width: 820 }}>
+          <div style={{ fontFamily: SERIF, fontSize: 26, letterSpacing: "0.4em", color: "#9c937f" }}>{s.kicker}</div>
+          <div style={{ fontFamily: SERIF, fontSize: 96, fontWeight: 600, color: WARM, marginTop: 18, lineHeight: 1.05 }}>{s.name}</div>
+          <div style={{ fontFamily: SERIF, fontSize: 30, letterSpacing: "0.3em", textTransform: "uppercase", color: "#b9ad94", marginTop: 16 }}>{s.role}</div>
+          {s.sub ? <div style={{ fontFamily: SERIF, fontSize: 40, fontStyle: "italic", color: WARM, marginTop: 34, lineHeight: 1.35 }}>{s.sub}</div> : null}
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+/** Quiet cut: a caption, set low and small, the way a subtitle sits. */
+const Cap: React.FC<{ text: string; len: number }> = ({ text, len }) => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ opacity: interpolate(frame, [0, 8, len - 8, len], [0, 1, 1, 0], clamp) }}>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 380, background: "linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.78) 45%, rgba(0,0,0,0) 100%)" }} />
+      <div style={{ position: "absolute", left: 220, right: 220, bottom: BAR + 58, textAlign: "center", fontFamily: SERIF, fontSize: 46, fontStyle: "italic", color: WARM, lineHeight: 1.3, textShadow: "0 2px 14px rgba(0,0,0,0.95)" }}>
+        {text}
       </div>
     </AbsoluteFill>
   );
@@ -660,7 +713,7 @@ export const Ten: React.FC = () => {
           ) : s.t === "m" ? (
             <Whole src={s.src ?? ""} />
           ) : s.t === "face" ? (
-            <Face s={s} />
+            A24 ? <QuietFace s={s} /> : <Face s={s} />
           ) : s.t === "logo" ? (
             <Logo s={s} />
           ) : s.t === "ps" ? (
@@ -674,13 +727,13 @@ export const Ten: React.FC = () => {
           ) : s.t === "tri" ? (
             <Tri srcs={s.srcs ?? []} />
           ) : s.t === "title" ? (
-            <Title s={s} />
+            A24 ? <QuietCard s={s} /> : <Title s={s} />
           ) : s.t === "stat" ? (
             <Stat s={s} />
           ) : s.t === "city" ? (
             <City s={s} />
           ) : s.t === "c" ? (
-            <Card s={s} />
+            A24 ? <QuietCard s={s} /> : <Card s={s} />
           ) : s.t === "sheet" ? (
             <Sheet />
           ) : (
@@ -710,6 +763,11 @@ export const Ten: React.FC = () => {
       {CHIPS.map((c) => (
         <Sequence key={`chip-${c.from}`} name={`Chip ${c.name}`} from={c.from} durationInFrames={c.len} layout="none">
           <Chip src={c.src} name={c.name} idx={c.idx} len={c.len} />
+        </Sequence>
+      ))}
+      {CAPS.map((c) => (
+        <Sequence key={`cap-${c.from}`} name={`Caption ${c.text}`} from={c.from} durationInFrames={c.len}>
+          <Cap text={c.text} len={c.len} />
         </Sequence>
       ))}
       {LTS.map((l) => (
