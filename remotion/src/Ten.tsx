@@ -192,10 +192,10 @@ const Whole: React.FC<{ src: string }> = ({ src }) => {
       <CanvasImage
         src={staticFile(src)}
         style={{
-          ...(A24 ? { width: 1800, height: 956, objectFit: "contain" as const } : { maxWidth: 1800, maxHeight: 940, width: "auto", height: "auto" }),
+          ...(A24 ? { width: 1920, height: 956, objectFit: "contain" as const } : { maxWidth: 1800, maxHeight: 940, width: "auto", height: "auto" }),
           boxShadow: A24 ? "none" : "0 26px 90px rgba(0,0,0,0.75)",
           filter: "contrast(1.06) saturate(1.04)",
-          scale: String(interpolate(frame, [0, durationInFrames], A24 ? [1.0, 1.03] : [1.0, 1.045])),
+          scale: String(interpolate(frame, [0, durationInFrames], A24 ? [1.0, 1.06] : [1.0, 1.045])),
         }}
       />
       <AbsoluteFill style={{ backgroundColor: "#fff", opacity: A24 ? 0 : interpolate(frame, [0, 3], [0.35, 0], clamp) }} />

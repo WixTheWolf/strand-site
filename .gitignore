@@ -65,3 +65,6 @@ remotion/out
 /remotion/public/f/
 /remotion/scripts/prep_a24.py
 /remotion/scripts/build_a24.py
+/remotion/public/c/
+/remotion/scripts/prep_cine.py
+/remotion/scripts/build_cine.py
