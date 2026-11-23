@@ -265,7 +265,8 @@ const WARM = "#efe9dc";
 const QuietCard: React.FC<{ s: Shot }> = ({ s }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const fade = interpolate(frame, [0, 14, durationInFrames - 12, durationInFrames], [0, 1, 1, 0], clamp);
+  const edge = Math.max(1, Math.min(14, Math.floor(durationInFrames / 3)));
+  const fade = interpolate(frame, [0, edge, durationInFrames - edge, durationInFrames], [0, 1, 1, 0], clamp);
   const big = (s.title ?? "").length <= 26;
   return (
     <AbsoluteFill style={{ backgroundColor: "#000", alignItems: "center", justifyContent: "center", gap: 30, opacity: fade, padding: "0 260px" }}>
