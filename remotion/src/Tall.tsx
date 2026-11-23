@@ -78,7 +78,7 @@ const Logo: React.FC<{ s: Shot }> = ({ s }) => {
 /** The score sits low under voices and real sound, and comes up between them. */
 const musicVolume = (frame: number, seg: (typeof MUSIC)[number]) => {
   let duck = 1;
-  for (const a of VOICE) duck = Math.min(duck, interpolate(frame, [a.at - 12, a.at, a.at + a.len, a.at + a.len + 18], [1, 0.32, 0.32, 1], clamp));
+  for (const a of VOICE) duck = Math.min(duck, interpolate(frame, [a.at - 12, a.at, a.at + a.len, a.at + a.len + 18], [1, 0.5, 0.5, 1], clamp));
   for (const [a, b, level] of HUSH) duck = Math.min(duck, interpolate(frame, [a - 10, a, b, b + 16], [1, level, level, 1], clamp));
   const edge = interpolate(frame, [seg.from, seg.from + 20, seg.to - 36, seg.to], [0, 1, 1, 0], clamp);
   return seg.vol * duck * edge;
