@@ -68,3 +68,7 @@ remotion/out
 /remotion/public/c/
 /remotion/scripts/prep_cine.py
 /remotion/scripts/build_cine.py
+/remotion/src/tall-timeline.json
+/remotion/public/t/
+/remotion/scripts/prep_tall.py
+/remotion/scripts/build_tall.py
