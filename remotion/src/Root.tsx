@@ -5,12 +5,18 @@ import { LipOut } from "./LipOut";
 import { Recap2026 } from "./Recap2026";
 import { RecapV2 } from "./RecapV2";
 import { Teaser2027 } from "./Teaser2027";
+import { DECADE_DURATION, Decade } from "./Decade";
+import { TEN_DURATION, Ten } from "./Ten";
+import { TALL_DURATION, Tall } from "./Tall";
 import { FILM_DURATION, StrandFilm } from "./StrandFilm";
 import { TeeStrike } from "./TeeStrike";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition id="StrandTall" component={Tall} durationInFrames={TALL_DURATION} fps={30} width={1080} height={1920} />
+      <Composition id="StrandTen" component={Ten} durationInFrames={TEN_DURATION} fps={30} width={1920} height={1080} />
+      <Composition id="StrandDecade" component={Decade} durationInFrames={DECADE_DURATION} fps={30} width={1920} height={1080} />
       <Composition
         id="StrandFilm"
         component={StrandFilm}

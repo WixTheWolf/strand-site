@@ -44,3 +44,31 @@ next-env.d.ts
 # remotion video project
 remotion/node_modules
 remotion/out
+
+# Drew's recordings and the members-only film stay out of this public repo
+/public/songs/
+/public/films/strand-ten-years*
+/remotion/public/ten/o[1-4].mp3
+/remotion/public/ten/song[1-4].mp3
+/remotion/public/ten/drew*.mp4
+/remotion/public/ten/song5.mp3
+/remotion/public/ten/drew0.mp4
+/remotion/scripts/*.local.json
+/remotion/src/ten-timeline.json
+# Raw trip footage and photo selects for the private film stay out of this public repo
+/remotion/public/mv/
+/remotion/public/m/
+/remotion/scripts/build_movie.py
+/remotion/scripts/build_five.py
+/remotion/public/logos/
+/remotion/public/ten/vo/
+/remotion/public/f/
+/remotion/scripts/prep_a24.py
+/remotion/scripts/build_a24.py
+/remotion/public/c/
+/remotion/scripts/prep_cine.py
+/remotion/scripts/build_cine.py
+/remotion/src/tall-timeline.json
+/remotion/public/t/
+/remotion/scripts/prep_tall.py
+/remotion/scripts/build_tall.py

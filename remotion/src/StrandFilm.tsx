@@ -28,10 +28,10 @@ loadFont({
   weight: "400 900",
   style: "italic",
 });
-const SERIF = '"Playfair Display", Georgia, serif';
+export const SERIF = '"Playfair Display", Georgia, serif';
 
 export const FILM_DURATION = 2760;
-const LETTERBOX = 138; // 2.39:1 inside 16:9
+export const LETTERBOX = 138; // 2.39:1 inside 16:9
 // The score: lone hits at 0s, 8s and 12s, then a 120 BPM groove from 14s
 // (a beat is 15 frames, a bar 60). Cuts sit on those beats.
 const TITLE_HIT = 360; // 12s
@@ -41,7 +41,7 @@ const CART_HUSH = [1215, 1290]; // record scratch: "We don't talk about the cart
 const SILENCE = [2310, 2400]; // the score drops out for "He declined to comment."
 const FINAL_HIT = 2520; // 84s — "2027"
 
-const ease = Easing.out(Easing.cubic);
+export const ease = Easing.out(Easing.cubic);
 
 /* ------------------------------------------------------------------ */
 /* Narration: clip, start frame, length in frames                      */
@@ -93,7 +93,7 @@ const scoreVolume = (frame: number) => {
 /* Documentary furniture                                               */
 /* ------------------------------------------------------------------ */
 
-const Caps: React.FC<{
+export const Caps: React.FC<{
   children: React.ReactNode;
   size?: number;
   color?: string;
@@ -117,7 +117,7 @@ const Caps: React.FC<{
 );
 
 /** Fade and rise in — the film's default text entrance. */
-const Rise: React.FC<{ children: React.ReactNode; delay?: number; distance?: number }> = ({
+export const Rise: React.FC<{ children: React.ReactNode; delay?: number; distance?: number }> = ({
   children,
   delay = 0,
   distance = 26,
@@ -136,7 +136,7 @@ const Rise: React.FC<{ children: React.ReactNode; delay?: number; distance?: num
 };
 
 /** Typewriter stamp for places and dates. */
-const Stamp: React.FC<{ children: string; delay?: number; color?: string }> = ({
+export const Stamp: React.FC<{ children: string; delay?: number; color?: string }> = ({
   children,
   delay = 0,
   color = "rgba(244,242,234,0.8)",
@@ -339,7 +339,7 @@ const Scramble: React.FC<{ length: number; seed?: string; to?: string; resolveAt
 /* Scenes                                                              */
 /* ------------------------------------------------------------------ */
 
-const FootageScene: React.FC<{
+export const FootageScene: React.FC<{
   src: string;
   trimBefore?: number;
   playbackRate?: number;
@@ -549,7 +549,7 @@ const PairingsCard: React.FC = () => {
 };
 
 /** A rubber-stamp slam for the one thing the Commissioner will say. */
-const Stamped: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const Stamped: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const frame = useCurrentFrame();
   return (
     <div
@@ -582,7 +582,7 @@ const EDITIONS = [
   { year: 2026, place: "Brewster, Washington" },
 ];
 
-const Ledger: React.FC = () => {
+export const Ledger: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ backgroundColor: INK }}>
@@ -735,7 +735,7 @@ const TenYears: React.FC = () => {
   );
 };
 
-const Finale: React.FC = () => {
+export const Finale: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
@@ -812,7 +812,7 @@ const Burst: React.FC<{ photos: Array<string | [string, string]>; per: number }>
   );
 };
 
-const FIELD: Array<[string, string]> = [
+export const FIELD: Array<[string, string]> = [
   ["J-BONE", "j-bone.jpg"],
   ["WIX", "wix.jpg"],
   ["FRED", "fred.jpg"],
@@ -978,7 +978,7 @@ const Triptych: React.FC<{ panels: Array<{ src: string; trimBefore?: number; ox?
 };
 
 /** A deadpan label for whoever is on screen. */
-const Tag: React.FC<{ children: string; delay?: number }> = ({ children, delay = 4 }) => {
+export const Tag: React.FC<{ children: string; delay?: number }> = ({ children, delay = 4 }) => {
   const frame = useCurrentFrame();
   return (
     <div
@@ -1004,7 +1004,7 @@ const Tag: React.FC<{ children: string; delay?: number }> = ({ children, delay =
 };
 
 /** One big word, slammed on and gone. */
-const WordSlam: React.FC<{ children: string }> = ({ children }) => {
+export const WordSlam: React.FC<{ children: string }> = ({ children }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   return (
@@ -1012,7 +1012,7 @@ const WordSlam: React.FC<{ children: string }> = ({ children }) => {
       <div
         style={{
           fontFamily: SERIF,
-          fontSize: 190,
+          fontSize: Math.min(190, Math.round(3100 / children.length)),
           fontWeight: 900,
           fontStyle: "italic",
           color: BONE,
@@ -1107,7 +1107,7 @@ const shake = (frame: number, at: number, power: number) => {
   return [Math.sin(t * 2.9) * d, Math.cos(t * 3.7) * d * 0.7];
 };
 
-const HitFlash: React.FC<{ at: number; strength: number }> = ({ at, strength }) => {
+export const HitFlash: React.FC<{ at: number; strength: number }> = ({ at, strength }) => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill

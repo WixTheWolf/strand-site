@@ -1,0 +1,129 @@
+{
+ "vo": [],
+ "chapters": [
+  {
+   "key": "18",
+   "year": 2018,
+   "place": "Palm Springs, California",
+   "num": "I",
+   "from": 960,
+   "len": 480,
+   "b": 0,
+   "c": 200,
+   "vfrom": 336,
+   "vlen": 90
+  },
+  {
+   "key": "19",
+   "year": 2019,
+   "place": "Indio, California",
+   "num": "II",
+   "from": 1440,
+   "len": 480,
+   "b": 0,
+   "c": 200,
+   "vfrom": 426,
+   "vlen": 0
+  },
+  {
+   "key": "20",
+   "year": 2020,
+   "place": "Palm Desert, California",
+   "num": "III",
+   "from": 1920,
+   "len": 300,
+   "b": 0,
+   "c": 200,
+   "vfrom": 246,
+   "vlen": 0
+  },
+  {
+   "key": "21",
+   "year": 2021,
+   "place": "La Quinta, California",
+   "num": "IV",
+   "from": 2220,
+   "len": 480,
+   "b": 0,
+   "c": 200,
+   "vfrom": 336,
+   "vlen": 90
+  },
+  {
+   "key": "22",
+   "year": 2022,
+   "place": "Rams Hill, California",
+   "num": "V",
+   "from": 2700,
+   "len": 420,
+   "b": 0,
+   "c": 200,
+   "vfrom": 366,
+   "vlen": 0
+  },
+  {
+   "key": "23",
+   "year": 2023,
+   "place": "St. George, Utah",
+   "num": "VI",
+   "from": 3120,
+   "len": 600,
+   "b": 0,
+   "c": 200,
+   "vfrom": 156,
+   "vlen": 390
+  },
+  {
+   "key": "24",
+   "year": 2024,
+   "place": "Ojai, California",
+   "num": "VII",
+   "from": 3720,
+   "len": 600,
+   "b": 0,
+   "c": 200,
+   "vfrom": 156,
+   "vlen": 390
+  },
+  {
+   "key": "25",
+   "year": 2025,
+   "place": "Monterey, California",
+   "num": "VIII",
+   "from": 4320,
+   "len": 600,
+   "b": 0,
+   "c": 200,
+   "vfrom": 156,
+   "vlen": 390
+  },
+  {
+   "key": "26",
+   "year": 2026,
+   "place": "Brewster, Washington",
+   "num": "IX",
+   "from": 4920,
+   "len": 600,
+   "b": 0,
+   "c": 200,
+   "vfrom": 150,
+   "vlen": 396
+  }
+ ],
+ "intro": 960,
+ "roll": [
+  5520,
+  5820
+ ],
+ "ledger": [
+  5820,
+  6000
+ ],
+ "eyes": [
+  6000,
+  6120
+ ],
+ "finalHit": 6120,
+ "tagline": 6300,
+ "total": 6480
+}
