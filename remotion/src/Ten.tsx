@@ -125,6 +125,13 @@ const Fact: React.FC<{ text: string; len: number }> = ({ text, len }) => {
 /** Location / date stamp, bottom left, like archive footage in a doc. */
 const Stamp: React.FC<{ children: string }> = ({ children }) => {
   const frame = useCurrentFrame();
+  if (A24) {
+    return (
+      <div style={{ position: "absolute", left: 96, bottom: BAR + 40, fontFamily: SERIF, fontSize: 34, letterSpacing: "0.3em", color: "#efe9dc", opacity: 0.86 * interpolate(frame, [4, 16], [0, 1], clamp), textShadow: "0 1px 10px rgba(0,0,0,0.9)" }}>
+        {children}
+      </div>
+    );
+  }
   const n = Math.round(interpolate(frame, [3, 3 + children.length * 0.7], [0, children.length], clamp));
   return (
     <div style={{ position: "absolute", left: 110, bottom: BAR + 54, ...caps(30, 700, "0.2em"), color: INKC, textShadow: PIER ? "none" : "0 2px 14px rgba(0,0,0,0.9)" }}>
@@ -185,10 +192,7 @@ const Whole: React.FC<{ src: string }> = ({ src }) => {
       <CanvasImage
         src={staticFile(src)}
         style={{
-          maxWidth: 1800,
-          maxHeight: A24 ? 956 : 940,
-          width: "auto",
-          height: "auto",
+          ...(A24 ? { width: 1800, height: 956, objectFit: "contain" as const } : { maxWidth: 1800, maxHeight: 940, width: "auto", height: "auto" }),
           boxShadow: A24 ? "none" : "0 26px 90px rgba(0,0,0,0.75)",
           filter: "contrast(1.06) saturate(1.04)",
           scale: String(interpolate(frame, [0, durationInFrames], A24 ? [1.0, 1.03] : [1.0, 1.045])),
@@ -270,7 +274,7 @@ const QuietCard: React.FC<{ s: Shot }> = ({ s }) => {
   const big = (s.title ?? "").length <= 26;
   return (
     <AbsoluteFill style={{ backgroundColor: "#000", alignItems: "center", justifyContent: "center", gap: 30, opacity: fade, padding: "0 260px" }}>
-      {s.kicker ? <div style={{ fontFamily: SERIF, fontSize: 30, letterSpacing: "0.42em", textTransform: "uppercase", color: "#9c937f" }}>{s.kicker}</div> : null}
+      {s.kicker ? <div style={{ fontFamily: SERIF, fontSize: 42, letterSpacing: "0.42em", textTransform: "uppercase", color: "#b9ad94" }}>{s.kicker}</div> : null}
       {s.title ? (
         <div style={{ fontFamily: SERIF, fontSize: big ? 92 : 58, fontWeight: 500, letterSpacing: big ? "0.16em" : "0.01em", textTransform: big ? "uppercase" : "none", color: WARM, textAlign: "center", lineHeight: 1.35 }}>{s.title}</div>
       ) : null}
